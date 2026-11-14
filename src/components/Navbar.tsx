@@ -92,7 +92,7 @@ export default function Navbar() {
             <Link
               href="/"
               className="group flex items-center gap-3 focus:outline-none"
-              aria-label="BUILD CLOTHING Homepage"
+              aria-label="BUILD Homepage"
             >
               {/* Premium Vector Monogram Emblem */}
               <div className="w-8 h-8 rounded-[2px] bg-[#151515] flex items-center justify-center shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105">
@@ -113,9 +113,9 @@ export default function Navbar() {
                 </svg>
               </div>
 
-              {/* Brand Name Typography */}
-              <span className="font-display text-2xl sm:text-[26px] tracking-wider text-[#151515] uppercase font-black leading-none transition-colors group-hover:text-black">
-                BUILD CLOTHING
+              {/* Brand Name Typography - BUILD ONLY */}
+              <span className="font-display text-2xl sm:text-[28px] tracking-wider text-[#151515] uppercase font-black leading-none transition-colors group-hover:text-black">
+                BUILD
               </span>
             </Link>
           </div>
@@ -278,7 +278,7 @@ export default function Navbar() {
                     </svg>
                   </div>
                   <span className="font-display text-2xl font-black tracking-wider text-[#151515] uppercase">
-                    BUILD CLOTHING
+                    BUILD
                   </span>
                 </div>
                 <button
