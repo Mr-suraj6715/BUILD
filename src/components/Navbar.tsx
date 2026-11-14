@@ -84,20 +84,21 @@ export default function Navbar() {
             : "bg-[#F5F3EE] border-b border-[#E8E5DE]"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <div className="w-full max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 sm:gap-6">
           {/* ======================================================== */}
           {/* LEFT SECTION — BRAND IDENTITY                            */}
+          {/* Prominent, enlarged monogram + brand name                */}
           {/* ======================================================== */}
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <Link
               href="/"
-              className="group flex items-center gap-3 focus:outline-none"
+              className="group flex items-center gap-3 sm:gap-3.5 focus:outline-none"
               aria-label="BUILD Homepage"
             >
-              {/* Premium Vector Monogram Emblem */}
-              <div className="w-8 h-8 rounded-[2px] bg-[#151515] flex items-center justify-center shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105">
+              {/* Premium Vector Monogram Emblem (+25% to 30% larger) */}
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[3px] bg-[#151515] flex items-center justify-center shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105">
                 <svg
-                  className="w-5 h-5"
+                  className="w-6 h-6 sm:w-7 sm:h-7"
                   viewBox="0 0 44 44"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -113,8 +114,8 @@ export default function Navbar() {
                 </svg>
               </div>
 
-              {/* Brand Name Typography - BUILD ONLY */}
-              <span className="font-display text-2xl sm:text-[28px] tracking-wider text-[#151515] uppercase font-black leading-none transition-colors group-hover:text-black">
+              {/* Brand Name Typography - BUILD (+30% larger, condensed & bold) */}
+              <span className="font-display text-3xl sm:text-[34px] tracking-[0.02em] text-[#151515] uppercase font-bold leading-none transition-colors group-hover:text-black">
                 BUILD
               </span>
             </Link>
@@ -122,9 +123,10 @@ export default function Navbar() {
 
           {/* ======================================================== */}
           {/* CENTER SECTION — MAIN NAVIGATION                         */}
+          {/* Compact, balanced spacing, uppercase streetwear style    */}
           {/* ======================================================== */}
           <nav
-            className="hidden lg:flex items-center space-x-7 xl:space-x-8"
+            className="hidden lg:flex items-center gap-5 xl:gap-7"
             aria-label="Main Navigation"
           >
             {navLinks.map((link) => {
@@ -133,17 +135,17 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-[12px] uppercase font-semibold tracking-[0.16em] transition-colors relative py-1.5 flex items-center gap-1.5 focus:outline-none ${
+                  className={`text-[12px] xl:text-[13px] uppercase font-bold tracking-[0.14em] transition-colors relative py-1.5 flex items-center gap-1.5 focus:outline-none ${
                     active
                       ? "text-[#151515]"
-                      : "text-[#151515]/75 hover:text-[#151515]"
+                      : "text-[#151515]/70 hover:text-[#151515]"
                   } after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#151515] ${
                     active ? "after:scale-x-100" : "after:scale-x-0"
                   } hover:after:scale-x-100 after:transition-transform after:duration-200`}
                 >
                   <span>{link.name}</span>
                   {link.badge && (
-                    <span className="bg-[#D8FF36] text-[#151515] font-mono text-[9px] px-1.5 py-0.5 font-bold uppercase tracking-wider rounded-[2px] shadow-xs">
+                    <span className="bg-[#D8FF36] text-[#151515] font-mono text-[9px] px-1.5 py-0.5 font-black uppercase tracking-wider rounded-[2px] shadow-xs">
                       {link.badge}
                     </span>
                   )}
@@ -154,9 +156,10 @@ export default function Navbar() {
 
           {/* ======================================================== */}
           {/* RIGHT SECTION — ACTION ICONS                             */}
-          {/* Exact order: Search, Account, Shopping Bag / Cart        */}
+          {/* Exact sequence: Search, Account, Shopping Bag / Cart     */}
+          {/* Compact spacing, vertically centered                     */}
           {/* ======================================================== */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* 1. Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
@@ -164,7 +167,7 @@ export default function Navbar() {
               aria-label="Search Catalog"
               aria-expanded={searchOpen}
             >
-              <Search className="w-5 h-5" strokeWidth={1.75} />
+              <Search className="w-5 h-5" strokeWidth={1.8} />
             </button>
 
             {/* 2. Account */}
@@ -173,7 +176,7 @@ export default function Navbar() {
               className="p-2 text-[#151515] hover:text-black transition-colors rounded-full hover:bg-[#E8E5DE]/60 focus:outline-none"
               aria-label={user ? `Account (${user.name})` : "Account Login"}
             >
-              <User className="w-5 h-5" strokeWidth={1.75} />
+              <User className="w-5 h-5" strokeWidth={1.8} />
             </Link>
 
             {/* 3. Shopping Bag / Cart */}
@@ -182,7 +185,7 @@ export default function Navbar() {
               className="relative p-2 text-[#151515] hover:text-black transition-colors rounded-full hover:bg-[#E8E5DE]/60 focus:outline-none"
               aria-label={`Shopping Bag (${totalItems} items)`}
             >
-              <ShoppingBag className="w-5 h-5" strokeWidth={1.75} />
+              <ShoppingBag className="w-5 h-5" strokeWidth={1.8} />
               {totalItems > 0 && (
                 <span className="absolute top-1 right-1 bg-[#151515] text-[#D8FF36] text-[10px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center leading-none">
                   {totalItems}
@@ -193,10 +196,10 @@ export default function Navbar() {
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 text-[#151515] hover:text-black lg:hidden rounded-full hover:bg-[#E8E5DE]/60 focus:outline-none"
+              className="p-2 text-[#151515] hover:text-black lg:hidden rounded-full hover:bg-[#E8E5DE]/60 focus:outline-none ml-0.5"
               aria-label="Open Mobile Menu"
             >
-              <Menu className="w-6 h-6" strokeWidth={1.75} />
+              <Menu className="w-6 h-6" strokeWidth={1.8} />
             </button>
           </div>
         </div>
@@ -260,13 +263,14 @@ export default function Navbar() {
             <div>
               {/* Header with Monogram and Close Button */}
               <div className="flex items-center justify-between pb-6 border-b border-[#E8E5DE]">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-[2px] bg-[#151515] flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-[3px] bg-[#151515] flex items-center justify-center shrink-0 shadow-xs">
                     <svg
-                      className="w-4 h-4"
+                      className="w-5.5 h-5.5"
                       viewBox="0 0 44 44"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
                     >
                       <path
                         fillRule="evenodd"
@@ -277,7 +281,7 @@ export default function Navbar() {
                       <rect x="33" y="9" width="4" height="4" fill="#D8FF36" />
                     </svg>
                   </div>
-                  <span className="font-display text-2xl font-black tracking-wider text-[#151515] uppercase">
+                  <span className="font-display text-2xl sm:text-3xl font-bold tracking-[0.02em] text-[#151515] uppercase leading-none">
                     BUILD
                   </span>
                 </div>
