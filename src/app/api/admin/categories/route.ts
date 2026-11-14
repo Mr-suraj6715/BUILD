@@ -62,7 +62,7 @@ export async function POST(request: Request) {
           name,
           slug,
           description: description || null,
-          image: image || "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
+          image: image || "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=2400&q=95",
           badge: badge || "FEATURED CAPSULE",
           isFeatured: isFeatured ?? true,
         },
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
           name,
           slug,
           description: description || null,
-          image: image || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+          image: image || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
         },
       });
       return NextResponse.json({ success: true, item: category });

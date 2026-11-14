@@ -19,7 +19,7 @@ export default function DropCountdown() {
     subtitle: "STRICTLY LIMITED TO 300 NUMBERED PIECES",
     description: "Experimental boxy silhouettes crafted with 260 GSM Japanese combed cotton, industrial high-density rubberized typography, and custom distressed wash.",
     targetDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1200&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95",
     badge: "EXCLUSIVE DROP",
   });
 
@@ -44,7 +44,7 @@ export default function DropCountdown() {
             subtitle: data.dropCountdown.subtitle || "LIMITED PIECES WORLDWIDE",
             description: data.dropCountdown.description || "",
             targetDate: data.dropCountdown.targetDate,
-            imageUrl: data.dropCountdown.imageUrl || "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1200&q=80",
+            imageUrl: data.dropCountdown.imageUrl || "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95",
             badge: data.dropCountdown.badge || "NEXT DROP",
           });
         }

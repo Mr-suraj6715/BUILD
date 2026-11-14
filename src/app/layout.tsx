@@ -8,7 +8,7 @@ import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "BUILD CLOTHING | Premium Gen Z Streetwear & Graphic Apparel",
+  title: "BUILD  | Premium Gen Z Streetwear & Graphic Apparel",
   description:
     "Premium independent streetwear label. Engineered boxy silhouettes, 240+ GSM heavyweight cotton, original anime & cyberpunk graphic drops. Built Different.",
   keywords: [

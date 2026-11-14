@@ -57,9 +57,14 @@ function download(filename, url) {
 async function run() {
   console.log(`Downloading ${Object.keys(images).length} assets into ${targetDir}...`);
   for (const [filename, url] of Object.entries(images)) {
-    process.stdout.write(`Downloading ${filename}... `);
+    if (filename === 'logo.png') {
+      console.log('Skipping logo.png (using vector logo.svg)');
+      continue;
+    }
+    const highResUrl = url.includes('lh3.googleusercontent.com') && !url.includes('=s') ? `${url}=s0` : url;
+    process.stdout.write(`Downloading ${filename} (high-res)... `);
     try {
-      await download(filename, url);
+      await download(filename, highResUrl);
       console.log('DONE');
     } catch (e) {
       console.log('FAIL:', e.message);

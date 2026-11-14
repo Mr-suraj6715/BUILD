@@ -100,7 +100,7 @@ async function main() {
       subtitle: "STRICTLY LIMITED TO 300 NUMBERED PIECES",
       description: "Experimental boxy silhouettes crafted with 260 GSM Japanese combed cotton, industrial high-density rubberized typography, and custom distressed wash.",
       targetDate: futureDate,
-      imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1400&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95",
       badge: "EXCLUSIVE DROP",
       isActive: true,
     },
@@ -112,7 +112,7 @@ async function main() {
       name: "ALL T-SHIRTS",
       slug: "all-t-shirts",
       description: "The complete archive of heavyweight, graphic, minimal, and oversized streetwear tees.",
-      image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80",
+      image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
     },
   });
 
@@ -332,9 +332,9 @@ async function main() {
       categoryId: catOversized.id,
       collectionId: colGraphicUniverse.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80", alt: "Neo Tokyo Front Angle", isPrimary: true },
-        { url: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80", alt: "Neo Tokyo Detail Print", isPrimary: false },
-        { url: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80", alt: "Neo Tokyo Model Look", isPrimary: false },
+        { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95", alt: "Neo Tokyo Front Angle", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=2400&q=95", alt: "Neo Tokyo Detail Print", isPrimary: false },
+        { url: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=2400&q=95", alt: "Neo Tokyo Model Look", isPrimary: false },
       ],
       colors: [
         { name: "Washed Black", hex: "#151515" },
@@ -359,8 +359,8 @@ async function main() {
       categoryId: catOversized.id,
       collectionId: colOversizedEdit.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80", alt: "Dystopian Architect Tee", isPrimary: true },
-        { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80", alt: "Back Typography Angle", isPrimary: false },
+        { url: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95", alt: "Dystopian Architect Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=2400&q=95", alt: "Back Typography Angle", isPrimary: false },
       ],
       colors: [
         { name: "Acid Charcoal", hex: "#222222" },
@@ -385,8 +385,8 @@ async function main() {
       categoryId: catLimited.id,
       collectionId: colLimitedDrops.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80", alt: "Kaiju Protocol Tee Front", isPrimary: true },
-        { url: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=1000&q=80", alt: "Kaiju Protocol Tee Back", isPrimary: false },
+        { url: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=2400&q=95", alt: "Kaiju Protocol Tee Front", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=2400&q=95", alt: "Kaiju Protocol Tee Back", isPrimary: false },
       ],
       colors: [
         { name: "Pitch Black", hex: "#101010" },
@@ -411,7 +411,7 @@ async function main() {
       categoryId: catGraphic.id,
       collectionId: colGraphicUniverse.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80", alt: "Chromatic Chaos Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=2400&q=95", alt: "Chromatic Chaos Tee", isPrimary: true },
       ],
       colors: [
         { name: "Moss Green", hex: "#2E3A2F" },
@@ -436,7 +436,7 @@ async function main() {
       categoryId: catMinimal.id,
       collectionId: colEssentials.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=80", alt: "Void Matrix Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2400&q=95", alt: "Void Matrix Tee", isPrimary: true },
       ],
       colors: [
         { name: "Mineral Slate", hex: "#3A3D40" },
@@ -461,7 +461,7 @@ async function main() {
       categoryId: catGraphic.id,
       collectionId: colLimitedDrops.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?auto=format&fit=crop&w=1000&q=80", alt: "Cyber Ronin Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?auto=format&fit=crop&w=2400&q=95", alt: "Cyber Ronin Tee", isPrimary: true },
       ],
       colors: [
         { name: "Jet Black", hex: "#0E0E0E" },
@@ -485,7 +485,7 @@ async function main() {
       categoryId: catGraphic.id,
       collectionId: colGraphicUniverse.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=1000&q=80", alt: "No Signal Retro Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=2400&q=95", alt: "No Signal Retro Tee", isPrimary: true },
       ],
       colors: [
         { name: "Vintage Bone", hex: "#E8E5DE" },
@@ -510,7 +510,7 @@ async function main() {
       categoryId: catMinimal.id,
       collectionId: colEssentials.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=1000&q=80", alt: "Astral Drift Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=2400&q=95", alt: "Astral Drift Tee", isPrimary: true },
       ],
       colors: [
         { name: "Heather Slate", hex: "#5C6068" },
@@ -670,7 +670,7 @@ async function main() {
             unitPrice: firstProduct.basePrice,
             quantity: 1,
             total: firstProduct.basePrice,
-            productImage: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80",
+            productImage: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
           },
         },
       },

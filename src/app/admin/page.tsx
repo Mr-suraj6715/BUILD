@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
     isNewDrop: true,
     isBestseller: false,
     isLimited: false,
-    imageUrl: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
     colorName: "Washed Black",
     colorHex: "#151515",
     initialStock: 25,
@@ -387,7 +387,7 @@ export default function AdminDashboardPage() {
               title: dropTitle,
               subtitle: dropSubtitle,
               targetDate: new Date(dropTargetDate).toISOString(),
-              imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1200&q=80",
+              imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95",
             },
           }),
         });

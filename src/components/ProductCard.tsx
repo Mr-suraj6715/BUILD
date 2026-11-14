@@ -44,7 +44,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const primaryImage =
     product.images?.find((img) => img.isPrimary)?.url ||
     product.images?.[0]?.url ||
-    "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80";
+    "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95";
 
   const secondaryImage =
     product.images?.[1]?.url || primaryImage;

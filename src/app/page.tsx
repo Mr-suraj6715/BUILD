@@ -69,7 +69,7 @@ export default async function HomePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 bg-[#D8FF36] text-[#151515] font-mono text-xs px-2.5 py-1 tracking-widest uppercase font-bold">
                   <span className="w-1.5 h-1.5 bg-[#151515] rounded-full animate-ping" />
-                  ZARA-STYLE EDITORIAL DROP // 2025
+                  ZARA-STYLE EDITORIAL DROP
                 </span>
                 <span className="font-mono text-xs text-[#AAAAAA] tracking-wider uppercase bg-[#262626] px-2 py-1 border border-[#333333]">
                   [ LIMITED 500 PIECE RUN ]
@@ -135,7 +135,7 @@ export default async function HomePage() {
                 <img
                   src="/images/stitch/hero-model.jpg"
                   alt="Streetwear models in oversized graphic t-shirts"
-                  className="w-full h-full object-cover grayscale contrast-125 transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
                 />
 
                 {/* Technical Watermark */}
@@ -444,7 +444,7 @@ export default async function HomePage() {
               <img
                 src="/images/stitch/lookbook-hero.jpg"
                 alt="Shibuya Neon Alleyway Streetwear Editorial"
-                className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
               />
               <div className="absolute bottom-4 left-4 font-display text-lg text-white bg-black/80 px-4 py-1">
                 SCENE 04 // 02:40 AM
@@ -456,7 +456,7 @@ export default async function HomePage() {
                 <img
                   src="/images/stitch/lookbook-detail.jpg"
                   alt="Heavyweight Ribbed Collar Streetwear Portrait"
-                  className="w-full h-full object-cover grayscale"
+                  className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
                 />
               </div>
               <div className="bg-[#1D1C16] p-6 border border-[#2E2D27]">
