@@ -9,6 +9,8 @@ import PriceZones from "@/components/PriceZones";
 import TrustPerks from "@/components/TrustPerks";
 import DropCountdown from "@/components/DropCountdown";
 import NewsletterForm from "@/components/NewsletterForm";
+import HeroMedia from "@/components/HeroMedia";
+import BuildSeriesShowcase from "@/components/BuildSeriesShowcase";
 
 export const revalidate = 60; // ISR cache 60s
 
@@ -125,33 +127,11 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Zara-Style High-Fashion Model Imagery */}
+            {/* Right Column: High-Fashion Promo Video & Media Showcase */}
             <div className="lg:col-span-5 relative mt-6 lg:mt-0">
               <div className="absolute -top-3 -right-3 w-full h-full bg-[#262626] -z-0 border border-[#333333]" />
               <div className="absolute -bottom-3 -left-3 w-28 h-28 bg-[#D8FF36]/20 -z-0" />
-
-              {/* Hero Photo Card */}
-              <div className="relative z-10 w-full aspect-[4/5] bg-[#1E1E1E] overflow-hidden shadow-2xl group border border-[#333333]">
-                <img
-                  src="/images/stitch/hero-model.jpg"
-                  alt="Streetwear models in oversized graphic t-shirts"
-                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
-                />
-
-                {/* Technical Watermark */}
-                <div className="absolute top-4 left-4 flex flex-col gap-1 pointer-events-none">
-                  <span className="bg-[#151515]/90 backdrop-blur-md text-[#F5F3EE] font-mono text-[10px] px-2 py-0.5 tracking-widest uppercase">
-                    CAMPAIGN 04 // EDITORIAL
-                  </span>
-                  <span className="bg-white/90 backdrop-blur-md text-[#151515] font-mono text-[10px] px-2 py-0.5 uppercase tracking-wider font-bold">
-                    280 GSM RAW ORGANIC
-                  </span>
-                </div>
-
-                <div className="absolute bottom-4 right-4 bg-[#D8FF36] text-[#151515] font-display text-xl px-3 py-1 shadow-md">
-                  TOKYO // NYC // BERLIN
-                </div>
-              </div>
+              <HeroMedia />
             </div>
           </div>
         </div>
@@ -161,6 +141,11 @@ export default async function HomePage() {
           SECTION 02 — H&M-INSPIRED STORY CATEGORIES RAIL
           ========================================================================= */}
       <StoryCategories />
+
+      {/* =========================================================================
+          SECTION 02.5 — FLAGSHIP CORE COLLECTION: THE BUILD SERIES
+          ========================================================================= */}
+      <BuildSeriesShowcase />
 
       {/* =========================================================================
           SECTION 03 — ZUDIO-INSPIRED PRICE POINT SHOPPING ZONES
@@ -427,45 +412,44 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between border-b border-[#333333] pb-4">
             <div>
-              <span className="font-mono text-xs text-[#D8FF36] uppercase tracking-widest">
-                // LOOKBOOK ARCHIVE VOL. 04
+              <span className="font-mono text-xs text-[#D8FF36] uppercase tracking-widest font-bold">
+                // EDITORIAL CAMPAIGN: THE BUILD SERIES
               </span>
               <h2 className="font-display text-4xl sm:text-6xl text-white uppercase leading-none mt-1">
-                SHIBUYA CONCRETE
+                BUILDING A BETTER TOMORROW
               </h2>
             </div>
-            <div className="font-mono text-xs text-[#888888] uppercase mt-2 md:mt-0">
-              COORDINATES: 35.6580° N, 139.7016° E
+            <div className="font-mono text-xs text-[#888888] uppercase mt-2 md:mt-0 font-bold">
+              240 GSM HEAVY COMBED COTTON // CORE ARCHIVE
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
             <div className="md:col-span-8 relative aspect-[16/9] bg-[#1D1C16] overflow-hidden shadow-2xl border border-[#333333]">
               <img
-                src="/images/stitch/lookbook-hero.jpg"
-                alt="Shibuya Neon Alleyway Streetwear Editorial"
+                src="/images/campaign/build-series-flatlay.jpg"
+                alt="BUILD Core T-Shirt Collection Flat Lay - Front Chest Logo & Back Graphic"
                 className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
               />
-              <div className="absolute bottom-4 left-4 font-display text-lg text-white bg-black/80 px-4 py-1">
-                SCENE 04 // 02:40 AM
+              <div className="absolute bottom-4 left-4 font-display text-lg text-white bg-black/85 px-4 py-1.5 border-l-2 border-[#D8FF36]">
+                FLAT LAY STUDIO // MIDNIGHT NAVY DUAL PRINT
               </div>
             </div>
 
             <div className="md:col-span-4 flex flex-col gap-6">
-              <div className="aspect-square bg-[#1D1C16] overflow-hidden shadow-xl border border-[#333333]">
+              <div className="aspect-square bg-[#0c121c] overflow-hidden shadow-xl border border-[#333333] flex items-center justify-center p-4">
                 <img
-                  src="/images/stitch/lookbook-detail.jpg"
-                  alt="Heavyweight Ribbed Collar Streetwear Portrait"
-                  className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
+                  src="/images/campaign/build-artwork.jpg"
+                  alt="Building A Better Tomorrow Official Graphic Artwork"
+                  className="max-h-full max-w-full object-contain transition-all duration-700 hover:scale-105"
                 />
               </div>
               <div className="bg-[#1D1C16] p-6 border border-[#2E2D27]">
                 <span className="font-mono text-xs text-[#D8FF36] uppercase tracking-widest font-bold">
-                  CURATOR NOTES
+                  ARCHITECTURAL IDENTITY
                 </span>
                 <p className="font-sans text-xs sm:text-sm text-[#AAAAAA] mt-2 leading-relaxed">
-                  Vol. 04 explores the friction between rigid urban architecture and unrestrained
-                  graphic identity. Captured on 35mm film across Shibuya&apos;s industrial underpasses.
+                  The flagship globe &amp; metropolis illustration fuses brutalist architectural line-work with retro-futuristic cartography. Screenprinted on 240 GSM dense combed cotton for eternal durability.
                 </p>
               </div>
             </div>

@@ -15,11 +15,12 @@ export default function CustomPrintStudioPage() {
   ];
 
   const colors = [
+    { name: "Midnight Navy", hex: "#1B2430" },
+    { name: "Burgundy Wine", hex: "#581825" },
+    { name: "Vintage Sand", hex: "#D2B48C" },
     { name: "Washed Charcoal", hex: "#242424" },
     { name: "Pristine Bone", hex: "#E8E5DE" },
     { name: "Deep Onyx", hex: "#111111" },
-    { name: "Acid Slate", hex: "#4D5359" },
-    { name: "Military Olive", hex: "#383A2D" },
   ];
 
   const placements = [
@@ -270,6 +271,19 @@ export default function CustomPrintStudioPage() {
                     className="hidden"
                   />
                 </label>
+
+                {/* Quick Load Flagship Campaign Graphic */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadedImage("/images/campaign/build-artwork.jpg");
+                    setSelectedPlacement(placements[1]); // Back placement
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-[#151515] text-[#D8FF36] border border-[#2E2D27] hover:bg-black font-mono text-[11px] font-bold uppercase tracking-wider transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#D8FF36]" />
+                  ⚡ Load Official &quot;Building A Better Tomorrow&quot; Artwork
+                </button>
 
                 {uploadedImage && (
                   <div className="flex items-center justify-between bg-[#F5F3EE] p-2 px-3 font-mono text-xs border border-[#E8E5DE]">
