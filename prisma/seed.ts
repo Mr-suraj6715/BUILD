@@ -411,7 +411,8 @@ async function main() {
       categoryId: catGraphic.id,
       collectionId: colGraphicUniverse.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=2400&q=95", alt: "Chromatic Chaos Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=2400&q=95", alt: "Chromatic Chaos Front View", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=2400&q=95", alt: "Chromatic Chaos Back Print View", isPrimary: false },
       ],
       colors: [
         { name: "Moss Green", hex: "#2E3A2F" },
@@ -436,7 +437,8 @@ async function main() {
       categoryId: catMinimal.id,
       collectionId: colEssentials.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2400&q=95", alt: "Void Matrix Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2400&q=95", alt: "Void Matrix Front View", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=2400&q=95", alt: "Void Matrix Alternate Angle", isPrimary: false },
       ],
       colors: [
         { name: "Mineral Slate", hex: "#3A3D40" },
@@ -461,7 +463,8 @@ async function main() {
       categoryId: catGraphic.id,
       collectionId: colLimitedDrops.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?auto=format&fit=crop&w=2400&q=95", alt: "Cyber Ronin Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?auto=format&fit=crop&w=2400&q=95", alt: "Cyber Ronin Front View", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=2400&q=95", alt: "Cyber Ronin Katana Back Art", isPrimary: false },
       ],
       colors: [
         { name: "Jet Black", hex: "#0E0E0E" },
@@ -485,7 +488,8 @@ async function main() {
       categoryId: catGraphic.id,
       collectionId: colGraphicUniverse.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=2400&q=95", alt: "No Signal Retro Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=2400&q=95", alt: "No Signal Retro Glitch Front", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95", alt: "No Signal Retro Glitch Alternate Angle", isPrimary: false },
       ],
       colors: [
         { name: "Vintage Bone", hex: "#E8E5DE" },
@@ -510,7 +514,8 @@ async function main() {
       categoryId: catMinimal.id,
       collectionId: colEssentials.id,
       images: [
-        { url: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=2400&q=95", alt: "Astral Drift Tee", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=2400&q=95", alt: "Astral Drift Front Angle", isPrimary: true },
+        { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95", alt: "Astral Drift Back Silhouette", isPrimary: false },
       ],
       colors: [
         { name: "Heather Slate", hex: "#5C6068" },

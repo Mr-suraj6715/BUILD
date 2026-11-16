@@ -20,7 +20,7 @@ export interface ProductCardProps {
     isBestseller?: boolean;
     isLimited?: boolean;
     rating?: number;
-    images: { url: string; alt: string; isPrimary: boolean }[];
+    images: { url: string; alt: string; isPrimary: boolean; displayOrder?: number }[];
     variants?: {
       id: string;
       size: string;
@@ -34,6 +34,8 @@ export interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const [isHovered, setIsHovered] = useState(false);
+  const [mobileActiveIndex, setMobileActiveIndex] = useState<0 | 1>(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>("L");
   const [selectedColor, setSelectedColor] = useState<string>(
     product.variants?.[0]?.color || ""
@@ -41,13 +43,35 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  // Image 1: Default / Front View
   const primaryImage =
     product.images?.find((img) => img.isPrimary)?.url ||
     product.images?.[0]?.url ||
     "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95";
 
+  // Image 2: Hover / Alternate 3/4 or Back View
   const secondaryImage =
-    product.images?.[1]?.url || primaryImage;
+    product.images?.find((img) => !img.isPrimary && img.displayOrder === 1)?.url ||
+    product.images?.find((img) => !img.isPrimary)?.url ||
+    (product.images && product.images.length > 1 ? product.images[1].url : null);
+
+  const hasSecondary = Boolean(secondaryImage && secondaryImage !== primaryImage);
+
+  // Handle touch swipe on mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null || !hasSecondary) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    // Swipe threshold of 35px
+    if (Math.abs(diff) > 35) {
+      setMobileActiveIndex((prev) => (prev === 0 ? 1 : 0));
+    }
+    setTouchStartX(null);
+  };
 
   // Calculate discount percentage
   const discountPercent =
@@ -107,8 +131,12 @@ export default function ProductCard({ product }: ProductCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Product Image Frame */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#E8E5DE] border border-[#D4D0C8]">
+      {/* Product Image Frame with Dual-Image Smooth Hover Crossfade */}
+      <div
+        className="relative aspect-[3/4] w-full overflow-hidden bg-[#E8E5DE] border border-[#D4D0C8]"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* Badges */}
         <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 pointer-events-none">
           {isSoldOut ? (
@@ -152,18 +180,68 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         </button>
 
-        {/* Link to detail page */}
-        <Link href={`/product/${product.slug}`} className="block w-full h-full">
+        {/* Mobile Angle Toggle Pill */}
+        {hasSecondary && (
+          <div className="absolute top-3 right-12 z-20 flex sm:hidden items-center gap-1 bg-[#151515]/85 backdrop-blur-xs px-2 py-1 border border-[#D4D0C8]/40 shadow-xs">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileActiveIndex((prev) => (prev === 0 ? 1 : 0));
+              }}
+              className="flex items-center gap-1 focus:outline-none"
+              aria-label="Toggle front or back angle view"
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  mobileActiveIndex === 0 ? "bg-[#D8FF36] scale-125" : "bg-white/40"
+                }`}
+              />
+              <span
+                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  mobileActiveIndex === 1 ? "bg-[#D8FF36] scale-125" : "bg-white/40"
+                }`}
+              />
+              <span className="text-[8px] font-mono font-bold text-[#F5F3EE] uppercase tracking-wider ml-0.5">
+                {mobileActiveIndex === 0 ? "FRONT" : "ANGLE"}
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* Main Product Link Container */}
+        <Link href={`/product/${product.slug}`} className="block w-full h-full relative">
+          {/* IMAGE 1: Default Front View */}
           <img
-            src={isHovered && secondaryImage ? secondaryImage : primaryImage}
-            alt={product.title}
-            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            src={primaryImage}
+            alt={`${product.title} - Front View`}
+            loading="lazy"
+            decoding="async"
+            className={`w-full h-full object-cover object-center transition-all duration-300 ease-in-out group-hover:scale-105 ${
+              hasSecondary && mobileActiveIndex === 1 ? "opacity-0" : "opacity-100"
+            }`}
           />
+
+          {/* IMAGE 2: Hover / Alternate View (Smooth 300ms crossfade, preloaded, zero flicker) */}
+          {hasSecondary && (
+            <img
+              src={secondaryImage!}
+              alt={`${product.title} - Hover Alternate View`}
+              loading="eager"
+              decoding="async"
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-300 ease-in-out group-hover:scale-105 pointer-events-none ${
+                isHovered || mobileActiveIndex === 1
+                  ? "opacity-100"
+                  : "opacity-0"
+              }`}
+            />
+          )}
         </Link>
 
         {/* Quick Add Overlay on Hover (Desktop) */}
         {!isSoldOut && (
-          <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex flex-col gap-2 z-20">
+          <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/85 via-black/45 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex flex-col gap-2 z-20">
             {/* Quick Size Pills */}
             <div className="flex items-center justify-center gap-1.5">
               {availableSizes.map((size) => (

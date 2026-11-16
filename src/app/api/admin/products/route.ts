@@ -53,6 +53,8 @@ export async function POST(request: Request) {
       isBestseller,
       isNewDrop,
       isLimited,
+      frontImage,
+      hoverImage,
       images, // array of { url, alt, isPrimary }
       variants, // array of { size, color, colorHex, sku, stock }
     } = body;
@@ -89,6 +91,34 @@ export async function POST(request: Request) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
 
+    const resolvedImages = [];
+    if (frontImage) {
+      resolvedImages.push({
+        url: frontImage,
+        alt: `${title} Front View`,
+        isPrimary: true,
+        displayOrder: 0,
+      });
+    }
+    if (hoverImage) {
+      resolvedImages.push({
+        url: hoverImage,
+        alt: `${title} Hover / Alternate Angle`,
+        isPrimary: false,
+        displayOrder: 1,
+      });
+    }
+    if (resolvedImages.length === 0 && Array.isArray(images) && images.length > 0) {
+      images.forEach((img: any, idx: number) => {
+        resolvedImages.push({
+          url: img.url,
+          alt: img.alt || (idx === 0 ? `${title} Front View` : `${title} Hover View`),
+          isPrimary: img.isPrimary !== undefined ? img.isPrimary : idx === 0,
+          displayOrder: idx,
+        });
+      });
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         title,
@@ -109,12 +139,7 @@ export async function POST(request: Request) {
         isNewDrop: Boolean(isNewDrop),
         isLimited: Boolean(isLimited),
         images: {
-          create: (images || []).map((img: any, idx: number) => ({
-            url: img.url,
-            alt: img.alt || title,
-            isPrimary: img.isPrimary || idx === 0,
-            displayOrder: idx,
-          })),
+          create: resolvedImages,
         },
         variants: {
           create: (variants || []).map((v: any) => ({
@@ -128,7 +153,7 @@ export async function POST(request: Request) {
         },
       },
       include: {
-        images: true,
+        images: { orderBy: { displayOrder: "asc" } },
         variants: true,
       },
     });
@@ -137,6 +162,135 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Create product error:", error);
     return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const session = await getSessionUser();
+    if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const {
+      id,
+      title,
+      description,
+      fabric,
+      gsm,
+      fit,
+      printType,
+      printPlacement,
+      artwork,
+      basePrice,
+      originalPrice,
+      categoryId,
+      collectionId,
+      isFeatured,
+      isBestseller,
+      isNewDrop,
+      isLimited,
+      frontImage,
+      hoverImage,
+      images,
+      variants,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Product ID is required for editing" }, { status: 400 });
+    }
+
+    // Catalog validation
+    if (title || description || fit) {
+      const prohibitedKeywords = [
+        "hoodie", "sweatshirt", "jacket", "jeans", "trouser", "pant", "short",
+        "shoe", "sneaker", "slipper", "sandal", "cap", "hat", "bag", "sock", "watch"
+      ];
+      const textToCheck = `${title || ""} ${description || ""} ${fit || ""}`.toLowerCase();
+      for (const badWord of prohibitedKeywords) {
+        if (textToCheck.includes(badWord)) {
+          return NextResponse.json(
+            { error: `BUILD CLOTHING is strictly an exclusive T-shirt brand. Non-T-shirt products (${badWord}) are strictly prohibited.` },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    // Resolve images
+    const resolvedImages: Array<{ url: string; alt: string; isPrimary: boolean; displayOrder: number }> = [];
+    if (frontImage) {
+      resolvedImages.push({
+        url: frontImage,
+        alt: `${title || "Product"} Front View`,
+        isPrimary: true,
+        displayOrder: 0,
+      });
+    }
+    if (hoverImage) {
+      resolvedImages.push({
+        url: hoverImage,
+        alt: `${title || "Product"} Hover / Alternate Angle`,
+        isPrimary: false,
+        displayOrder: 1,
+      });
+    }
+    if (resolvedImages.length === 0 && Array.isArray(images) && images.length > 0) {
+      images.forEach((img: any, idx: number) => {
+        resolvedImages.push({
+          url: img.url,
+          alt: img.alt || (idx === 0 ? "Front View" : "Hover View"),
+          isPrimary: img.isPrimary !== undefined ? img.isPrimary : idx === 0,
+          displayOrder: idx,
+        });
+      });
+    }
+
+    // Update product fields
+    const updateData: any = {};
+    if (title) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (fabric) updateData.fabric = fabric;
+    if (gsm) updateData.gsm = parseInt(gsm);
+    if (fit) updateData.fit = fit;
+    if (printType !== undefined) updateData.printType = printType;
+    if (printPlacement !== undefined) updateData.printPlacement = printPlacement;
+    if (artwork !== undefined) updateData.artwork = artwork;
+    if (basePrice !== undefined) updateData.basePrice = parseFloat(basePrice);
+    if (originalPrice !== undefined) updateData.originalPrice = parseFloat(originalPrice);
+    if (categoryId) updateData.categoryId = categoryId;
+    if (collectionId !== undefined) updateData.collectionId = collectionId || null;
+    if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
+    if (isBestseller !== undefined) updateData.isBestseller = Boolean(isBestseller);
+    if (isNewDrop !== undefined) updateData.isNewDrop = Boolean(isNewDrop);
+    if (isLimited !== undefined) updateData.isLimited = Boolean(isLimited);
+
+    // If new images provided, replace existing images
+    if (resolvedImages.length > 0) {
+      await prisma.productImage.deleteMany({
+        where: { productId: id },
+      });
+      updateData.images = {
+        create: resolvedImages,
+      };
+    }
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: updateData,
+      include: {
+        images: { orderBy: { displayOrder: "asc" } },
+        variants: true,
+        category: true,
+        collection: true,
+      },
+    });
+
+    return NextResponse.json({ success: true, product: updated });
+  } catch (error: any) {
+    console.error("Update product error:", error);
+    return NextResponse.json({ error: error.message || "Failed to update product" }, { status: 500 });
   }
 }
 

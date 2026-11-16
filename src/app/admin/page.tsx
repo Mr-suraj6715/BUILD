@@ -40,6 +40,10 @@ import {
   Check,
   X,
   Menu,
+  UploadCloud,
+  Image as ImageIcon,
+  RefreshCw,
+  Eye,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { formatPrice } from "@/lib/utils";
@@ -129,11 +133,20 @@ export default function AdminDashboardPage() {
     isNewDrop: true,
     isBestseller: false,
     isLimited: false,
-    imageUrl: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
+    frontImage: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
+    hoverImage: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=2400&q=95",
     colorName: "Washed Black",
     colorHex: "#151515",
     initialStock: 25,
   });
+
+  // Edit Product State
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [showEditProductModal, setShowEditProductModal] = useState(false);
+  const [frontUploadProgress, setFrontUploadProgress] = useState(0);
+  const [hoverUploadProgress, setHoverUploadProgress] = useState(0);
+  const [editFrontProgress, setEditFrontProgress] = useState(0);
+  const [editHoverProgress, setEditHoverProgress] = useState(0);
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryType, setNewCategoryType] = useState<"CATEGORY" | "COLLECTION">("CATEGORY");
@@ -301,6 +314,42 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const uploadProductImage = async (
+    file: File,
+    type: "front" | "hover",
+    setProgress: (p: number) => void,
+    onSuccess: (url: string) => void
+  ) => {
+    try {
+      setProgress(25);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", type);
+      setProgress(55);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      setProgress(85);
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProgress(100);
+        setTimeout(() => {
+          onSuccess(data.url);
+          setProgress(0);
+        }, 200);
+      } else {
+        alert(data.error || "Image upload failed");
+        setProgress(0);
+      }
+    } catch (err: any) {
+      alert("Upload failed: " + err.message);
+      setProgress(0);
+    }
+  };
+
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -310,7 +359,12 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({
           ...newProduct,
           categoryId: newProduct.categoryId || categories[0]?.id,
-          images: [{ url: newProduct.imageUrl, alt: newProduct.title, isPrimary: true }],
+          frontImage: newProduct.frontImage,
+          hoverImage: newProduct.hoverImage,
+          images: [
+            { url: newProduct.frontImage, alt: `${newProduct.title} Front View`, isPrimary: true, displayOrder: 0 },
+            { url: newProduct.hoverImage, alt: `${newProduct.title} Hover View`, isPrimary: false, displayOrder: 1 },
+          ],
           variants: ["S", "M", "L", "XL", "XXL"].map((sz) => ({
             size: sz,
             color: newProduct.colorName,
@@ -326,6 +380,57 @@ export default function AdminDashboardPage() {
       } else {
         const data = await res.json();
         alert(data.error || "Failed to create product");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOpenEditProduct = (p: any) => {
+    const frontImg = p.images?.find((img: any) => img.isPrimary)?.url || p.images?.[0]?.url || "";
+    const hoverImg = p.images?.find((img: any) => !img.isPrimary && img.displayOrder === 1)?.url || p.images?.[1]?.url || "";
+    setEditingProduct({
+      ...p,
+      frontImage: frontImg,
+      hoverImage: hoverImg,
+    });
+    setShowEditProductModal(true);
+  };
+
+  const handleUpdateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    try {
+      const res = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingProduct.id,
+          title: editingProduct.title,
+          description: editingProduct.description,
+          fabric: editingProduct.fabric,
+          gsm: editingProduct.gsm,
+          fit: editingProduct.fit,
+          basePrice: editingProduct.basePrice,
+          originalPrice: editingProduct.originalPrice,
+          categoryId: editingProduct.categoryId,
+          collectionId: editingProduct.collectionId,
+          isFeatured: editingProduct.isFeatured,
+          isBestseller: editingProduct.isBestseller,
+          isNewDrop: editingProduct.isNewDrop,
+          isLimited: editingProduct.isLimited,
+          frontImage: editingProduct.frontImage,
+          hoverImage: editingProduct.hoverImage,
+        }),
+      });
+
+      if (res.ok) {
+        setShowEditProductModal(false);
+        setEditingProduct(null);
+        fetchAllAdminData();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to update product");
       }
     } catch (err) {
       console.error(err);
@@ -809,35 +914,77 @@ export default function AdminDashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#D4D0C8]">
-                    {products.map((p) => (
-                      <tr key={p.id} className="hover:bg-[#F5F3EE]">
-                        <td className="p-3 font-bold text-[#151515] flex items-center gap-3">
-                          <img
-                            src={p.images?.[0]?.url}
-                            alt={p.title}
-                            className="w-10 h-12 object-cover bg-white"
-                          />
-                          <div>
-                            <Link href={`/product/${p.slug}`} className="hover:underline">
-                              {p.title}
-                            </Link>
-                            <span className="block text-[10px] text-[#777777]">Slug: {p.slug}</span>
-                          </div>
-                        </td>
-                        <td className="p-3">{p.category?.name || "Streetwear"}</td>
-                        <td className="p-3 font-bold">{formatPrice(p.basePrice)}</td>
-                        <td className="p-3">{p.gsm} GSM</td>
-                        <td className="p-3 font-bold text-amber-800">★ {p.rating} ({p.reviewCount})</td>
-                        <td className="p-3 text-right">
-                          <button
-                            onClick={() => handleDeleteProduct(p.id)}
-                            className="text-red-600 hover:text-red-800 p-1"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {products.map((p) => {
+                      const frontImg = p.images?.find((img: any) => img.isPrimary)?.url || p.images?.[0]?.url;
+                      const hoverImg = p.images?.find((img: any) => !img.isPrimary && img.displayOrder === 1)?.url || p.images?.[1]?.url;
+                      return (
+                        <tr key={p.id} className="hover:bg-[#F5F3EE] transition-colors">
+                          <td className="p-3 font-bold text-[#151515]">
+                            <div className="flex items-center gap-3">
+                              {/* Dual Thumbnails */}
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <div className="relative group/thumb">
+                                  <img
+                                    src={frontImg}
+                                    alt="Front"
+                                    className="w-10 h-12 object-cover bg-white border border-[#D4D0C8]"
+                                  />
+                                  <span className="absolute -bottom-1 -left-1 bg-[#101010] text-[#D8FF36] text-[8px] font-mono px-1 font-bold">
+                                    1:FR
+                                  </span>
+                                </div>
+                                {hoverImg ? (
+                                  <div className="relative group/thumb">
+                                    <img
+                                      src={hoverImg}
+                                      alt="Hover"
+                                      className="w-10 h-12 object-cover bg-white border border-[#D4D0C8]"
+                                    />
+                                    <span className="absolute -bottom-1 -left-1 bg-[#536500] text-white text-[8px] font-mono px-1 font-bold">
+                                      2:HV
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="w-10 h-12 border border-dashed border-[#D4D0C8] flex items-center justify-center text-[8px] text-[#777777] bg-[#E8E5DE]/50">
+                                    NO HOV
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <Link href={`/product/${p.slug}`} className="hover:underline block font-bold text-sm">
+                                  {p.title}
+                                </Link>
+                                <span className="block text-[10px] text-[#777777]">
+                                  {p.images?.length || 0} image{p.images?.length === 1 ? "" : "s"} • Slug: {p.slug}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-3">{p.category?.name || "Streetwear"}</td>
+                          <td className="p-3 font-bold">{formatPrice(p.basePrice)}</td>
+                          <td className="p-3">{p.gsm} GSM</td>
+                          <td className="p-3 font-bold text-amber-800">★ {p.rating} ({p.reviewCount})</td>
+                          <td className="p-3 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => handleOpenEditProduct(p)}
+                                className="p-1.5 text-[#151515] hover:text-black hover:bg-[#D4D0C8] transition-colors rounded-none"
+                                title="Edit Product Images & Attributes"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(p.id)}
+                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 transition-colors rounded-none"
+                                title="Delete Product"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1879,15 +2026,219 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[#555555] uppercase mb-1">High-Res Product Image URL *</label>
-                <input
-                  type="url"
-                  required
-                  value={newProduct.imageUrl}
-                  onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
-                  className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515]"
-                />
+              {/* TWO-IMAGE HOVER EFFECT UPLOADS */}
+              <div className="space-y-3 pt-2 pb-1 border-t border-b border-[#D4D0C8]">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold uppercase text-[#151515] tracking-wider">
+                    PRIMARY PRODUCT IMAGES (TWO-IMAGE HOVER EFFECT) *
+                  </label>
+                  <span className="text-[10px] text-[#777777] font-mono">
+                    JPG, PNG, WEBP, AVIF (Max 10MB)
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#555555]">
+                  Upload exactly two views of the same T-shirt: Image 1 is the default front view; Image 2 is the alternate angle (3/4 or back view) revealed on customer hover.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                  {/* IMAGE 1: FRONT VIEW */}
+                  <div className="bg-[#E8E5DE] border-2 border-dashed border-[#B0ABA0] p-4 relative flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold uppercase text-[#151515] flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-[#151515] text-[#D8FF36] text-[10px] flex items-center justify-center font-bold">1</span>
+                        Front View (Default)
+                      </span>
+                      {newProduct.frontImage && (
+                        <span className="text-[9px] font-mono bg-[#151515] text-[#D8FF36] px-1.5 py-0.5 font-bold uppercase">
+                          ACTIVE FRONT
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Preview Box */}
+                    {newProduct.frontImage ? (
+                      <div className="relative aspect-[3/4] w-full max-w-[200px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/img mb-3">
+                        <img
+                          src={newProduct.frontImage}
+                          alt="Front View Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-white transition-colors">
+                            Replace
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "front", setFrontUploadProgress, (url) => setNewProduct({ ...newProduct, frontImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setNewProduct({ ...newProduct, frontImage: "" })}
+                            className="bg-red-600 text-white text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-red-700 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-[3/4] w-full max-w-[200px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3">
+                        <UploadCloud className="w-8 h-8 text-[#777777] mb-2" />
+                        <span className="text-xs font-bold text-[#151515] uppercase">Front View</span>
+                        <span className="text-[10px] text-[#777777] mt-1">Drag file or click below</span>
+                      </div>
+                    )}
+
+                    {/* Upload progress */}
+                    {frontUploadProgress > 0 && (
+                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
+                        <div
+                          className="bg-[#151515] h-full transition-all duration-200"
+                          style={{ width: `${frontUploadProgress}%` }}
+                        />
+                      </div>
+                    )}
+
+                    {/* File input & URL controls */}
+                    <div className="space-y-2 mt-auto">
+                      <label className="block w-full py-2 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors">
+                        Choose Front Photo File
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) uploadProductImage(file, "front", setFrontUploadProgress, (url) => setNewProduct({ ...newProduct, frontImage: url }));
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="Or paste front image URL..."
+                        value={newProduct.frontImage}
+                        onChange={(e) => setNewProduct({ ...newProduct, frontImage: e.target.value })}
+                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1.5 text-[11px] text-[#151515] font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* IMAGE 2: HOVER / ALTERNATE ANGLE */}
+                  <div className="bg-[#E8E5DE] border-2 border-dashed border-[#B0ABA0] p-4 relative flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold uppercase text-[#151515] flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-[#536500] text-white text-[10px] flex items-center justify-center font-bold">2</span>
+                        Hover / Alternate View
+                      </span>
+                      {newProduct.hoverImage && (
+                        <span className="text-[9px] font-mono bg-[#536500] text-white px-1.5 py-0.5 font-bold uppercase">
+                          REVEAL ON HOVER
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Preview Box */}
+                    {newProduct.hoverImage ? (
+                      <div className="relative aspect-[3/4] w-full max-w-[200px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/img mb-3">
+                        <img
+                          src={newProduct.hoverImage}
+                          alt="Hover Angle Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-white transition-colors">
+                            Replace
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "hover", setHoverUploadProgress, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setNewProduct({ ...newProduct, hoverImage: "" })}
+                            className="bg-red-600 text-white text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-red-700 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-[3/4] w-full max-w-[200px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3">
+                        <UploadCloud className="w-8 h-8 text-[#777777] mb-2" />
+                        <span className="text-xs font-bold text-[#151515] uppercase">Hover View (Back or 3/4)</span>
+                        <span className="text-[10px] text-[#777777] mt-1">Drag file or click below</span>
+                      </div>
+                    )}
+
+                    {/* Upload progress */}
+                    {hoverUploadProgress > 0 && (
+                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
+                        <div
+                          className="bg-[#536500] h-full transition-all duration-200"
+                          style={{ width: `${hoverUploadProgress}%` }}
+                        />
+                      </div>
+                    )}
+
+                    {/* File input & URL controls */}
+                    <div className="space-y-2 mt-auto">
+                      <label className="block w-full py-2 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors">
+                        Choose Hover Photo File
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) uploadProductImage(file, "hover", setHoverUploadProgress, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="Or paste hover image URL..."
+                        value={newProduct.hoverImage}
+                        onChange={(e) => setNewProduct({ ...newProduct, hoverImage: e.target.value })}
+                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1.5 text-[11px] text-[#151515] font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* LIVE STOREFRONT HOVER TEST BOX */}
+                {newProduct.frontImage && newProduct.hoverImage && (
+                  <div className="mt-3 bg-[#151515] text-[#F5F3EE] p-3 border border-[#333333] flex items-center justify-between gap-4">
+                    <div className="text-xs">
+                      <span className="text-[#D8FF36] font-bold uppercase block tracking-wider">
+                        ★ LIVE STOREFRONT HOVER TEST
+                      </span>
+                      <span className="text-[11px] text-[#AAAAAA]">
+                        Hover your cursor over the test card on the right to preview customer transition!
+                      </span>
+                    </div>
+                    <div className="relative aspect-[3/4] w-20 shrink-0 bg-white overflow-hidden border border-[#D8FF36] group/test cursor-pointer">
+                      <img
+                        src={newProduct.frontImage}
+                        alt="Test Front"
+                        className="w-full h-full object-cover transition-all duration-300 group-hover/test:scale-105"
+                      />
+                      <img
+                        src={newProduct.hoverImage}
+                        alt="Test Hover"
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover/test:opacity-100 transition-opacity duration-300 pointer-events-none group-hover/test:scale-105"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -1911,6 +2262,316 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddProductModal(false)}
+                  className="px-6 py-3 border border-[#151515] text-xs font-bold uppercase"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* EDIT PRODUCT MODAL (WITH TWO-IMAGE HOVER EDITING)        */}
+      {/* ======================================================== */}
+      {showEditProductModal && editingProduct && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-[#F5F3EE] border-2 border-[#151515] p-6 max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-6 pb-3 border-b border-[#D4D0C8]">
+              <div>
+                <h3 className="font-display text-2xl uppercase font-black text-[#151515]">
+                  EDIT PRODUCT: {editingProduct.title}
+                </h3>
+                <span className="text-[10px] font-mono text-[#777777]">
+                  Manage front view, hover alternate angle, prices & specs
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  setShowEditProductModal(false);
+                  setEditingProduct(null);
+                }}
+                className="text-[#151515] hover:text-black font-bold text-lg p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateProduct} className="space-y-4 text-xs font-mono">
+              <div>
+                <label className="block text-[#555555] uppercase mb-1">T-Shirt Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingProduct.title}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, title: e.target.value })}
+                  className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515] font-bold"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#555555] uppercase mb-1">Category</label>
+                  <select
+                    value={editingProduct.categoryId}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, categoryId: e.target.value })}
+                    className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515]"
+                  >
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[#555555] uppercase mb-1">Collection</label>
+                  <select
+                    value={editingProduct.collectionId || ""}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, collectionId: e.target.value })}
+                    className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515]"
+                  >
+                    <option value="">No Collection</option>
+                    {collections.map((col) => (
+                      <option key={col.id} value={col.id}>{col.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[#555555] uppercase mb-1">Selling Price (INR) *</label>
+                  <input
+                    type="number"
+                    required
+                    value={editingProduct.basePrice}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, basePrice: Number(e.target.value) })}
+                    className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#555555] uppercase mb-1">Original Price (INR)</label>
+                  <input
+                    type="number"
+                    value={editingProduct.originalPrice}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, originalPrice: Number(e.target.value) })}
+                    className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#555555] uppercase mb-1">GSM Weight</label>
+                  <input
+                    type="number"
+                    value={editingProduct.gsm}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, gsm: Number(e.target.value) })}
+                    className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-[#151515]"
+                  />
+                </div>
+              </div>
+
+              {/* TWO-IMAGE EDITING SECTION */}
+              <div className="space-y-3 pt-2 pb-1 border-t border-b border-[#D4D0C8]">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold uppercase text-[#151515] tracking-wider">
+                    PRIMARY PRODUCT IMAGES (TWO-IMAGE HOVER EFFECT)
+                  </label>
+                  <span className="text-[10px] text-[#777777] font-mono">
+                    Image 1: Front | Image 2: Hover View
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* EDIT FRONT IMAGE */}
+                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-3 flex flex-col justify-between">
+                    <span className="text-xs font-bold uppercase text-[#151515] block mb-2">
+                      Image 1: Front View (Default)
+                    </span>
+                    {editingProduct.frontImage ? (
+                      <div className="relative aspect-[3/4] w-full max-w-[180px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/editimg mb-2">
+                        <img
+                          src={editingProduct.frontImage}
+                          alt="Edit Front View"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-editimg:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[9px] font-bold uppercase px-2 py-1">
+                            Replace
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "front", setEditFrontProgress, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setEditingProduct({ ...editingProduct, frontImage: "" })}
+                            className="bg-red-600 text-white text-[9px] font-bold uppercase px-2 py-1"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-[3/4] w-full max-w-[180px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-3 text-center mb-2">
+                        <UploadCloud className="w-6 h-6 text-[#777777] mb-1" />
+                        <span className="text-[10px] text-[#777777]">No Front Photo</span>
+                      </div>
+                    )}
+
+                    {editFrontProgress > 0 && (
+                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
+                        <div className="bg-[#151515] h-full" style={{ width: `${editFrontProgress}%` }} />
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5">
+                      <label className="block w-full py-1.5 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[10px] font-bold uppercase text-center cursor-pointer transition-colors">
+                        Upload New Front File
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) uploadProductImage(file, "front", setEditFrontProgress, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="Front Image URL"
+                        value={editingProduct.frontImage || ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, frontImage: e.target.value })}
+                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1 text-[10px] font-mono text-[#151515]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* EDIT HOVER IMAGE */}
+                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-3 flex flex-col justify-between">
+                    <span className="text-xs font-bold uppercase text-[#151515] block mb-2">
+                      Image 2: Hover View (Alternate / Back)
+                    </span>
+                    {editingProduct.hoverImage ? (
+                      <div className="relative aspect-[3/4] w-full max-w-[180px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/editimg mb-2">
+                        <img
+                          src={editingProduct.hoverImage}
+                          alt="Edit Hover View"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-editimg:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[9px] font-bold uppercase px-2 py-1">
+                            Replace
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "hover", setEditHoverProgress, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setEditingProduct({ ...editingProduct, hoverImage: "" })}
+                            className="bg-red-600 text-white text-[9px] font-bold uppercase px-2 py-1"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-[3/4] w-full max-w-[180px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-3 text-center mb-2">
+                        <UploadCloud className="w-6 h-6 text-[#777777] mb-1" />
+                        <span className="text-[10px] text-[#777777]">No Hover Photo</span>
+                      </div>
+                    )}
+
+                    {editHoverProgress > 0 && (
+                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
+                        <div className="bg-[#536500] h-full" style={{ width: `${editHoverProgress}%` }} />
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5">
+                      <label className="block w-full py-1.5 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[10px] font-bold uppercase text-center cursor-pointer transition-colors">
+                        Upload New Hover File
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) uploadProductImage(file, "hover", setEditHoverProgress, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="Hover Image URL"
+                        value={editingProduct.hoverImage || ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, hoverImage: e.target.value })}
+                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1 text-[10px] font-mono text-[#151515]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* LIVE TEST BOX IN EDIT MODAL */}
+                {editingProduct.frontImage && editingProduct.hoverImage && (
+                  <div className="mt-2 bg-[#151515] text-[#F5F3EE] p-2.5 border border-[#333333] flex items-center justify-between">
+                    <div>
+                      <span className="text-[#D8FF36] font-bold uppercase block text-[11px]">
+                        ★ LIVE HOVER PREVIEW
+                      </span>
+                      <span className="text-[10px] text-[#AAAAAA]">
+                        Hover over this preview to test the 300ms crossfade!
+                      </span>
+                    </div>
+                    <div className="relative aspect-[3/4] w-16 bg-white overflow-hidden border border-[#D8FF36] group/edittest cursor-pointer">
+                      <img
+                        src={editingProduct.frontImage}
+                        alt="Edit Test Front"
+                        className="w-full h-full object-cover transition-all duration-300 group-hover/edittest:scale-105"
+                      />
+                      <img
+                        src={editingProduct.hoverImage}
+                        alt="Edit Test Hover"
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover/edittest:opacity-100 transition-opacity duration-300 pointer-events-none group-hover/edittest:scale-105"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[#555555] uppercase mb-1">T-Shirt Description</label>
+                <textarea
+                  rows={3}
+                  value={editingProduct.description || ""}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                  className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2 text-[#151515]"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-3">
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#101010] text-[#D8FF36] font-bold text-xs uppercase tracking-widest hover:bg-black"
+                >
+                  Save Product & Image Updates
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditProductModal(false);
+                    setEditingProduct(null);
+                  }}
                   className="px-6 py-3 border border-[#151515] text-xs font-bold uppercase"
                 >
                   Cancel
