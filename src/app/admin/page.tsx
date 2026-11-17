@@ -133,8 +133,8 @@ export default function AdminDashboardPage() {
     isNewDrop: true,
     isBestseller: false,
     isLimited: false,
-    frontImage: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=2400&q=95",
-    hoverImage: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=2400&q=95",
+    frontImage: "",
+    hoverImage: "",
     colorName: "Washed Black",
     colorHex: "#151515",
     initialStock: 25,
@@ -147,6 +147,10 @@ export default function AdminDashboardPage() {
   const [hoverUploadProgress, setHoverUploadProgress] = useState(0);
   const [editFrontProgress, setEditFrontProgress] = useState(0);
   const [editHoverProgress, setEditHoverProgress] = useState(0);
+  const [frontUploadError, setFrontUploadError] = useState<string | null>(null);
+  const [hoverUploadError, setHoverUploadError] = useState<string | null>(null);
+  const [editFrontError, setEditFrontError] = useState<string | null>(null);
+  const [editHoverError, setEditHoverError] = useState<string | null>(null);
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryType, setNewCategoryType] = useState<"CATEGORY" | "COLLECTION">("CATEGORY");
@@ -318,14 +322,31 @@ export default function AdminDashboardPage() {
     file: File,
     type: "front" | "hover",
     setProgress: (p: number) => void,
+    setError: (err: string | null) => void,
     onSuccess: (url: string) => void
   ) => {
+    setError(null);
+
+    // Validate file type: PNG, JPG, JPEG, WEBP
+    const validMimes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    const validExts = /\.(png|jpe?g|webp)$/i;
+    if (!validMimes.includes(file.type) && !validExts.test(file.name)) {
+      setError("Invalid format. Please select a PNG, JPG, JPEG, or WEBP file.");
+      return;
+    }
+
+    // Validate file size: 10 MB maximum
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File exceeds 10MB limit. Please upload an image under 10MB.");
+      return;
+    }
+
     try {
-      setProgress(25);
+      setProgress(20);
       const formData = new FormData();
       formData.append("file", file);
       formData.append("type", type);
-      setProgress(55);
+      setProgress(50);
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
@@ -339,19 +360,30 @@ export default function AdminDashboardPage() {
         setTimeout(() => {
           onSuccess(data.url);
           setProgress(0);
-        }, 200);
+        }, 150);
       } else {
-        alert(data.error || "Image upload failed");
+        setError(data.error || "Image upload failed");
         setProgress(0);
       }
     } catch (err: any) {
-      alert("Upload failed: " + err.message);
+      setError("Upload failed: " + err.message);
       setProgress(0);
     }
   };
 
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation: Require both images before publishing a new product
+    if (!newProduct.frontImage) {
+      alert("Validation Error: Please upload the FRONT VIEW (DEFAULT) image before publishing.");
+      return;
+    }
+    if (!newProduct.hoverImage) {
+      alert("Validation Error: Please upload the HOVER / ALTERNATE VIEW image before publishing.");
+      return;
+    }
+
     try {
       const res = await fetch("/api/admin/products", {
         method: "POST",
@@ -376,6 +408,29 @@ export default function AdminDashboardPage() {
 
       if (res.ok) {
         setShowAddProductModal(false);
+        // Reset form
+        setNewProduct({
+          title: "",
+          description: "",
+          fabric: "100% Combed Ringspun Cotton (240 GSM)",
+          gsm: 240,
+          fit: "Oversized Boxy Fit",
+          printType: "High-Density Screen Print",
+          printPlacement: "Chest & Full Back",
+          artwork: "",
+          basePrice: 1499,
+          originalPrice: 2499,
+          categoryId: categories[0]?.id || "",
+          collectionId: "",
+          isNewDrop: true,
+          isBestseller: false,
+          isLimited: false,
+          frontImage: "",
+          hoverImage: "",
+          colorName: "Washed Black",
+          colorHex: "#151515",
+          initialStock: 25,
+        });
         fetchAllAdminData();
       } else {
         const data = await res.json();
@@ -400,6 +455,16 @@ export default function AdminDashboardPage() {
   const handleUpdateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProduct) return;
+
+    if (!editingProduct.frontImage) {
+      alert("Validation Error: Please upload the FRONT VIEW (DEFAULT) image.");
+      return;
+    }
+    if (!editingProduct.hoverImage) {
+      alert("Validation Error: Please upload the HOVER / ALTERNATE VIEW image.");
+      return;
+    }
+
     try {
       const res = await fetch("/api/admin/products", {
         method: "PUT",
@@ -2041,175 +2106,291 @@ export default function AdminDashboardPage() {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                  {/* IMAGE 1: FRONT VIEW */}
-                  <div className="bg-[#E8E5DE] border-2 border-dashed border-[#B0ABA0] p-4 relative flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase text-[#151515] flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-[#151515] text-[#D8FF36] text-[10px] flex items-center justify-center font-bold">1</span>
-                        Front View (Default)
-                      </span>
-                      {newProduct.frontImage && (
-                        <span className="text-[9px] font-mono bg-[#151515] text-[#D8FF36] px-1.5 py-0.5 font-bold uppercase">
-                          ACTIVE FRONT
+                  {/* CARD 1: FRONT VIEW (DEFAULT) */}
+                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-4 relative flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D4D0C8]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#151515] text-[#D8FF36] text-[11px] flex items-center justify-center font-bold">1</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
+                          FRONT VIEW (DEFAULT)
+                        </span>
+                      </div>
+                      {newProduct.frontImage ? (
+                        <span className="text-[10px] font-mono bg-[#151515] text-[#D8FF36] px-2 py-0.5 font-bold uppercase tracking-wider">
+                          ✓ READY
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono bg-[#D4D0C8] text-[#555555] px-2 py-0.5 font-bold uppercase">
+                          REQUIRED
                         </span>
                       )}
                     </div>
 
-                    {/* Preview Box */}
+                    {/* Image Preview Box */}
                     {newProduct.frontImage ? (
-                      <div className="relative aspect-[3/4] w-full max-w-[200px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/img mb-3">
+                      <div className="relative aspect-[3/4] w-full max-w-[220px] mx-auto bg-black border border-[#D4D0C8] overflow-hidden mb-3 group/img shadow-sm">
                         <img
                           src={newProduct.frontImage}
                           alt="Front View Preview"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-white transition-colors">
-                            Replace
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                          <label className="w-full text-center cursor-pointer bg-[#D8FF36] text-[#101010] text-[11px] font-bold uppercase py-2 px-3 hover:bg-white transition-colors">
+                            Replace Image
                             <input
                               type="file"
-                              accept="image/*"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                               className="hidden"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
-                                if (file) uploadProductImage(file, "front", setFrontUploadProgress, (url) => setNewProduct({ ...newProduct, frontImage: url }));
+                                if (file) uploadProductImage(file, "front", setFrontUploadProgress, setFrontUploadError, (url) => setNewProduct({ ...newProduct, frontImage: url }));
                               }}
                             />
                           </label>
                           <button
                             type="button"
-                            onClick={() => setNewProduct({ ...newProduct, frontImage: "" })}
-                            className="bg-red-600 text-white text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-red-700 transition-colors"
+                            onClick={() => {
+                              setNewProduct({ ...newProduct, frontImage: "" });
+                              setFrontUploadError(null);
+                            }}
+                            className="w-full text-center bg-red-600 text-white text-[11px] font-bold uppercase py-2 px-3 hover:bg-red-700 transition-colors"
                           >
                             Remove
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="aspect-[3/4] w-full max-w-[200px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3">
-                        <UploadCloud className="w-8 h-8 text-[#777777] mb-2" />
-                        <span className="text-xs font-bold text-[#151515] uppercase">Front View</span>
-                        <span className="text-[10px] text-[#777777] mt-1">Drag file or click below</span>
-                      </div>
-                    )}
-
-                    {/* Upload progress */}
-                    {frontUploadProgress > 0 && (
-                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
-                        <div
-                          className="bg-[#151515] h-full transition-all duration-200"
-                          style={{ width: `${frontUploadProgress}%` }}
-                        />
-                      </div>
-                    )}
-
-                    {/* File input & URL controls */}
-                    <div className="space-y-2 mt-auto">
-                      <label className="block w-full py-2 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors">
-                        Choose Front Photo File
+                      <label className="aspect-[3/4] w-full max-w-[220px] mx-auto border-2 border-dashed border-[#B0ABA0] hover:border-[#151515] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3 cursor-pointer transition-colors group">
+                        <UploadCloud className="w-9 h-9 text-[#666666] group-hover:text-black mb-2 transition-colors" />
+                        <span className="text-xs font-bold text-[#151515] uppercase tracking-wider">
+                          SELECT FRONT IMAGE
+                        </span>
+                        <span className="text-[10px] text-[#777777] mt-1 font-mono">
+                          PNG, JPG, JPEG, WEBP (MAX 10MB)
+                        </span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) uploadProductImage(file, "front", setFrontUploadProgress, (url) => setNewProduct({ ...newProduct, frontImage: url }));
+                            if (file) uploadProductImage(file, "front", setFrontUploadProgress, setFrontUploadError, (url) => setNewProduct({ ...newProduct, frontImage: url }));
                           }}
                         />
                       </label>
-                      <input
-                        type="url"
-                        placeholder="Or paste front image URL..."
-                        value={newProduct.frontImage}
-                        onChange={(e) => setNewProduct({ ...newProduct, frontImage: e.target.value })}
-                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1.5 text-[11px] text-[#151515] font-mono"
-                      />
+                    )}
+
+                    {/* Upload Progress Bar */}
+                    {frontUploadProgress > 0 && (
+                      <div className="w-full mb-3">
+                        <div className="flex justify-between text-[10px] font-mono text-[#555555] mb-1">
+                          <span>UPLOADING FILE...</span>
+                          <span>{frontUploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-[#D4D0C8] h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-[#151515] h-full transition-all duration-200"
+                            style={{ width: `${frontUploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Validation Error Message */}
+                    {frontUploadError && (
+                      <div className="mb-3 p-2 bg-red-100 border border-red-300 text-red-800 text-[11px] font-mono">
+                        ⚠ {frontUploadError}
+                      </div>
+                    )}
+
+                    {/* Prominent Action Button */}
+                    <div className="mt-auto pt-2">
+                      {newProduct.frontImage ? (
+                        <div className="flex items-center gap-2">
+                          <label className="flex-1 py-2.5 bg-[#151515] hover:bg-black text-[#F5F3EE] hover:text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>REPLACE IMAGE</span>
+                            <input
+                              type="file"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "front", setFrontUploadProgress, setFrontUploadError, (url) => setNewProduct({ ...newProduct, frontImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewProduct({ ...newProduct, frontImage: "" });
+                              setFrontUploadError(null);
+                            }}
+                            className="py-2.5 px-3 bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold uppercase transition-colors"
+                            title="Remove front image"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="block w-full py-3 bg-[#151515] hover:bg-black text-[#D8FF36] hover:text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-md flex items-center justify-center gap-2">
+                          <UploadCloud className="w-4 h-4" />
+                          <span>UPLOAD FRONT IMAGE</span>
+                          <input
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadProductImage(file, "front", setFrontUploadProgress, setFrontUploadError, (url) => setNewProduct({ ...newProduct, frontImage: url }));
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
 
-                  {/* IMAGE 2: HOVER / ALTERNATE ANGLE */}
-                  <div className="bg-[#E8E5DE] border-2 border-dashed border-[#B0ABA0] p-4 relative flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase text-[#151515] flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-[#536500] text-white text-[10px] flex items-center justify-center font-bold">2</span>
-                        Hover / Alternate View
-                      </span>
-                      {newProduct.hoverImage && (
-                        <span className="text-[9px] font-mono bg-[#536500] text-white px-1.5 py-0.5 font-bold uppercase">
-                          REVEAL ON HOVER
+                  {/* CARD 2: HOVER / ALTERNATE VIEW */}
+                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-4 relative flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D4D0C8]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#536500] text-white text-[11px] flex items-center justify-center font-bold">2</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
+                          HOVER / ALTERNATE VIEW
+                        </span>
+                      </div>
+                      {newProduct.hoverImage ? (
+                        <span className="text-[10px] font-mono bg-[#536500] text-white px-2 py-0.5 font-bold uppercase tracking-wider">
+                          ✓ READY
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono bg-[#D4D0C8] text-[#555555] px-2 py-0.5 font-bold uppercase">
+                          REQUIRED
                         </span>
                       )}
                     </div>
 
-                    {/* Preview Box */}
+                    {/* Image Preview Box */}
                     {newProduct.hoverImage ? (
-                      <div className="relative aspect-[3/4] w-full max-w-[200px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/img mb-3">
+                      <div className="relative aspect-[3/4] w-full max-w-[220px] mx-auto bg-black border border-[#D4D0C8] overflow-hidden mb-3 group/img shadow-sm">
                         <img
                           src={newProduct.hoverImage}
-                          alt="Hover Angle Preview"
+                          alt="Hover Alternate Preview"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-white transition-colors">
-                            Replace
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                          <label className="w-full text-center cursor-pointer bg-[#D8FF36] text-[#101010] text-[11px] font-bold uppercase py-2 px-3 hover:bg-white transition-colors">
+                            Replace Image
                             <input
                               type="file"
-                              accept="image/*"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                               className="hidden"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
-                                if (file) uploadProductImage(file, "hover", setHoverUploadProgress, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
+                                if (file) uploadProductImage(file, "hover", setHoverUploadProgress, setHoverUploadError, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
                               }}
                             />
                           </label>
                           <button
                             type="button"
-                            onClick={() => setNewProduct({ ...newProduct, hoverImage: "" })}
-                            className="bg-red-600 text-white text-[10px] font-bold uppercase px-2.5 py-1.5 hover:bg-red-700 transition-colors"
+                            onClick={() => {
+                              setNewProduct({ ...newProduct, hoverImage: "" });
+                              setHoverUploadError(null);
+                            }}
+                            className="w-full text-center bg-red-600 text-white text-[11px] font-bold uppercase py-2 px-3 hover:bg-red-700 transition-colors"
                           >
                             Remove
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="aspect-[3/4] w-full max-w-[200px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3">
-                        <UploadCloud className="w-8 h-8 text-[#777777] mb-2" />
-                        <span className="text-xs font-bold text-[#151515] uppercase">Hover View (Back or 3/4)</span>
-                        <span className="text-[10px] text-[#777777] mt-1">Drag file or click below</span>
-                      </div>
-                    )}
-
-                    {/* Upload progress */}
-                    {hoverUploadProgress > 0 && (
-                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
-                        <div
-                          className="bg-[#536500] h-full transition-all duration-200"
-                          style={{ width: `${hoverUploadProgress}%` }}
-                        />
-                      </div>
-                    )}
-
-                    {/* File input & URL controls */}
-                    <div className="space-y-2 mt-auto">
-                      <label className="block w-full py-2 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors">
-                        Choose Hover Photo File
+                      <label className="aspect-[3/4] w-full max-w-[220px] mx-auto border-2 border-dashed border-[#B0ABA0] hover:border-[#151515] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3 cursor-pointer transition-colors group">
+                        <UploadCloud className="w-9 h-9 text-[#666666] group-hover:text-black mb-2 transition-colors" />
+                        <span className="text-xs font-bold text-[#151515] uppercase tracking-wider">
+                          SELECT HOVER IMAGE
+                        </span>
+                        <span className="text-[10px] text-[#777777] mt-1 font-mono">
+                          BACK OR 3/4 ANGLE (MAX 10MB)
+                        </span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) uploadProductImage(file, "hover", setHoverUploadProgress, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
+                            if (file) uploadProductImage(file, "hover", setHoverUploadProgress, setHoverUploadError, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
                           }}
                         />
                       </label>
-                      <input
-                        type="url"
-                        placeholder="Or paste hover image URL..."
-                        value={newProduct.hoverImage}
-                        onChange={(e) => setNewProduct({ ...newProduct, hoverImage: e.target.value })}
-                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1.5 text-[11px] text-[#151515] font-mono"
-                      />
+                    )}
+
+                    {/* Upload Progress Bar */}
+                    {hoverUploadProgress > 0 && (
+                      <div className="w-full mb-3">
+                        <div className="flex justify-between text-[10px] font-mono text-[#555555] mb-1">
+                          <span>UPLOADING FILE...</span>
+                          <span>{hoverUploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-[#D4D0C8] h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-[#536500] h-full transition-all duration-200"
+                            style={{ width: `${hoverUploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Validation Error Message */}
+                    {hoverUploadError && (
+                      <div className="mb-3 p-2 bg-red-100 border border-red-300 text-red-800 text-[11px] font-mono">
+                        ⚠ {hoverUploadError}
+                      </div>
+                    )}
+
+                    {/* Prominent Action Button */}
+                    <div className="mt-auto pt-2">
+                      {newProduct.hoverImage ? (
+                        <div className="flex items-center gap-2">
+                          <label className="flex-1 py-2.5 bg-[#151515] hover:bg-black text-[#F5F3EE] hover:text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>REPLACE IMAGE</span>
+                            <input
+                              type="file"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "hover", setHoverUploadProgress, setHoverUploadError, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewProduct({ ...newProduct, hoverImage: "" });
+                              setHoverUploadError(null);
+                            }}
+                            className="py-2.5 px-3 bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold uppercase transition-colors"
+                            title="Remove hover image"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="block w-full py-3 bg-[#151515] hover:bg-black text-[#D8FF36] hover:text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-md flex items-center justify-center gap-2">
+                          <UploadCloud className="w-4 h-4" />
+                          <span>UPLOAD HOVER IMAGE</span>
+                          <input
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadProductImage(file, "hover", setHoverUploadProgress, setHoverUploadError, (url) => setNewProduct({ ...newProduct, hoverImage: url }));
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -2381,143 +2562,277 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* EDIT FRONT IMAGE */}
-                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-3 flex flex-col justify-between">
-                    <span className="text-xs font-bold uppercase text-[#151515] block mb-2">
-                      Image 1: Front View (Default)
-                    </span>
+                  {/* EDIT CARD 1: FRONT VIEW (DEFAULT) */}
+                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D4D0C8]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#151515] text-[#D8FF36] text-[11px] flex items-center justify-center font-bold">1</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
+                          FRONT VIEW (DEFAULT)
+                        </span>
+                      </div>
+                      {editingProduct.frontImage ? (
+                        <span className="text-[10px] font-mono bg-[#151515] text-[#D8FF36] px-2 py-0.5 font-bold uppercase tracking-wider">
+                          ✓ ACTIVE FRONT
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono bg-red-600 text-white px-2 py-0.5 font-bold uppercase">
+                          REQUIRED
+                        </span>
+                      )}
+                    </div>
+
                     {editingProduct.frontImage ? (
-                      <div className="relative aspect-[3/4] w-full max-w-[180px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/editimg mb-2">
+                      <div className="relative aspect-[3/4] w-full max-w-[200px] mx-auto bg-black border border-[#D4D0C8] overflow-hidden group/editimg mb-3 shadow-sm">
                         <img
                           src={editingProduct.frontImage}
                           alt="Edit Front View"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-editimg:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[9px] font-bold uppercase px-2 py-1">
-                            Replace
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-editimg:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                          <label className="w-full text-center cursor-pointer bg-[#D8FF36] text-[#101010] text-[10px] font-bold uppercase py-1.5 px-2 hover:bg-white transition-colors">
+                            Replace Image
                             <input
                               type="file"
-                              accept="image/*"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                               className="hidden"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
-                                if (file) uploadProductImage(file, "front", setEditFrontProgress, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
+                                if (file) uploadProductImage(file, "front", setEditFrontProgress, setEditFrontError, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
                               }}
                             />
                           </label>
                           <button
                             type="button"
-                            onClick={() => setEditingProduct({ ...editingProduct, frontImage: "" })}
-                            className="bg-red-600 text-white text-[9px] font-bold uppercase px-2 py-1"
+                            onClick={() => {
+                              setEditingProduct({ ...editingProduct, frontImage: "" });
+                              setEditFrontError(null);
+                            }}
+                            className="w-full text-center bg-red-600 text-white text-[10px] font-bold uppercase py-1.5 px-2 hover:bg-red-700 transition-colors"
                           >
                             Remove
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="aspect-[3/4] w-full max-w-[180px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-3 text-center mb-2">
-                        <UploadCloud className="w-6 h-6 text-[#777777] mb-1" />
-                        <span className="text-[10px] text-[#777777]">No Front Photo</span>
-                      </div>
-                    )}
-
-                    {editFrontProgress > 0 && (
-                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
-                        <div className="bg-[#151515] h-full" style={{ width: `${editFrontProgress}%` }} />
-                      </div>
-                    )}
-
-                    <div className="space-y-1.5">
-                      <label className="block w-full py-1.5 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[10px] font-bold uppercase text-center cursor-pointer transition-colors">
-                        Upload New Front File
+                      <label className="aspect-[3/4] w-full max-w-[200px] mx-auto border-2 border-dashed border-[#B0ABA0] hover:border-[#151515] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3 cursor-pointer transition-colors group">
+                        <UploadCloud className="w-8 h-8 text-[#666666] group-hover:text-black mb-2 transition-colors" />
+                        <span className="text-xs font-bold text-[#151515] uppercase tracking-wider">
+                          SELECT FRONT IMAGE
+                        </span>
+                        <span className="text-[10px] text-[#777777] mt-1 font-mono">
+                          PNG, JPG, JPEG, WEBP (MAX 10MB)
+                        </span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) uploadProductImage(file, "front", setEditFrontProgress, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
+                            if (file) uploadProductImage(file, "front", setEditFrontProgress, setEditFrontError, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
                           }}
                         />
                       </label>
-                      <input
-                        type="url"
-                        placeholder="Front Image URL"
-                        value={editingProduct.frontImage || ""}
-                        onChange={(e) => setEditingProduct({ ...editingProduct, frontImage: e.target.value })}
-                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1 text-[10px] font-mono text-[#151515]"
-                      />
+                    )}
+
+                    {editFrontProgress > 0 && (
+                      <div className="w-full mb-3">
+                        <div className="flex justify-between text-[10px] font-mono text-[#555555] mb-1">
+                          <span>UPLOADING FILE...</span>
+                          <span>{editFrontProgress}%</span>
+                        </div>
+                        <div className="w-full bg-[#D4D0C8] h-2 rounded-full overflow-hidden">
+                          <div className="bg-[#151515] h-full transition-all duration-200" style={{ width: `${editFrontProgress}%` }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {editFrontError && (
+                      <div className="mb-3 p-2 bg-red-100 border border-red-300 text-red-800 text-[11px] font-mono">
+                        ⚠ {editFrontError}
+                      </div>
+                    )}
+
+                    <div className="mt-auto pt-2">
+                      {editingProduct.frontImage ? (
+                        <div className="flex items-center gap-2">
+                          <label className="flex-1 py-2 bg-[#151515] hover:bg-black text-[#F5F3EE] hover:text-[#D8FF36] text-[10px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                            <RefreshCw className="w-3 h-3" />
+                            <span>REPLACE IMAGE</span>
+                            <input
+                              type="file"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "front", setEditFrontProgress, setEditFrontError, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingProduct({ ...editingProduct, frontImage: "" });
+                              setEditFrontError(null);
+                            }}
+                            className="py-2 px-2.5 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold uppercase transition-colors"
+                            title="Remove front image"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="block w-full py-2.5 bg-[#151515] hover:bg-black text-[#D8FF36] hover:text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-md flex items-center justify-center gap-2">
+                          <UploadCloud className="w-4 h-4" />
+                          <span>UPLOAD FRONT IMAGE</span>
+                          <input
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadProductImage(file, "front", setEditFrontProgress, setEditFrontError, (url) => setEditingProduct({ ...editingProduct, frontImage: url }));
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
 
-                  {/* EDIT HOVER IMAGE */}
-                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-3 flex flex-col justify-between">
-                    <span className="text-xs font-bold uppercase text-[#151515] block mb-2">
-                      Image 2: Hover View (Alternate / Back)
-                    </span>
+                  {/* EDIT CARD 2: HOVER / ALTERNATE VIEW */}
+                  <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#D4D0C8]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#536500] text-white text-[11px] flex items-center justify-center font-bold">2</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
+                          HOVER / ALTERNATE VIEW
+                        </span>
+                      </div>
+                      {editingProduct.hoverImage ? (
+                        <span className="text-[10px] font-mono bg-[#536500] text-white px-2 py-0.5 font-bold uppercase tracking-wider">
+                          ✓ REVEAL ON HOVER
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono bg-red-600 text-white px-2 py-0.5 font-bold uppercase">
+                          REQUIRED
+                        </span>
+                      )}
+                    </div>
+
                     {editingProduct.hoverImage ? (
-                      <div className="relative aspect-[3/4] w-full max-w-[180px] mx-auto bg-white border border-[#D4D0C8] overflow-hidden group/editimg mb-2">
+                      <div className="relative aspect-[3/4] w-full max-w-[200px] mx-auto bg-black border border-[#D4D0C8] overflow-hidden group/editimg mb-3 shadow-sm">
                         <img
                           src={editingProduct.hoverImage}
                           alt="Edit Hover View"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-editimg:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                          <label className="cursor-pointer bg-[#D8FF36] text-[#101010] text-[9px] font-bold uppercase px-2 py-1">
-                            Replace
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-editimg:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                          <label className="w-full text-center cursor-pointer bg-[#D8FF36] text-[#101010] text-[10px] font-bold uppercase py-1.5 px-2 hover:bg-white transition-colors">
+                            Replace Image
                             <input
                               type="file"
-                              accept="image/*"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                               className="hidden"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
-                                if (file) uploadProductImage(file, "hover", setEditHoverProgress, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
+                                if (file) uploadProductImage(file, "hover", setEditHoverProgress, setEditHoverError, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
                               }}
                             />
                           </label>
                           <button
                             type="button"
-                            onClick={() => setEditingProduct({ ...editingProduct, hoverImage: "" })}
-                            className="bg-red-600 text-white text-[9px] font-bold uppercase px-2 py-1"
+                            onClick={() => {
+                              setEditingProduct({ ...editingProduct, hoverImage: "" });
+                              setEditHoverError(null);
+                            }}
+                            className="w-full text-center bg-red-600 text-white text-[10px] font-bold uppercase py-1.5 px-2 hover:bg-red-700 transition-colors"
                           >
                             Remove
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="aspect-[3/4] w-full max-w-[180px] mx-auto border-2 border-dashed border-[#D4D0C8] bg-[#F5F3EE] flex flex-col items-center justify-center p-3 text-center mb-2">
-                        <UploadCloud className="w-6 h-6 text-[#777777] mb-1" />
-                        <span className="text-[10px] text-[#777777]">No Hover Photo</span>
-                      </div>
-                    )}
-
-                    {editHoverProgress > 0 && (
-                      <div className="w-full bg-[#D4D0C8] h-1.5 rounded-full overflow-hidden mb-2">
-                        <div className="bg-[#536500] h-full" style={{ width: `${editHoverProgress}%` }} />
-                      </div>
-                    )}
-
-                    <div className="space-y-1.5">
-                      <label className="block w-full py-1.5 bg-[#151515] text-[#F5F3EE] hover:text-[#D8FF36] text-[10px] font-bold uppercase text-center cursor-pointer transition-colors">
-                        Upload New Hover File
+                      <label className="aspect-[3/4] w-full max-w-[200px] mx-auto border-2 border-dashed border-[#B0ABA0] hover:border-[#151515] bg-[#F5F3EE] flex flex-col items-center justify-center p-4 text-center mb-3 cursor-pointer transition-colors group">
+                        <UploadCloud className="w-8 h-8 text-[#666666] group-hover:text-black mb-2 transition-colors" />
+                        <span className="text-xs font-bold text-[#151515] uppercase tracking-wider">
+                          SELECT HOVER IMAGE
+                        </span>
+                        <span className="text-[10px] text-[#777777] mt-1 font-mono">
+                          BACK OR 3/4 ANGLE (MAX 10MB)
+                        </span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) uploadProductImage(file, "hover", setEditHoverProgress, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
+                            if (file) uploadProductImage(file, "hover", setEditHoverProgress, setEditHoverError, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
                           }}
                         />
                       </label>
-                      <input
-                        type="url"
-                        placeholder="Hover Image URL"
-                        value={editingProduct.hoverImage || ""}
-                        onChange={(e) => setEditingProduct({ ...editingProduct, hoverImage: e.target.value })}
-                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-2 py-1 text-[10px] font-mono text-[#151515]"
-                      />
+                    )}
+
+                    {editHoverProgress > 0 && (
+                      <div className="w-full mb-3">
+                        <div className="flex justify-between text-[10px] font-mono text-[#555555] mb-1">
+                          <span>UPLOADING FILE...</span>
+                          <span>{editHoverProgress}%</span>
+                        </div>
+                        <div className="w-full bg-[#D4D0C8] h-2 rounded-full overflow-hidden">
+                          <div className="bg-[#536500] h-full transition-all duration-200" style={{ width: `${editHoverProgress}%` }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {editHoverError && (
+                      <div className="mb-3 p-2 bg-red-100 border border-red-300 text-red-800 text-[11px] font-mono">
+                        ⚠ {editHoverError}
+                      </div>
+                    )}
+
+                    <div className="mt-auto pt-2">
+                      {editingProduct.hoverImage ? (
+                        <div className="flex items-center gap-2">
+                          <label className="flex-1 py-2 bg-[#151515] hover:bg-black text-[#F5F3EE] hover:text-[#D8FF36] text-[10px] font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                            <RefreshCw className="w-3 h-3" />
+                            <span>REPLACE IMAGE</span>
+                            <input
+                              type="file"
+                              accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadProductImage(file, "hover", setEditHoverProgress, setEditHoverError, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingProduct({ ...editingProduct, hoverImage: "" });
+                              setEditHoverError(null);
+                            }}
+                            className="py-2 px-2.5 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold uppercase transition-colors"
+                            title="Remove hover image"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="block w-full py-2.5 bg-[#151515] hover:bg-black text-[#D8FF36] hover:text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer transition-colors shadow-md flex items-center justify-center gap-2">
+                          <UploadCloud className="w-4 h-4" />
+                          <span>UPLOAD HOVER IMAGE</span>
+                          <input
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadProductImage(file, "hover", setEditHoverProgress, setEditHoverError, (url) => setEditingProduct({ ...editingProduct, hoverImage: url }));
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>
