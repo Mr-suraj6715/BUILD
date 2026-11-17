@@ -9,7 +9,7 @@ import PriceZones from "@/components/PriceZones";
 import TrustPerks from "@/components/TrustPerks";
 import DropCountdown from "@/components/DropCountdown";
 import NewsletterForm from "@/components/NewsletterForm";
-import HeroMedia from "@/components/HeroMedia";
+import HeroVideoBackground from "@/components/HeroVideoBackground";
 import BuildSeriesShowcase from "@/components/BuildSeriesShowcase";
 
 export const revalidate = 60; // ISR cache 60s
@@ -48,92 +48,9 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FBF9F4] text-[#1B1C19]">
       {/* =========================================================================
-          SECTION 01 — ZARA-INSPIRED EDITORIAL CAMPAIGN HERO
+          SECTION 01 — FULL-SCREEN CINEMATIC VIDEO BACKGROUND HERO
           ========================================================================= */}
-      <section className="relative w-full bg-[#151515] text-[#F5F3EE] overflow-hidden border-b border-[#262626]">
-        {/* Subtle Architectural Grid Pattern */}
-        <div className="absolute inset-0 pointer-events-none opacity-20">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="hero-grid" width="48" height="48" patternUnits="userSpaceOnUse">
-                <path d="M 48 0 L 0 0 0 48" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/20" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#hero-grid)" />
-          </svg>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            {/* Left Column: High-Impact Typography & Narrative */}
-            <div className="lg:col-span-6 flex flex-col justify-center z-10 space-y-6">
-              {/* Overline Badge & Live Counter */}
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 bg-[#D8FF36] text-[#151515] font-mono text-xs px-2.5 py-1 tracking-widest uppercase font-bold">
-                  <span className="w-1.5 h-1.5 bg-[#151515] rounded-full animate-ping" />
-                  OFFICIAL 2026 CAMPAIGN
-                </span>
-                <span className="font-mono text-xs text-[#AAAAAA] tracking-wider uppercase bg-[#262626] px-2 py-1 border border-[#333333]">
-                  [ CORE T-SHIRT COLLECTION ]
-                </span>
-              </div>
-
-              {/* Main Monumental Headline */}
-              <div className="flex flex-col">
-                <span className="font-mono text-xs font-bold text-[#888888] uppercase tracking-widest mb-1">
-                  BUILD CLOTHING // THE ARCHITECTURAL SERIES
-                </span>
-                <h1 className="font-display text-6xl sm:text-7xl lg:text-8xl tracking-tight text-white uppercase select-none leading-[0.88]">
-                  BUILT <br />
-                  <span className="text-[#D8FF36]">DIFFERENT.</span>
-                </h1>
-              </div>
-
-              {/* Body Description with Precision Specs */}
-              <p className="font-sans text-base sm:text-lg text-[#CCCCCC] max-w-xl leading-relaxed">
-                Premium 240 GSM heavy combed cotton, regular-fit half sleeves, minimal chest hit, and massive brutalist globe architecture back screenprint. Designed for pure streetwear distinction.
-              </p>
-
-              {/* Primary CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link
-                  href="/shop"
-                  className="group inline-flex items-center justify-center bg-[#D8FF36] text-[#151515] font-mono text-xs font-bold px-7 py-4 uppercase tracking-widest transition-all duration-150 hover:bg-white hover:text-[#151515] shadow-lg gap-2"
-                >
-                  <span>SHOP THE BUILD SERIES</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-
-                <Link
-                  href="/custom-print"
-                  className="group inline-flex items-center justify-center bg-transparent text-[#F5F3EE] font-mono text-xs font-bold px-7 py-4 uppercase tracking-widest border border-white/30 hover:border-white hover:bg-white/10 transition-all gap-2"
-                >
-                  <span className="w-2 h-2 rounded-full bg-[#D8FF36]" />
-                  <span>CUSTOM PRINT LAB</span>
-                </Link>
-              </div>
-
-              {/* Fast-Fashion Price Highlights (Zudio Anchor) */}
-              <div className="pt-2 flex flex-wrap items-center gap-3 text-xs font-mono text-[#AAAAAA]">
-                <span className="bg-[#262626] px-2.5 py-1 text-[#D8FF36] font-bold">
-                  FLAGSHIP TEES @ ₹1,699
-                </span>
-                <span>•</span>
-                <span>FREE DELIVERY ACROSS INDIA</span>
-                <span>•</span>
-                <span>CODE: SURAJ300</span>
-              </div>
-            </div>
-
-            {/* Right Column: High-Fashion Promo Video & Media Showcase */}
-            <div className="lg:col-span-6 relative mt-6 lg:mt-0">
-              <div className="absolute -top-3 -right-3 w-full h-full bg-[#262626] -z-0 border border-[#333333]" />
-              <div className="absolute -bottom-3 -left-3 w-28 h-28 bg-[#D8FF36]/20 -z-0" />
-              <HeroMedia />
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroVideoBackground />
 
       {/* =========================================================================
           SECTION 02 — H&M-INSPIRED STORY CATEGORIES RAIL

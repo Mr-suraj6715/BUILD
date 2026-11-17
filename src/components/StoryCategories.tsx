@@ -57,7 +57,7 @@ const categories: CategoryTile[] = [
 
 export default function StoryCategories() {
   return (
-    <section className="w-full bg-[#F5F3EE] py-8 sm:py-10 border-b border-[#E8E5DE]">
+    <section id="story-categories" className="w-full bg-[#F5F3EE] py-8 sm:py-10 border-b border-[#E8E5DE]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-4">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#777777]">

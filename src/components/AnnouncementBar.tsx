@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 interface Announcement {
@@ -11,6 +12,7 @@ interface Announcement {
 }
 
 export default function AnnouncementBar() {
+  const pathname = usePathname();
   const [messages, setMessages] = useState<Announcement[]>([
     { id: "1", text: "NEW DROP LIVE — LIMITED STOCK WORLDWIDE", link: "/shop?badge=NEW+DROP" },
     { id: "2", text: "FREE EXPRESS SHIPPING ON ALL ORDERS ABOVE ₹1,499", link: "/shop" },
@@ -36,6 +38,11 @@ export default function AnnouncementBar() {
     }, 4500);
     return () => clearInterval(interval);
   }, [messages]);
+
+  // On the home page, the 100vh cinematic background video starts right at top:0
+  if (pathname === "/") {
+    return null;
+  }
 
   const current = messages[currentIndex] || messages[0];
 
