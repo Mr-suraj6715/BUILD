@@ -46,7 +46,7 @@ export default async function HomePage() {
   const { featuredProducts, collections } = await getHomeData();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FBF9F4] text-[#1B1C19]">
+    <div className="flex flex-col min-h-screen bg-[#080808] text-[#1B1C19]">
       {/* =========================================================================
           SECTION 01 — FULL-SCREEN CINEMATIC VIDEO BACKGROUND HERO
           ========================================================================= */}

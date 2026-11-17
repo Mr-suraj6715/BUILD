@@ -7,14 +7,36 @@ import { ArrowRight, Volume2, VolumeX, ChevronDown } from "lucide-react";
 export default function HeroVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [videoLoaded, setVideoLoaded] = useState(false);
 
+  // Robust browser autoplay guarantee
   useEffect(() => {
-    // Check if user prefers reduced motion
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion && videoRef.current) {
-      videoRef.current.pause();
-    }
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Set muted properties directly on DOM element to pass strict browser autoplay policies
+    video.defaultMuted = true;
+    video.muted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("autoplay", "");
+
+    const playVideo = () => {
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise.catch((err) => {
+          console.warn("Autoplay was prevented by browser policy:", err);
+        });
+      }
+    };
+
+    playVideo();
+    video.addEventListener("canplay", playVideo);
+    video.addEventListener("loadeddata", playVideo);
+
+    return () => {
+      video.removeEventListener("canplay", playVideo);
+      video.removeEventListener("loadeddata", playVideo);
+    };
   }, []);
 
   const toggleAudio = () => {
@@ -33,58 +55,50 @@ export default function HeroVideoBackground() {
   };
 
   return (
-    <section className="relative w-full h-[100vh] min-h-[640px] overflow-hidden flex flex-col justify-between text-[#F5F3EE]">
+    <section
+      className="relative w-full h-[100vh] min-h-[640px] overflow-hidden flex flex-col justify-between text-[#F5F3EE] bg-[#080808]"
+      style={{ isolation: "isolate" }}
+    >
       {/* =========================================================================
-          1. FULL-SCREEN VIDEO BACKGROUND (100% WIDTH x 100VH HEIGHT)
+          1. REAL HTML5 VIDEO BACKGROUND (COVERING 100% WIDTH x 100% HEIGHT)
+          Explicit z-0 within isolated stacking context so it is never behind parent
           ========================================================================= */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden -z-10 pointer-events-none select-none">
-        {/* High-Quality Poster Image Fallback while video loads */}
-        <img
-          src="/images/campaign/build-series-navy.jpg"
-          alt="BUILD CLOTHING Campaign Poster"
-          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
-            videoLoaded ? "opacity-0" : "opacity-100"
-          }`}
-        />
-
-        {/* Cinematic Campaign Video playing continuously in background */}
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted={isMuted}
-          playsInline
-          preload="auto"
-          onLoadedData={() => setVideoLoaded(true)}
-          className="absolute inset-0 w-full h-full object-cover object-center scale-[1.01]"
-        >
-          <source src="/videos/build-promo.mp4" type="video/mp4" />
-        </video>
-
-        {/* =========================================================================
-            5. SOPHISTICATED GRADIENT OVERLAYS
-            Darkening on left and bottom for text readability, keeping models illuminated
-            ========================================================================= */}
-        {/* Left-to-right editorial darkening for headline contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent/10" />
-
-        {/* Bottom-to-top darkening for specs and smooth transition into next section */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/25 to-black/35" />
-
-        {/* Subtle top vignette for transparent navbar readability */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
-      </div>
-
-      {/* Top Spacer to account for transparent fixed navbar height (80px) */}
-      <div className="h-20 w-full shrink-0" aria-hidden="true" />
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        poster="/images/campaign/build-series-navy.jpg"
+        className="absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none"
+      >
+        <source src="/videos/build-promo.mp4" type="video/mp4" />
+      </video>
 
       {/* =========================================================================
-          3. HERO CONTENT OVER VIDEO
+          2. EDITORIAL GRADIENT OVERLAYS (Z-INDEX: 1)
+          Ensures high text contrast while keeping models and prints illuminated
+          ========================================================================= */}
+      {/* Left-to-right subtle darkening for headline readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-[1] pointer-events-none" />
+
+      {/* Bottom darkening for specs & smooth transition into next section */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-black/35 z-[1] pointer-events-none" />
+
+      {/* Top subtle vignette for transparent navbar */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/60 to-transparent z-[1] pointer-events-none" />
+
+      {/* Spacer to push hero content below transparent fixed navbar (80px) */}
+      <div className="h-20 w-full shrink-0 relative z-[2]" aria-hidden="true" />
+
+      {/* =========================================================================
+          3. HERO CONTENT OVER VIDEO (Z-INDEX: 2)
           Intelligently positioned on left side so models & back print stay visible
           ========================================================================= */}
-      <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 my-auto">
+      <div className="relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 my-auto">
         <div className="max-w-2xl flex flex-col justify-center space-y-6">
-          {/* Subtle Technical Badge */}
+          {/* Technical Badge */}
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 bg-[#D8FF36] text-[#151515] font-mono text-[11px] sm:text-xs px-2.5 py-1 tracking-widest uppercase font-bold shadow-md">
               <span className="w-1.5 h-1.5 bg-[#151515] rounded-full animate-ping" />
@@ -147,9 +161,9 @@ export default function HeroVideoBackground() {
       </div>
 
       {/* =========================================================================
-          BOTTOM BAR: SCROLL CUE & AUDIO TOGGLE
+          BOTTOM BAR: SCROLL CUE & AUDIO TOGGLE (Z-INDEX: 2)
           ========================================================================= */}
-      <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-2 flex items-center justify-between">
+      <div className="relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-2 flex items-center justify-between">
         {/* Scroll Indicator */}
         <button
           type="button"
