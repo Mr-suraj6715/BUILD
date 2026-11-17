@@ -64,26 +64,26 @@ export default async function HomePage() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Left Column: High-Impact Typography & Narrative */}
-            <div className="lg:col-span-7 flex flex-col justify-center z-10 space-y-6">
+            <div className="lg:col-span-6 flex flex-col justify-center z-10 space-y-6">
               {/* Overline Badge & Live Counter */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 bg-[#D8FF36] text-[#151515] font-mono text-xs px-2.5 py-1 tracking-widest uppercase font-bold">
                   <span className="w-1.5 h-1.5 bg-[#151515] rounded-full animate-ping" />
-                  ZARA-STYLE EDITORIAL DROP
+                  OFFICIAL 2026 CAMPAIGN
                 </span>
                 <span className="font-mono text-xs text-[#AAAAAA] tracking-wider uppercase bg-[#262626] px-2 py-1 border border-[#333333]">
-                  [ LIMITED 500 PIECE RUN ]
+                  [ CORE T-SHIRT COLLECTION ]
                 </span>
               </div>
 
               {/* Main Monumental Headline */}
               <div className="flex flex-col">
                 <span className="font-mono text-xs font-bold text-[#888888] uppercase tracking-widest mb-1">
-                  COLLECTION 04: THE OVERSIZED ARCHIVE
+                  BUILD CLOTHING // THE ARCHITECTURAL SERIES
                 </span>
-                <h1 className="font-display text-6xl sm:text-8xl lg:text-9xl tracking-tight text-white uppercase select-none leading-[0.88]">
+                <h1 className="font-display text-6xl sm:text-7xl lg:text-8xl tracking-tight text-white uppercase select-none leading-[0.88]">
                   BUILT <br />
                   <span className="text-[#D8FF36]">DIFFERENT.</span>
                 </h1>
@@ -91,9 +91,7 @@ export default async function HomePage() {
 
               {/* Body Description with Precision Specs */}
               <p className="font-sans text-base sm:text-lg text-[#CCCCCC] max-w-xl leading-relaxed">
-                High-fashion editorial silhouettes meeting fast-fashion accessibility. 240–280 GSM
-                luxury combed organic cotton, engineered with Tokyo drop-shoulders and crack-proof Kornit
-                prints. Built for the streetwear purist.
+                Premium 240 GSM heavy combed cotton, regular-fit half sleeves, minimal chest hit, and massive brutalist globe architecture back screenprint. Designed for pure streetwear distinction.
               </p>
 
               {/* Primary CTA Buttons */}
@@ -102,7 +100,7 @@ export default async function HomePage() {
                   href="/shop"
                   className="group inline-flex items-center justify-center bg-[#D8FF36] text-[#151515] font-mono text-xs font-bold px-7 py-4 uppercase tracking-widest transition-all duration-150 hover:bg-white hover:text-[#151515] shadow-lg gap-2"
                 >
-                  <span>SHOP NEW DROPS</span>
+                  <span>SHOP THE BUILD SERIES</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
 
@@ -118,17 +116,17 @@ export default async function HomePage() {
               {/* Fast-Fashion Price Highlights (Zudio Anchor) */}
               <div className="pt-2 flex flex-wrap items-center gap-3 text-xs font-mono text-[#AAAAAA]">
                 <span className="bg-[#262626] px-2.5 py-1 text-[#D8FF36] font-bold">
-                  TEES STARTING @ ₹999
+                  FLAGSHIP TEES @ ₹1,699
                 </span>
                 <span>•</span>
-                <span>FREE DELIVERY OVER ₹1,499</span>
+                <span>FREE DELIVERY ACROSS INDIA</span>
                 <span>•</span>
-                <span>50% OFF CODE: SURAJ300</span>
+                <span>CODE: SURAJ300</span>
               </div>
             </div>
 
             {/* Right Column: High-Fashion Promo Video & Media Showcase */}
-            <div className="lg:col-span-5 relative mt-6 lg:mt-0">
+            <div className="lg:col-span-6 relative mt-6 lg:mt-0">
               <div className="absolute -top-3 -right-3 w-full h-full bg-[#262626] -z-0 border border-[#333333]" />
               <div className="absolute -bottom-3 -left-3 w-28 h-28 bg-[#D8FF36]/20 -z-0" />
               <HeroMedia />
