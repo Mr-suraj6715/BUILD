@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     // 1. Validate items against actual database prices and stock
     let subtotal = 0;
     const validatedOrderItems: {
-      variantId: string;
+      variantId: string | null;
       productTitle: string;
       variantSize: string;
       variantColor: string;
@@ -42,8 +42,38 @@ export async function POST(request: Request) {
       total: number;
       productImage: string;
     }[] = [];
+    const stockToDecrement: { variantId: string; quantity: number }[] = [];
 
-    for (const item of items as CartInputItem[]) {
+    for (const item of items as (CartInputItem & {
+      title?: string;
+      size?: string;
+      color?: string;
+      price?: number;
+      image?: string;
+      isCustom?: boolean;
+    })[]) {
+      const isCustomItem = item.isCustom || (item.variantId && String(item.variantId).startsWith("custom-"));
+
+      if (isCustomItem) {
+        // Dynamic custom studio item validation
+        const unitPrice = item.price && item.price >= 1499 ? item.price : 1899;
+        const itemQuantity = Math.max(1, item.quantity || 1);
+        const itemTotal = unitPrice * itemQuantity;
+        subtotal += itemTotal;
+
+        validatedOrderItems.push({
+          variantId: null,
+          productTitle: item.title || "Custom Oversized Printed Tee",
+          variantSize: item.size || "L",
+          variantColor: item.color || "Midnight Navy",
+          unitPrice,
+          quantity: itemQuantity,
+          total: itemTotal,
+          productImage: item.image || "/images/stitch/custom-mockup.png",
+        });
+        continue;
+      }
+
       const variant = await prisma.productVariant.findUnique({
         where: { id: item.variantId },
         include: {
@@ -85,6 +115,8 @@ export async function POST(request: Request) {
         total: itemTotal,
         productImage: variant.product.images[0]?.url || "",
       });
+
+      stockToDecrement.push({ variantId: variant.id, quantity: item.quantity });
     }
 
     // 2. Validate Coupon with strict database rules
@@ -140,12 +172,20 @@ export async function POST(request: Request) {
     const orderNumber = generateOrderNumber();
     const isCOD = paymentMethod === "COD";
 
-    // 4. Create Order & increment coupon usage count in a transaction
+    // 4. Create Order, decrement variant stock & increment coupon usage in a single transaction
     const order = await prisma.$transaction(async (tx) => {
       if (appliedCouponId) {
         await tx.coupon.update({
           where: { id: appliedCouponId },
           data: { usageCount: { increment: 1 } },
+        });
+      }
+
+      // Decrement catalog variant stock safely inside transaction
+      for (const item of stockToDecrement) {
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data: { stock: { decrement: item.quantity } },
         });
       }
 
@@ -178,14 +218,6 @@ export async function POST(request: Request) {
         },
       });
     });
-
-    // 5. Decrement stock
-    for (const item of items) {
-      await prisma.productVariant.update({
-        where: { id: item.variantId },
-        data: { stock: { decrement: item.quantity } },
-      });
-    }
 
     // Send transactional order confirmation email
     const recipientEmail = guestEmail || session?.email;

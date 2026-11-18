@@ -65,12 +65,12 @@ export async function POST(request: Request) {
 
     // STRICT CATALOG VALIDATION: T-SHIRTS ONLY
     const prohibitedKeywords = [
-      "hoodie", "sweatshirt", "jacket", "jeans", "trouser", "pant", "short",
-      "shoe", "sneaker", "slipper", "sandal", "cap", "hat", "bag", "sock", "watch"
+      "hoodie", "sweatshirt", "jacket", "jeans", "trouser", "pant", "shoe", "sneaker", "slipper", "sandal", "cap", "hat", "bag", "sock", "watch"
     ];
-    const textToCheck = `${title} ${description || ""} ${fit || ""}`.toLowerCase();
+    const textToCheck = `${title} ${description || ""} ${fit || ""}`;
     for (const badWord of prohibitedKeywords) {
-      if (textToCheck.includes(badWord)) {
+      const wordRegex = new RegExp(`\\b${badWord}s?\\b`, "i");
+      if (wordRegex.test(textToCheck)) {
         return NextResponse.json(
           { error: `BUILD CLOTHING is strictly an exclusive T-shirt brand. Non-T-shirt products (${badWord}) are strictly prohibited.` },
           { status: 400 }
@@ -201,15 +201,15 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Product ID is required for editing" }, { status: 400 });
     }
 
-    // Catalog validation
+    // Catalog validation: T-shirts only
     if (title || description || fit) {
       const prohibitedKeywords = [
-        "hoodie", "sweatshirt", "jacket", "jeans", "trouser", "pant", "short",
-        "shoe", "sneaker", "slipper", "sandal", "cap", "hat", "bag", "sock", "watch"
+        "hoodie", "sweatshirt", "jacket", "jeans", "trouser", "pant", "shoe", "sneaker", "slipper", "sandal", "cap", "hat", "bag", "sock", "watch"
       ];
-      const textToCheck = `${title || ""} ${description || ""} ${fit || ""}`.toLowerCase();
+      const textToCheck = `${title || ""} ${description || ""} ${fit || ""}`;
       for (const badWord of prohibitedKeywords) {
-        if (textToCheck.includes(badWord)) {
+        const wordRegex = new RegExp(`\\b${badWord}s?\\b`, "i");
+        if (wordRegex.test(textToCheck)) {
           return NextResponse.json(
             { error: `BUILD CLOTHING is strictly an exclusive T-shirt brand. Non-T-shirt products (${badWord}) are strictly prohibited.` },
             { status: 400 }

@@ -1,24 +1,20 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose/jwt/verify";
 
-function decodeJwtPayload(token: string): { role?: string; userId?: string } | null {
+const JWT_SECRET = process.env.JWT_SECRET || "build_clothing_fallback_secret_key_123456";
+const encodedSecret = new TextEncoder().encode(JWT_SECRET);
+
+async function verifyTokenEdge(token: string): Promise<{ role?: string; userId?: string } | null> {
   try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const payloadBase64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(payloadBase64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
+    const { payload } = await jwtVerify(token, encodedSecret);
+    return payload as { role?: string; userId?: string };
   } catch {
     return null;
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("bld_token")?.value;
 
@@ -35,7 +31,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/login?from=" + pathname, request.url));
     }
 
-    const payload = decodeJwtPayload(token);
+    const payload = await verifyTokenEdge(token);
     if (!payload || (payload.role !== "ADMIN" && payload.role !== "SUPER_ADMIN")) {
       return NextResponse.redirect(new URL("/account", request.url));
     }
@@ -47,7 +43,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/login?from=" + pathname, request.url));
     }
 
-    const payload = decodeJwtPayload(token);
+    const payload = await verifyTokenEdge(token);
     if (!payload) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }

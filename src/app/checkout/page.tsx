@@ -114,7 +114,16 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: cart.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
+          items: cart.map((i) => ({
+            variantId: i.variantId,
+            quantity: i.quantity,
+            title: i.title,
+            size: i.size,
+            color: i.color,
+            price: i.price,
+            image: i.image,
+            isCustom: i.variantId?.startsWith("custom-") || i.slug === "custom-print",
+          })),
           shippingAddress: formData,
           paymentMethod,
           couponCode: coupon?.code,

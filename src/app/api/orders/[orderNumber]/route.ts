@@ -7,6 +7,7 @@ export async function GET(
   { params }: { params: { orderNumber: string } }
 ) {
   try {
+    const session = await getSessionUser();
     const { orderNumber } = params;
 
     const order = await prisma.order.findUnique({
@@ -18,6 +19,20 @@ export async function GET(
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    // Access control: prevent other customers from inspecting another customer's order
+    if (
+      order.userId &&
+      session &&
+      session.userId !== order.userId &&
+      session.role !== "ADMIN" &&
+      session.role !== "SUPER_ADMIN"
+    ) {
+      return NextResponse.json(
+        { error: "Forbidden: You do not have permission to view this order" },
+        { status: 403 }
+      );
     }
 
     return NextResponse.json({ order });
@@ -46,7 +61,13 @@ export async function POST(
     }
 
     // Verify ownership if logged in
-    if (session && order.userId && order.userId !== session.userId && session.role !== "ADMIN") {
+    if (
+      session &&
+      order.userId &&
+      order.userId !== session.userId &&
+      session.role !== "ADMIN" &&
+      session.role !== "SUPER_ADMIN"
+    ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

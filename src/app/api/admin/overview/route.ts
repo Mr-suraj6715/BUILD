@@ -39,8 +39,9 @@ export async function GET() {
     const totalOrders = orders.length;
     const paidOrders = orders.filter((o) => o.paymentStatus === "PAID" || o.status === "DELIVERED");
     const totalRevenue = paidOrders.reduce((acc, curr) => acc + curr.totalAmount, 0);
-    const averageOrderValue = totalOrders > 0 ? Math.round(totalRevenue / (paidOrders.length || 1)) : 0;
+    const averageOrderValue = paidOrders.length > 0 ? Math.round(totalRevenue / paidOrders.length) : 0;
     const pendingOrders = orders.filter((o) => o.status === "PENDING" || o.status === "CONFIRMED").length;
+    const deliveredOrders = orders.filter((o) => o.status === "DELIVERED").length;
     const lowStockVariants = variants.filter((v) => v.stock <= 5);
     const refundRequests = orders.filter((o) => o.status === "RETURN_REQUESTED").length;
 
@@ -61,40 +62,66 @@ export async function GET() {
     // Recent 10 orders
     const recentOrders = orders.slice(0, 10);
 
-    // Sales by Category
+    // Sales by Category / Color from actual order items
     const categoryRevenueMap: Record<string, number> = {};
-    products.forEach((p) => {
-      const catName = p.category?.name || "Streetwear";
-      categoryRevenueMap[catName] = (categoryRevenueMap[catName] || 0) + p.basePrice * 8;
+    orders.forEach((o) => {
+      if (o.paymentStatus === "PAID" || o.status === "DELIVERED") {
+        o.items.forEach((item) => {
+          const groupName = item.variantColor || "Core";
+          categoryRevenueMap[groupName] = (categoryRevenueMap[groupName] || 0) + item.total;
+        });
+      }
     });
 
-    // Daily Revenue (Last 7 Days) for charts
-    const dailyRevenue = [
-      { day: "Mon", revenue: 14990, orders: 8 },
-      { day: "Tue", revenue: 22480, orders: 12 },
-      { day: "Wed", revenue: 18990, orders: 10 },
-      { day: "Thu", revenue: 31200, orders: 16 },
-      { day: "Fri", revenue: 42500, orders: 22 },
-      { day: "Sat", revenue: 58900, orders: 31 },
-      { day: "Sun", revenue: 49200, orders: 26 },
-    ];
+    // Daily Revenue (Last 7 Days) calculated from real database orders
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const now = new Date();
+    const last7DaysMap: Record<string, { day: string; revenue: number; orders: number }> = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dayName = days[d.getDay()];
+      const key = d.toISOString().split("T")[0];
+      last7DaysMap[key] = { day: dayName, revenue: 0, orders: 0 };
+    }
+    orders.forEach((o) => {
+      const orderDate = new Date(o.createdAt).toISOString().split("T")[0];
+      if (last7DaysMap[orderDate]) {
+        last7DaysMap[orderDate].orders += 1;
+        if (o.paymentStatus === "PAID" || o.status === "DELIVERED") {
+          last7DaysMap[orderDate].revenue += o.totalAmount;
+        }
+      }
+    });
+    const dailyRevenue = Object.values(last7DaysMap);
 
-    // Bestselling products ranking
-    const bestsellers = products.slice(0, 5).map((p, idx) => ({
-      id: p.id,
-      title: p.title,
-      price: p.basePrice,
-      unitsSold: 48 - idx * 7,
-      revenue: (48 - idx * 7) * p.basePrice,
-    }));
+    // Bestselling products ranking calculated from real order items
+    const productSalesMap: Record<string, { id: string; title: string; price: number; unitsSold: number; revenue: number }> = {};
+    orders.forEach((o) => {
+      o.items.forEach((item) => {
+        if (!productSalesMap[item.productTitle]) {
+          productSalesMap[item.productTitle] = {
+            id: item.variantId || item.id,
+            title: item.productTitle,
+            price: item.unitPrice,
+            unitsSold: 0,
+            revenue: 0,
+          };
+        }
+        productSalesMap[item.productTitle].unitsSold += item.quantity;
+        productSalesMap[item.productTitle].revenue += item.total;
+      });
+    });
+    const bestsellers = Object.values(productSalesMap).sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 5);
 
     return NextResponse.json({
       kpis: {
-        totalRevenue: totalRevenue || 238260,
-        totalOrders: totalOrders || 125,
-        totalCustomers: totalCustomers || 89,
-        averageOrderValue: averageOrderValue || 1906,
+        totalRevenue,
+        totalOrders,
+        totalCustomers,
+        averageOrderValue,
         pendingOrders,
+        deliveredOrders,
         lowStockCount: lowStockVariants.length,
         totalProducts: products.length,
         refundRequests,

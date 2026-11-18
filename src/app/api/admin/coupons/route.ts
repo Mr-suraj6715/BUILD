@@ -6,6 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
     const coupons = await prisma.coupon.findMany({
       orderBy: { code: "asc" },
     });

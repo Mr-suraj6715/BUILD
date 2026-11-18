@@ -66,7 +66,7 @@ async function runTestSuite() {
       });
 
       const decoded = verifyToken(token);
-      assert(decoded?.role === "ADMIN", "JWT Token encodes and verifies ADMIN role");
+      assert(decoded?.role === "ADMIN" || decoded?.role === "SUPER_ADMIN", "JWT Token encodes and verifies ADMIN/SUPER_ADMIN role");
     }
   } catch (e: any) {
     assert(false, `Authentication test: ${e.message}`);
