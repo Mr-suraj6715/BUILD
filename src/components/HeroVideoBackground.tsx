@@ -98,22 +98,8 @@ export default function HeroVideoBackground() {
           ========================================================================= */}
       <div className="relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 my-auto">
         <div className="max-w-2xl flex flex-col justify-center space-y-6">
-          {/* Technical Badge */}
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 bg-[#D8FF36] text-[#151515] font-mono text-[11px] sm:text-xs px-2.5 py-1 tracking-widest uppercase font-bold shadow-md">
-              <span className="w-1.5 h-1.5 bg-[#151515] rounded-full animate-ping" />
-              OFFICIAL 2026 CAMPAIGN
-            </span>
-            <span className="font-mono text-[11px] sm:text-xs text-[#D8FF36] tracking-widest uppercase bg-black/60 backdrop-blur-md px-2.5 py-1 border border-white/15">
-              THE CORE SERIES
-            </span>
-          </div>
-
-          {/* Monumental Main Heading per exact specification */}
+          {/* Monumental Main Heading */}
           <div className="flex flex-col">
-            <span className="font-mono text-xs font-bold text-[#AAAAAA] uppercase tracking-[0.2em] mb-2 drop-shadow">
-              BUILD CLOTHING // AUTUMN-WINTER
-            </span>
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[104px] tracking-tight text-white uppercase select-none leading-[0.88] drop-shadow-2xl">
               BUILT FOR <br />
               <span className="text-[#D8FF36]">THE DIFFERENT.</span>
