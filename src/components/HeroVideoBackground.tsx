@@ -1,49 +1,62 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Volume2, VolumeX, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 export default function HeroVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
 
-  // Robust browser autoplay guarantee
+  // Robust browser autoplay guarantee for Chrome, Edge, Safari, Firefox
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Set muted properties directly on DOM element to pass strict browser autoplay policies
+    // Strict muted and inline settings required by browser autoplay policies
     video.defaultMuted = true;
     video.muted = true;
     video.setAttribute("muted", "");
     video.setAttribute("playsinline", "");
     video.setAttribute("autoplay", "");
+    video.setAttribute("loop", "");
 
-    const playVideo = () => {
-      const promise = video.play();
-      if (promise !== undefined) {
-        promise.catch((err) => {
-          console.warn("Autoplay was prevented by browser policy:", err);
+    const startPlayback = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Fallback: retry on user touch or interaction
+          const onUserGesture = () => {
+            video.play().catch(() => { });
+            window.removeEventListener("touchstart", onUserGesture);
+            window.removeEventListener("click", onUserGesture);
+            window.removeEventListener("scroll", onUserGesture);
+          };
+          window.addEventListener("touchstart", onUserGesture, { once: true, passive: true });
+          window.addEventListener("click", onUserGesture, { once: true });
+          window.addEventListener("scroll", onUserGesture, { once: true, passive: true });
         });
       }
     };
 
-    playVideo();
-    video.addEventListener("canplay", playVideo);
-    video.addEventListener("loadeddata", playVideo);
+    startPlayback();
+    video.addEventListener("canplay", startPlayback);
+    video.addEventListener("loadeddata", startPlayback);
+    video.addEventListener("loadedmetadata", startPlayback);
+
+    // Ensure continuous loop without black frames
+    const handleEnded = () => {
+      video.currentTime = 0;
+      video.play().catch(() => { });
+    };
+    video.addEventListener("ended", handleEnded);
 
     return () => {
-      video.removeEventListener("canplay", playVideo);
-      video.removeEventListener("loadeddata", playVideo);
+      video.removeEventListener("canplay", startPlayback);
+      video.removeEventListener("loadeddata", startPlayback);
+      video.removeEventListener("loadedmetadata", startPlayback);
+      video.removeEventListener("ended", handleEnded);
     };
   }, []);
-
-  const toggleAudio = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
 
   const scrollToContent = () => {
     const nextSection = document.getElementById("story-categories");
@@ -56,57 +69,67 @@ export default function HeroVideoBackground() {
 
   return (
     <section
-      className="relative w-full h-[100vh] min-h-[640px] overflow-hidden flex flex-col justify-between text-[#F5F3EE] bg-[#080808]"
+      className="hero relative w-full h-[100vh] min-h-[640px] overflow-hidden flex flex-col justify-between text-[#F5F3EE] bg-[#080808]"
       style={{ isolation: "isolate" }}
+      aria-label="Hero Fashion Campaign"
     >
       {/* =========================================================================
-          1. REAL HTML5 VIDEO BACKGROUND (COVERING 100% WIDTH x 100% HEIGHT)
-          Explicit z-0 within isolated stacking context so it is never behind parent
+          1. REAL FULL-SCREEN HTML5 BACKGROUND VIDEO (AUTOPLAY, MUTED, LOOP)
+          Covering 100% width and 100vh height behind website content
           ========================================================================= */}
       <video
         ref={videoRef}
         autoPlay
-        muted
         loop
         playsInline
         preload="auto"
         poster="/images/campaign/build-series-navy.jpg"
-        className="absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none"
+        aria-hidden="true"
+        tabIndex={-1}
+        className="hero-video absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none select-none"
       >
+        <source src="/videos/build.mp4" type="video/mp4" />
+        <source src="/videos/build-campaign.mp4" type="video/mp4" />
         <source src="/videos/build-promo.mp4" type="video/mp4" />
       </video>
 
       {/* =========================================================================
-          2. EDITORIAL GRADIENT OVERLAYS (Z-INDEX: 1)
-          Ensures high text contrast while keeping models and prints illuminated
+          2. EDITORIAL CINEMATIC OVERLAY (Z-INDEX: 1)
+          Left-to-right gradient provides contrast for text while keeping models visible
           ========================================================================= */}
-      {/* Left-to-right subtle darkening for headline readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-[1] pointer-events-none" />
-
-      {/* Bottom darkening for specs & smooth transition into next section */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-black/35 z-[1] pointer-events-none" />
-
-      {/* Top subtle vignette for transparent navbar */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/60 to-transparent z-[1] pointer-events-none" />
+      <div
+        className="hero-overlay absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.20) 45%, rgba(0,0,0,0.30) 100%)",
+        }}
+      />
+      {/* Seamless transition into bottom section */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 z-[1] pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to top, #080808 0%, rgba(8,8,8,0.7) 40%, transparent 100%)",
+        }}
+      />
 
       {/* Spacer to push hero content below transparent fixed navbar (80px) */}
       <div className="h-20 w-full shrink-0 relative z-[2]" aria-hidden="true" />
 
       {/* =========================================================================
-          3. HERO CONTENT OVER VIDEO (Z-INDEX: 2)
-          Intelligently positioned on left side so models & back print stay visible
+          3. HERO CONTENT OVER MOVING VIDEO (Z-INDEX: 2)
           ========================================================================= */}
-      <div className="relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 my-auto">
+      <div className="hero-content relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 my-auto">
         <div className="max-w-2xl flex flex-col justify-center space-y-6">
           {/* Monumental Main Heading */}
           <div className="flex flex-col">
             <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[104px] tracking-tight text-white uppercase select-none leading-[0.88] drop-shadow-2xl">
               BUILT FOR <br />
-              <span className="text-[#D8FF36]">THE DIFFERENT.</span>
+              <span className="text-[#D8FF36]">THE DIFFERENT</span>
             </h1>
           </div>
 
-          {/* Supporting Text per exact specification */}
+          {/* Supporting Text */}
           <p className="font-sans text-base sm:text-xl text-[#F5F3EE] max-w-lg leading-relaxed drop-shadow font-normal">
             Premium streetwear. Bold identity. <br className="hidden sm:inline" />
             Wear what defines you.
@@ -125,7 +148,7 @@ export default function HeroVideoBackground() {
             </span>
           </div>
 
-          {/* CTA Buttons per exact specification */}
+          {/* Call-to-Action Buttons */}
           <div className="flex flex-wrap items-center gap-4 pt-3">
             <Link
               href="/shop"
@@ -147,10 +170,9 @@ export default function HeroVideoBackground() {
       </div>
 
       {/* =========================================================================
-          BOTTOM BAR: SCROLL CUE & AUDIO TOGGLE (Z-INDEX: 2)
+          4. BOTTOM BAR: SCROLL CUE (Z-INDEX: 2)
           ========================================================================= */}
       <div className="relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-2 flex items-center justify-between">
-        {/* Scroll Indicator */}
         <button
           type="button"
           onClick={scrollToContent}
@@ -158,27 +180,6 @@ export default function HeroVideoBackground() {
         >
           <span>EXPLORE ARCHIVE</span>
           <ChevronDown className="w-4 h-4 animate-bounce text-[#D8FF36]" />
-        </button>
-
-        {/* Audio Toggle (Mute/Unmute) */}
-        <button
-          type="button"
-          onClick={toggleAudio}
-          className="inline-flex items-center gap-2 bg-black/60 backdrop-blur-md text-[#F5F3EE] hover:text-[#D8FF36] border border-white/15 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors rounded-sm shadow-md"
-          title={isMuted ? "Unmute campaign audio" : "Mute campaign audio"}
-          aria-label={isMuted ? "Unmute campaign audio" : "Mute campaign audio"}
-        >
-          {isMuted ? (
-            <>
-              <VolumeX className="w-3.5 h-3.5 text-[#AAAAAA]" />
-              <span className="hidden sm:inline">AUDIO: MUTED</span>
-            </>
-          ) : (
-            <>
-              <Volume2 className="w-3.5 h-3.5 text-[#D8FF36]" />
-              <span className="hidden sm:inline text-[#D8FF36]">AUDIO: ON</span>
-            </>
-          )}
         </button>
       </div>
     </section>
