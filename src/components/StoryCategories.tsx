@@ -37,7 +37,7 @@ const categories: CategoryTile[] = [
     name: "CUSTOM PRINT",
     subtitle: "1200 DPI DTG Lab",
     href: "/custom-print",
-    image: "/images/stitch/custom-mockup.png",
+    image: "/images/campaign/build-series-flatlay.jpg",
     badge: "STUDIO",
   },
   {

@@ -245,8 +245,8 @@ export default async function HomePage() {
               </div>
 
               <img
-                src="/images/stitch/custom-mockup.png"
-                alt="3D Heavyweight T-Shirt Mockup Canvas"
+                src="/images/campaign/build-series-flatlay.jpg"
+                alt="THE BUILD SERIES — Building A Better Tomorrow Collection"
                 className="max-h-full max-w-full object-contain filter drop-shadow-2xl"
               />
 

@@ -70,9 +70,8 @@ export default function Navbar() {
 
   const navLinks: NavLinkItem[] = [
     { name: "HOME", href: "/" },
-    { name: "SHOP", href: "/shop" },
     { name: "COLLECTIONS", href: "/shop?collection=the-build-series" },
-    { name: "CUSTOM PRINT", href: "/custom-print", badge: "STUDIO" },
+    { name: "CUSTOM PRINT", href: "/custom-print" },
     { name: "LOOKBOOK", href: "/#lookbook" },
     { name: "ABOUT", href: "/#story" },
   ];
