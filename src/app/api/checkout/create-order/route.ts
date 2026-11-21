@@ -55,21 +55,21 @@ export async function POST(request: Request) {
       const isCustomItem = item.isCustom || (item.variantId && String(item.variantId).startsWith("custom-"));
 
       if (isCustomItem) {
-        // Dynamic custom studio item validation
-        const unitPrice = item.price && item.price >= 1499 ? item.price : 1899;
+        // Dynamic custom studio item validation (base prices start at 999 for regular fit)
+        const unitPrice = item.price && item.price >= 999 ? item.price : 999;
         const itemQuantity = Math.max(1, item.quantity || 1);
         const itemTotal = unitPrice * itemQuantity;
         subtotal += itemTotal;
 
         validatedOrderItems.push({
           variantId: null,
-          productTitle: item.title || "Custom Oversized Printed Tee",
+          productTitle: item.title || "BUILD Custom Studio Apparel",
           variantSize: item.size || "L",
           variantColor: item.color || "Midnight Navy",
           unitPrice,
           quantity: itemQuantity,
           total: itemTotal,
-          productImage: item.image || "/images/stitch/custom-mockup.png",
+          productImage: item.image || "/images/stitch/brand-studio.jpg",
         });
         continue;
       }

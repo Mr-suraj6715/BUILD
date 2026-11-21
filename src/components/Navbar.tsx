@@ -62,7 +62,13 @@ export default function Navbar() {
   };
 
   // Main navigation sequence per design specification
-  const navLinks = [
+  interface NavLinkItem {
+    name: string;
+    href: string;
+    badge?: string;
+  }
+
+  const navLinks: NavLinkItem[] = [
     { name: "HOME", href: "/" },
     { name: "SHOP", href: "/shop" },
     { name: "COLLECTIONS", href: "/shop?collection=the-build-series" },
@@ -80,16 +86,14 @@ export default function Navbar() {
   // Determine styling based on whether on homepage and whether scrolled
   const isLightText = isHome; // Always white on homepage (either transparent over video or dark scrolled navbar)
   const headerClasses = isHome
-    ? `fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 border-none ${
-        isScrolled
-          ? "bg-[#101010]/95 backdrop-blur-md shadow-xl py-0 text-white"
-          : "bg-transparent text-white"
-      }`
-    : `sticky top-0 z-40 w-full transition-all duration-200 ${
-        isScrolled
-          ? "bg-[#F5F3EE]/95 backdrop-blur-md border-b border-[#E8E5DE] shadow-[0_2px_12px_rgba(0,0,0,0.03)] text-[#151515]"
-          : "bg-[#F5F3EE] border-b border-[#E8E5DE] text-[#151515]"
-      }`;
+    ? `fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 border-none ${isScrolled
+      ? "bg-[#101010]/95 backdrop-blur-md shadow-xl py-0 text-white"
+      : "bg-transparent text-white"
+    }`
+    : `sticky top-0 z-40 w-full transition-all duration-200 ${isScrolled
+      ? "bg-[#F5F3EE]/95 backdrop-blur-md border-b border-[#E8E5DE] shadow-[0_2px_12px_rgba(0,0,0,0.03)] text-[#151515]"
+      : "bg-[#F5F3EE] border-b border-[#E8E5DE] text-[#151515]"
+    }`;
 
   return (
     <>
@@ -127,19 +131,16 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-[12px] xl:text-[13px] uppercase font-bold tracking-[0.14em] transition-colors relative py-1.5 flex items-center gap-1.5 focus:outline-none ${
-                    isLightText
-                      ? active
-                        ? "text-white"
-                        : "text-white/75 hover:text-white"
-                      : active
+                  className={`text-[12px] xl:text-[13px] uppercase font-bold tracking-[0.14em] transition-colors relative py-1.5 flex items-center gap-1.5 focus:outline-none ${isLightText
+                    ? active
+                      ? "text-white"
+                      : "text-white/75 hover:text-white"
+                    : active
                       ? "text-[#151515]"
                       : "text-[#151515]/70 hover:text-[#151515]"
-                  } after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] ${
-                    isLightText ? "after:bg-[#D8FF36]" : "after:bg-[#151515]"
-                  } ${
-                    active ? "after:scale-x-100" : "after:scale-x-0"
-                  } hover:after:scale-x-100 after:transition-transform after:duration-200`}
+                    } after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] ${isLightText ? "after:bg-[#D8FF36]" : "after:bg-[#151515]"
+                    } ${active ? "after:scale-x-100" : "after:scale-x-0"
+                    } hover:after:scale-x-100 after:transition-transform after:duration-200`}
                 >
                   <span>{link.name}</span>
                   {link.badge && (
@@ -160,11 +161,10 @@ export default function Navbar() {
             {/* 1. Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className={`p-2 transition-colors rounded-full focus:outline-none ${
-                isLightText
-                  ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
-                  : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
-              }`}
+              className={`p-2 transition-colors rounded-full focus:outline-none ${isLightText
+                ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
+                : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
+                }`}
               aria-label="Search Catalog"
               aria-expanded={searchOpen}
             >
@@ -174,11 +174,10 @@ export default function Navbar() {
             {/* 2. Account */}
             <Link
               href={user ? "/account" : "/auth/login"}
-              className={`p-2 transition-colors rounded-full focus:outline-none ${
-                isLightText
-                  ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
-                  : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
-              }`}
+              className={`p-2 transition-colors rounded-full focus:outline-none ${isLightText
+                ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
+                : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
+                }`}
               aria-label={user ? `Account (${user.name})` : "Account Login"}
             >
               <User className="w-5 h-5" strokeWidth={1.8} />
@@ -187,11 +186,10 @@ export default function Navbar() {
             {/* 3. Wishlist */}
             <Link
               href="/shop?filter=featured"
-              className={`p-2 transition-colors rounded-full focus:outline-none ${
-                isLightText
-                  ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
-                  : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
-              }`}
+              className={`p-2 transition-colors rounded-full focus:outline-none ${isLightText
+                ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
+                : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
+                }`}
               aria-label="Wishlist"
               title="Saved Items / Wishlist"
             >
@@ -201,11 +199,10 @@ export default function Navbar() {
             {/* 4. Shopping Bag / Cart */}
             <button
               onClick={() => setIsCartDrawerOpen(true)}
-              className={`relative p-2 transition-colors rounded-full focus:outline-none ${
-                isLightText
-                  ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
-                  : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
-              }`}
+              className={`relative p-2 transition-colors rounded-full focus:outline-none ${isLightText
+                ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
+                : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
+                }`}
               aria-label={`Shopping Bag (${totalItems} items)`}
             >
               <ShoppingBag className="w-5 h-5" strokeWidth={1.8} />
@@ -219,11 +216,10 @@ export default function Navbar() {
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className={`p-2 lg:hidden rounded-full focus:outline-none ml-0.5 ${
-                isLightText
-                  ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
-                  : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
-              }`}
+              className={`p-2 lg:hidden rounded-full focus:outline-none ml-0.5 ${isLightText
+                ? "text-white hover:text-[#D8FF36] hover:bg-white/10"
+                : "text-[#151515] hover:text-black hover:bg-[#E8E5DE]/60"
+                }`}
               aria-label="Open Mobile Menu"
             >
               <Menu className="w-6 h-6" strokeWidth={1.8} />
@@ -236,11 +232,10 @@ export default function Navbar() {
         {/* ======================================================== */}
         {searchOpen && (
           <div
-            className={`border-t px-4 py-3 animate-in fade-in slide-in-from-top-1 duration-150 ${
-              isLightText
-                ? "border-[#262626] bg-[#121212]/95 backdrop-blur-md text-white"
-                : "border-[#E8E5DE] bg-[#F5F3EE] text-[#151515]"
-            }`}
+            className={`border-t px-4 py-3 animate-in fade-in slide-in-from-top-1 duration-150 ${isLightText
+              ? "border-[#262626] bg-[#121212]/95 backdrop-blur-md text-white"
+              : "border-[#E8E5DE] bg-[#F5F3EE] text-[#151515]"
+              }`}
           >
             <form
               onSubmit={handleSearchSubmit}
@@ -248,9 +243,8 @@ export default function Navbar() {
             >
               <div className="relative flex-1">
                 <Search
-                  className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                    isLightText ? "text-[#AAAAAA]" : "text-[#777777]"
-                  }`}
+                  className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isLightText ? "text-[#AAAAAA]" : "text-[#777777]"
+                    }`}
                   strokeWidth={1.75}
                 />
                 <input
@@ -259,11 +253,10 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="SEARCH GRAPHIC TEES, HOODIES, DROPS..."
                   autoFocus
-                  className={`w-full pl-10 pr-4 py-2 font-mono text-xs uppercase tracking-wider border rounded-none focus:outline-none transition-colors ${
-                    isLightText
-                      ? "bg-[#1E1E1E] text-white border-[#333333] placeholder-[#888888] focus:border-[#D8FF36]"
-                      : "bg-white text-[#151515] border-[#D4D0C8] placeholder-[#999999] focus:border-black"
-                  }`}
+                  className={`w-full pl-10 pr-4 py-2 font-mono text-xs uppercase tracking-wider border rounded-none focus:outline-none transition-colors ${isLightText
+                    ? "bg-[#1E1E1E] text-white border-[#333333] placeholder-[#888888] focus:border-[#D8FF36]"
+                    : "bg-white text-[#151515] border-[#D4D0C8] placeholder-[#999999] focus:border-black"
+                    }`}
                 />
               </div>
               <button
@@ -275,11 +268,10 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setSearchOpen(false)}
-                className={`p-2 transition-colors shrink-0 ${
-                  isLightText
-                    ? "text-[#AAAAAA] hover:text-white"
-                    : "text-[#777777] hover:text-[#151515]"
-                }`}
+                className={`p-2 transition-colors shrink-0 ${isLightText
+                  ? "text-[#AAAAAA] hover:text-white"
+                  : "text-[#777777] hover:text-[#151515]"
+                  }`}
                 aria-label="Close search"
               >
                 <X className="w-5 h-5" strokeWidth={1.75} />
@@ -331,11 +323,10 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`text-sm uppercase font-bold tracking-wider py-3 px-3 rounded-sm transition-colors flex items-center justify-between ${
-                        active
-                          ? "bg-[#222222] text-[#D8FF36]"
-                          : "text-[#CCCCCC] hover:text-white hover:bg-white/5"
-                      }`}
+                      className={`text-sm uppercase font-bold tracking-wider py-3 px-3 rounded-sm transition-colors flex items-center justify-between ${active
+                        ? "bg-[#222222] text-[#D8FF36]"
+                        : "text-[#CCCCCC] hover:text-white hover:bg-white/5"
+                        }`}
                     >
                       <span>{link.name}</span>
                       {link.badge && (

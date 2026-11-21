@@ -1207,13 +1207,66 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        {o.items?.map((it: any) => (
-                          <div key={it.id} className="flex justify-between">
-                            <span>{it.productTitle} ({it.variantSize})</span>
-                            <span>Qty: {it.quantity} • {formatPrice(it.total)}</span>
-                          </div>
-                        ))}
+                      <div className="space-y-2">
+                        {o.items?.map((it: any) => {
+                          const isCustom = it.productTitle?.includes("CUSTOM") || it.productImage?.includes("/uploads/custom");
+                          return (
+                            <div
+                              key={it.id}
+                              className={`p-2.5 border transition-all ${
+                                isCustom ? "bg-white border-[#151515] shadow-sm" : "bg-transparent border-[#D4D0C8]"
+                              } flex flex-col sm:flex-row sm:items-center justify-between gap-3`}
+                            >
+                              <div className="flex items-center gap-3">
+                                {it.productImage && (
+                                  <a
+                                    href={it.productImage}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    title="Click to view artwork full size"
+                                  >
+                                    <img
+                                      src={it.productImage}
+                                      alt={it.productTitle}
+                                      className="w-12 h-12 object-contain bg-[#111] border border-[#CCC]"
+                                    />
+                                  </a>
+                                )}
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-[#151515]">{it.productTitle}</span>
+                                    {isCustom && (
+                                      <span className="px-1.5 py-0.5 bg-[#D8FF36] text-black font-mono text-[9px] font-black uppercase">
+                                        CUSTOM PRINT
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-[#666] text-[11px] mt-0.5">
+                                    <span>Color: {it.variantColor || "N/A"}</span>
+                                    <span className="mx-1.5">•</span>
+                                    <span>Size: {it.variantSize || "N/A"}</span>
+                                    {isCustom && it.productImage && (
+                                      <>
+                                        <span className="mx-1.5">•</span>
+                                        <a
+                                          href={it.productImage}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="text-blue-600 underline font-bold"
+                                        >
+                                          Download Artwork
+                                        </a>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="font-bold">Qty: {it.quantity} • {formatPrice(it.total)}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       <div className="pt-3 border-t border-[#D4D0C8] flex flex-wrap gap-2 items-center">
