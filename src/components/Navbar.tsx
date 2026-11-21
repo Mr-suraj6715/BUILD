@@ -97,43 +97,19 @@ export default function Navbar() {
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 sm:gap-6">
           {/* ======================================================== */}
           {/* LEFT SECTION — BRAND IDENTITY                            */}
-          {/* Prominent monogram + brand name                          */}
+          {/* Official BUILD Mountain Wordmark Logo                    */}
           {/* ======================================================== */}
           <div className="flex items-center shrink-0">
             <Link
               href="/"
-              className="group flex items-center gap-3 sm:gap-3.5 focus:outline-none"
+              className="group flex items-center focus:outline-none py-1"
               aria-label="BUILD Homepage"
             >
-              {/* Premium Vector Monogram Emblem */}
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[3px] bg-[#151515] border border-white/10 flex items-center justify-center shrink-0 shadow-md transition-transform duration-200 group-hover:scale-105">
-                <svg
-                  className="w-6 h-6 sm:w-7 sm:h-7"
-                  viewBox="0 0 44 44"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M11 9H23.5C27.0899 9 30 11.9101 30 15.5C30 17.8546 28.7497 19.9174 26.8837 21.0506C29.3496 22.148 31 24.6226 31 27.5C31 31.6421 27.6421 35 23.5 35H11V9ZM17 14.5V19.5H23C24.3807 19.5 25.5 18.3807 25.5 17C25.5 15.6193 24.3807 14.5 23 14.5H17ZM17 24.5V29.5H23.5C24.8807 29.5 26 28.3807 26 27C26 25.6193 24.8807 24.5 23.5 24.5H17Z"
-                    fill="#F5F3EE"
-                  />
-                  <rect x="33" y="9" width="4" height="4" fill="#D8FF36" />
-                </svg>
-              </div>
-
-              {/* Brand Name Typography - BUILD */}
-              <span
-                className={`font-display text-3xl sm:text-[34px] tracking-[0.02em] uppercase font-bold leading-none transition-colors ${
-                  isLightText
-                    ? "text-white group-hover:text-[#D8FF36]"
-                    : "text-[#151515] group-hover:text-black"
-                }`}
-              >
-                BUILD
-              </span>
+              <img
+                src={isLightText ? "/images/build-logo-white.png" : "/images/build-logo-dark.png"}
+                alt="BUILD"
+                className="h-9 sm:h-10 md:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+              />
             </Link>
           </div>
 
@@ -328,29 +304,14 @@ export default function Navbar() {
           {/* Slide-out Panel */}
           <div className="relative w-full max-w-xs bg-[#121212] text-white h-full shadow-2xl flex flex-col justify-between p-6 z-10 border-r border-[#262626]">
             <div>
-              {/* Header with Monogram and Close Button */}
+              {/* Header with BUILD Logo and Close Button */}
               <div className="flex items-center justify-between pb-6 border-b border-[#262626]">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-[3px] bg-[#1A1A1A] border border-white/10 flex items-center justify-center shrink-0 shadow-xs">
-                    <svg
-                      className="w-5.5 h-5.5"
-                      viewBox="0 0 44 44"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M11 9H23.5C27.0899 9 30 11.9101 30 15.5C30 17.8546 28.7497 19.9174 26.8837 21.0506C29.3496 22.148 31 24.6226 31 27.5C31 31.6421 27.6421 35 23.5 35H11V9ZM17 14.5V19.5H23C24.3807 19.5 25.5 18.3807 25.5 17C25.5 15.6193 24.3807 14.5 23 14.5H17ZM17 24.5V29.5H23.5C24.8807 29.5 26 28.3807 26 27C26 25.6193 24.8807 24.5 23.5 24.5H17Z"
-                        fill="#F5F3EE"
-                      />
-                      <rect x="33" y="9" width="4" height="4" fill="#D8FF36" />
-                    </svg>
-                  </div>
-                  <span className="font-display text-2xl sm:text-3xl font-bold tracking-[0.02em] text-white uppercase leading-none">
-                    BUILD
-                  </span>
+                <div className="flex items-center">
+                  <img
+                    src="/images/build-logo-white.png"
+                    alt="BUILD"
+                    className="h-8 sm:h-9 w-auto object-contain"
+                  />
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}

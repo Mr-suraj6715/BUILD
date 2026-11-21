@@ -73,10 +73,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10">
         {/* Brand identity column */}
         <div className="col-span-2 lg:col-span-2 space-y-4">
-          <Link href="/" className="inline-block">
-            <span className="font-display text-4xl tracking-wider uppercase font-black text-[#F5F3EE]">
-              BUILD<span className="text-[#D8FF36]">.</span>
-            </span>
+          <Link href="/" className="inline-block py-1">
+            <img
+              src="/images/build-logo-white.png"
+              alt="BUILD"
+              className="h-9 sm:h-10 w-auto object-contain"
+            />
           </Link>
           <p className="text-xs text-[#777777] max-w-sm leading-relaxed">
             BUILD CLOTHING is a premium independent streetwear label engineered for Gen Z and modern pop-culture communities. 240+ GSM heavyweight combed cotton, custom boxy silhouettes, and uncompromising original design.
