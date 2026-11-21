@@ -131,51 +131,55 @@ export default function GarmentModel({
 
   // Printable Zone Dimensions and Positioning by Placement
   const getPlacementBoxStyle = () => {
+    const isHoodie = garmentId === "hoodie";
+    const isSweatshirt = garmentId === "sweatshirt";
+    const isPolo = garmentId === "polo";
+
     if (view === "front") {
       switch (placement) {
         case "front-left": // Left breast/pocket
           return {
-            top: "28%",
-            left: "58%",
+            top: isHoodie || isSweatshirt ? "30%" : isPolo ? "32%" : "27%",
+            left: "56%",
             width: "22%",
-            height: "22%",
+            height: "20%",
           };
         case "front-full": // Full front
           return {
-            top: "23%",
-            left: "24%",
-            width: "52%",
-            height: "62%",
+            top: isHoodie ? "26%" : isPolo ? "30%" : "22%",
+            left: "26%",
+            width: "48%",
+            height: isHoodie ? "36%" : isPolo ? "48%" : "56%",
           };
         case "front-chest": // Standard chest center
         default:
           return {
-            top: "27%",
+            top: isHoodie ? "27%" : isPolo ? "31%" : "26%",
             left: "28%",
             width: "44%",
-            height: "44%",
+            height: isHoodie ? "36%" : "44%",
           };
       }
     } else {
       switch (placement) {
         case "back-upper": // Upper neck hit
           return {
-            top: "20%",
+            top: isHoodie ? "24%" : "18%",
             left: "35%",
             width: "30%",
-            height: "18%",
+            height: "16%",
           };
         case "back-full": // Massive full back
           return {
-            top: "23%",
-            left: "22%",
-            width: "56%",
-            height: "64%",
+            top: isHoodie ? "25%" : "22%",
+            left: "23%",
+            width: "54%",
+            height: isHoodie ? "50%" : "58%",
           };
         case "back-center": // Standard back center
         default:
           return {
-            top: "27%",
+            top: isHoodie ? "28%" : "26%",
             left: "27%",
             width: "46%",
             height: "46%",
@@ -187,17 +191,19 @@ export default function GarmentModel({
   const isLightColor =
     colorHex.toLowerCase() === "#ffffff" ||
     colorHex.toLowerCase() === "#fbfbfb" ||
+    colorHex.toLowerCase() === "#faf9f6" ||
+    colorHex.toLowerCase() === "#fffff0" ||
+    colorHex.toLowerCase() === "#fffdd0" ||
     colorHex.toLowerCase() === "#d9c9b6" ||
-    colorHex.toLowerCase() === "#e8e5de";
+    colorHex.toLowerCase() === "#c2b280" ||
+    colorHex.toLowerCase() === "#e8e5de" ||
+    colorHex.toLowerCase() === "#d3d3d3" ||
+    colorHex.toLowerCase() === "#e6e6fa" ||
+    colorHex.toLowerCase() === "#f4c2c2" ||
+    colorHex.toLowerCase() === "#fff44f";
 
-  const isHoodieOrSweatshirt = garmentId === "hoodie" || garmentId === "sweatshirt";
-  const garmentImgSrc = isHoodieOrSweatshirt
-    ? view === "front"
-      ? "/images/mockups/real-hoodie-front.png"
-      : "/images/mockups/real-hoodie-back.png"
-    : view === "front"
-    ? "/images/mockups/real-tee-front.png"
-    : "/images/mockups/real-tee-back.png";
+  // Dedicated clean photographic studio mockups for every single garment type & view
+  const garmentImgSrc = `/images/mockups/mockup-${garmentId}-${view}.png`;
 
   return (
     <div

@@ -108,22 +108,63 @@ const GARMENTS: GarmentOption[] = [
 ];
 
 // =========================================================================
-// 2. GARMENT COLORWAYS
+// 2. GARMENT COLORWAYS (CATEGORIZED LIBRARY)
 // =========================================================================
 interface ColorOption {
   name: string;
   hex: string;
+  category: "Classic" | "Streetwear" | "Earthy" | "Bold";
   badge?: string;
 }
 
 const COLORWAYS: ColorOption[] = [
-  { name: "Midnight Navy", hex: "#152238" },
-  { name: "Deep Maroon", hex: "#4A0E17" },
-  { name: "Premium Beige", hex: "#D9C9B6" },
-  { name: "Jet Black", hex: "#111111", badge: "CORE" },
-  { name: "Pure White", hex: "#FBFBFB" },
-  { name: "Charcoal Grey", hex: "#373A3C" },
-  { name: "Olive Green", hex: "#4B5320" },
+  // Classic Colours
+  { name: "Pure White", hex: "#FFFFFF", category: "Classic", badge: "CORE" },
+  { name: "Jet Black", hex: "#111111", category: "Classic", badge: "CORE" },
+  { name: "Charcoal", hex: "#363636", category: "Classic" },
+  { name: "Heather Grey", hex: "#9E9E9E", category: "Classic" },
+  { name: "Light Grey", hex: "#D3D3D3", category: "Classic" },
+  { name: "Off White", hex: "#FAF9F6", category: "Classic" },
+  { name: "Ivory", hex: "#FFFFF0", category: "Classic" },
+  { name: "Cream", hex: "#FFFDD0", category: "Classic" },
+
+  // Premium Streetwear Colours
+  { name: "Midnight Navy", hex: "#152238", category: "Streetwear", badge: "POPULAR" },
+  { name: "Deep Navy", hex: "#0A192F", category: "Streetwear" },
+  { name: "Royal Blue", hex: "#4169E1", category: "Streetwear" },
+  { name: "Sky Blue", hex: "#87CEEB", category: "Streetwear" },
+  { name: "Burgundy", hex: "#800020", category: "Streetwear" },
+  { name: "Deep Maroon", hex: "#4A0E17", category: "Streetwear", badge: "SIGNATURE" },
+  { name: "Wine", hex: "#722F37", category: "Streetwear" },
+  { name: "Chocolate Brown", hex: "#3D1C02", category: "Streetwear" },
+  { name: "Mocha", hex: "#493628", category: "Streetwear" },
+  { name: "Coffee Brown", hex: "#362B28", category: "Streetwear" },
+  { name: "Premium Beige", hex: "#D9C9B6", category: "Streetwear", badge: "NEW" },
+  { name: "Sand", hex: "#C2B280", category: "Streetwear" },
+  { name: "Taupe", hex: "#483C32", category: "Streetwear" },
+
+  // Earthy Colours
+  { name: "Olive Green", hex: "#4B5320", category: "Earthy", badge: "TRENDING" },
+  { name: "Forest Green", hex: "#228B22", category: "Earthy" },
+  { name: "Sage Green", hex: "#9DC183", category: "Earthy" },
+  { name: "Moss Green", hex: "#8A9A5B", category: "Earthy" },
+  { name: "Khaki", hex: "#C3B091", category: "Earthy" },
+  { name: "Stone", hex: "#928E85", category: "Earthy" },
+  { name: "Rust", hex: "#B7410E", category: "Earthy" },
+  { name: "Terracotta", hex: "#E2725B", category: "Earthy" },
+
+  // Bold Colours
+  { name: "Crimson Red", hex: "#990000", category: "Bold" },
+  { name: "Cherry Red", hex: "#D2042D", category: "Bold" },
+  { name: "Mustard Yellow", hex: "#FFDB58", category: "Bold" },
+  { name: "Lemon Yellow", hex: "#FFF44F", category: "Bold" },
+  { name: "Orange", hex: "#FFA500", category: "Bold" },
+  { name: "Lavender", hex: "#E6E6FA", category: "Bold" },
+  { name: "Purple", hex: "#800080", category: "Bold" },
+  { name: "Teal", hex: "#008080", category: "Bold" },
+  { name: "Emerald Green", hex: "#50C878", category: "Bold" },
+  { name: "Baby Pink", hex: "#F4C2C2", category: "Bold" },
+  { name: "Dusty Pink", hex: "#DCAE96", category: "Bold" },
 ];
 
 // =========================================================================
@@ -261,6 +302,89 @@ export default function CustomPrintStudioPage() {
   // Dynamic Price Calculations
   const selectedPrintSideObj = PRINT_SIDES.find((p) => p.id === printSide) || PRINT_SIDES[0];
   const unitPrice = selectedGarment.basePrice + selectedPrintSideObj.extra + selectedFinish.extra;
+
+  // Color Category State
+  const [colorCategory, setColorCategory] = useState<string>("All");
+
+  const filteredColors = COLORWAYS.filter((c) => {
+    if (colorCategory === "All") return true;
+    return c.category === colorCategory;
+  });
+
+  // Template Quick Actions
+  const handleStartWithBuildDesign = () => {
+    setFrontArtwork({
+      url: "/images/studio/demo-front-logo.png",
+      fileName: "build_summit_front.png",
+      x: 0,
+      y: 0,
+      scale: 0.85,
+      rotation: 0,
+    });
+    setBackArtwork({
+      url: "/images/studio/demo-back-graphic.png",
+      fileName: "build_tomorrow_back.png",
+      x: 0,
+      y: 0,
+      scale: 0.95,
+      rotation: 0,
+    });
+    setFrontText({
+      text: "",
+      font: "mono",
+      color: "#FFFFFF",
+      fontSize: 22,
+      x: 0,
+      y: 20,
+      rotation: 0,
+    });
+    setBackText({
+      text: "",
+      font: "mono",
+      color: "#FFFFFF",
+      fontSize: 22,
+      x: 0,
+      y: 20,
+      rotation: 0,
+    });
+  };
+
+  const handleStartFromBlank = () => {
+    setFrontArtwork({
+      url: null,
+      fileName: undefined,
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0,
+    });
+    setBackArtwork({
+      url: null,
+      fileName: undefined,
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0,
+    });
+    setFrontText({
+      text: "",
+      font: "mono",
+      color: "#FFFFFF",
+      fontSize: 22,
+      x: 0,
+      y: 20,
+      rotation: 0,
+    });
+    setBackText({
+      text: "",
+      font: "mono",
+      color: "#FFFFFF",
+      fontSize: 22,
+      x: 0,
+      y: 20,
+      rotation: 0,
+    });
+  };
 
   // Volume discounts: 5+ pcs = 10% off, 10+ pcs = 15% off
   const discountRate = quantity >= 10 ? 0.15 : quantity >= 5 ? 0.1 : 0;
@@ -449,13 +573,34 @@ export default function CustomPrintStudioPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 font-mono text-xs text-[#888888]">
+          <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-[#888888]">
+            {/* Quick Template Presets */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleStartWithBuildDesign}
+                className="flex items-center gap-1 px-2.5 py-1.5 bg-[#D8FF36] hover:bg-[#cbf720] text-black font-mono text-[11px] font-bold uppercase transition-all shadow-sm rounded-none"
+                title="Load approved BUILD summit front logo & architectural globe back graphic"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Start With BUILD Design</span>
+              </button>
+              <button
+                onClick={handleStartFromBlank}
+                className="flex items-center gap-1 px-2.5 py-1.5 bg-[#202020] hover:bg-[#2A2A2A] text-white font-mono text-[11px] font-bold uppercase border border-[#444] transition-all rounded-none"
+                title="Clear all artwork and text to reveal a completely plain unbranded garment"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-[#888]" />
+                <span>Start From Blank</span>
+              </button>
+            </div>
+
+            <span className="hidden sm:inline text-[#333]">|</span>
             <span className="hidden sm:inline">GARMENT: <strong className="text-white">{selectedGarment.name.toUpperCase()}</strong></span>
             <span className="hidden sm:inline">•</span>
             <span className="hidden sm:inline">COLOR: <strong className="text-white">{selectedColor.name.toUpperCase()}</strong></span>
             <button
               onClick={() => setIsPreviewOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1 bg-[#202020] hover:bg-[#2A2A2A] text-white font-mono text-xs border border-[#333] transition-colors uppercase font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#2A2A2A] text-white font-mono text-xs border border-[#333] transition-colors uppercase font-bold"
             >
               <Eye className="w-3.5 h-3.5 text-[#D8FF36]" />
               Preview Mockup
@@ -520,36 +665,68 @@ export default function CustomPrintStudioPage() {
                   <span className="w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center font-bold">2</span>
                   Garment Colour
                 </h3>
-                <span className="font-mono text-[11px] text-[#777]">{selectedColor.name}</span>
+                <span className="font-mono text-[11px] text-[#777] font-bold">{selectedColor.name}</span>
               </div>
 
-              <div className="grid grid-cols-4 gap-2.5">
-                {COLORWAYS.map((c) => {
+              {/* Organized Category Tabs */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none font-mono text-[10px]">
+                {["All", "Classic", "Streetwear", "Earthy", "Bold"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setColorCategory(cat)}
+                    className={`px-2 py-1 uppercase whitespace-nowrap transition-colors border ${
+                      colorCategory === cat
+                        ? "bg-black text-[#D8FF36] border-black font-bold shadow-sm"
+                        : "bg-[#FBF9F4] text-[#666] border-[#E5E0D6] hover:text-black"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Swatches Grid */}
+              <div className="grid grid-cols-6 gap-2 max-h-[190px] overflow-y-auto pr-1">
+                {filteredColors.map((c) => {
                   const isSelected = selectedColor.name === c.name;
+                  const isLight =
+                    c.hex === "#FFFFFF" ||
+                    c.hex === "#FBFBFB" ||
+                    c.hex === "#FAF9F6" ||
+                    c.hex === "#FFFFF0" ||
+                    c.hex === "#FFFDD0" ||
+                    c.hex === "#D9C9B6" ||
+                    c.hex === "#C2B280" ||
+                    c.hex === "#E6E6FA" ||
+                    c.hex === "#F4C2C2" ||
+                    c.hex === "#FFF44F";
                   return (
                     <button
                       key={c.name}
                       onClick={() => setSelectedColor(c)}
-                      title={c.name}
-                      className={`relative aspect-square border-2 transition-transform flex items-center justify-center ${
+                      title={`${c.name} (${c.hex})`}
+                      className={`relative aspect-square border transition-all flex items-center justify-center ${
                         isSelected
-                          ? "border-black scale-105 shadow-md ring-2 ring-[#D8FF36]"
-                          : "border-black/20 hover:scale-102"
+                          ? "border-black scale-110 shadow-md ring-2 ring-[#D8FF36] z-10"
+                          : "border-black/20 hover:scale-105"
                       }`}
                       style={{ backgroundColor: c.hex }}
                     >
                       {isSelected && (
                         <Check
-                          className={`w-4 h-4 ${
-                            c.hex === "#FFFFFF" || c.hex === "#FBFBFB" || c.hex === "#D9C9B6"
-                              ? "text-black"
-                              : "text-white"
-                          }`}
+                          className={`w-3.5 h-3.5 ${isLight ? "text-black" : "text-white"}`}
                         />
                       )}
                     </button>
                   );
                 })}
+              </div>
+
+              <div className="flex items-center justify-between font-mono text-[10px] text-[#888] pt-2 border-t border-[#EAE6DF]">
+                <span>HEX: <strong className="text-[#151515]">{selectedColor.hex}</strong></span>
+                <span className="uppercase text-[#2E7D32] bg-[#E8F5E9] px-1.5 py-0.5 font-bold">
+                  {selectedColor.category}
+                </span>
               </div>
             </div>
 
@@ -783,6 +960,30 @@ export default function CustomPrintStudioPage() {
               {/* Tab 1: Artwork Upload */}
               {activeRightTab === "artwork" && (
                 <div className="p-5 space-y-5">
+                  {/* Starter Design Template Mode */}
+                  <div className="bg-[#111111] p-3.5 text-white border border-[#2A2A2A] space-y-2.5">
+                    <div className="flex items-center justify-between font-mono text-[10px]">
+                      <span className="text-[#888] uppercase tracking-wider">Quick Preset Template</span>
+                      <span className="text-[#D8FF36]">INSTANT LOAD</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={handleStartWithBuildDesign}
+                        className="py-2 px-2 bg-[#D8FF36] hover:bg-[#cbf720] text-black font-mono text-[11px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        BUILD Design
+                      </button>
+                      <button
+                        onClick={handleStartFromBlank}
+                        className="py-2 px-2 bg-[#222222] hover:bg-[#333333] text-white font-mono text-[11px] font-bold uppercase border border-[#444] transition-all flex items-center justify-center gap-1.5"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-[#888]" />
+                        Start Blank
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Front Artwork Box */}
                   <div className="border border-[#E5E0D6] p-4 bg-[#FBF9F4] space-y-3">
                     <div className="flex items-center justify-between">
