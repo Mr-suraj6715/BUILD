@@ -299,20 +299,26 @@ export default function GarmentModel({
         {currentArtwork.url && (
           <div
             onMouseDown={(e) => handleMouseDown("artwork", e)}
-            className="absolute cursor-move select-none transition-shadow"
+            className="absolute cursor-move select-none transition-shadow z-20 flex items-center justify-center"
             style={{
               top: `calc(50% + ${currentArtwork.y}%)`,
               left: `calc(50% + ${currentArtwork.x}%)`,
               transform: `translate(-50%, -50%) rotate(${currentArtwork.rotation}deg) scale(${currentArtwork.scale})`,
-              maxWidth: "90%",
-              maxHeight: "90%",
+              maxWidth: "92%",
+              maxHeight: "92%",
               ...getFinishStyle(),
             }}
           >
             <img
-              src={currentArtwork.url}
+              src={
+                isLightColor && currentArtwork.url.includes("demo-front-logo.png")
+                  ? "/images/studio/demo-front-logo-dark.png"
+                  : isLightColor && currentArtwork.url.includes("demo-back-graphic.png")
+                  ? "/images/studio/demo-back-graphic-dark.png"
+                  : currentArtwork.url
+              }
               alt="Custom Artwork"
-              className="max-w-[200px] max-h-[220px] object-contain pointer-events-none filter drop-shadow-md"
+              className="max-w-[240px] max-h-[260px] object-contain pointer-events-none filter drop-shadow-md"
               draggable={false}
             />
             {interactive && activeDragItem === "artwork" && (

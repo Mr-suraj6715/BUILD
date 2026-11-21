@@ -197,17 +197,17 @@ export default function CustomPrintStudioPage() {
   const [selectedGarment, setSelectedGarment] = useState<GarmentOption>(GARMENTS[2]); // Default Oversized
   const [selectedColor, setSelectedColor] = useState<ColorOption>(COLORWAYS[0]); // Midnight Navy
   const [activeView, setActiveView] = useState<"front" | "back">("front");
-  const [printSide, setPrintSide] = useState<string>("front-only");
+  const [printSide, setPrintSide] = useState<string>("both");
   const [frontPlacement, setFrontPlacement] = useState<string>("front-chest");
   const [backPlacement, setBackPlacement] = useState<string>("back-center");
   const [selectedFinish, setSelectedFinish] = useState(FINISHES[0]);
   const [selectedSize, setSelectedSize] = useState<string>("L");
   const [quantity, setQuantity] = useState<number>(1);
 
-  // Artwork Upload State
+  // Artwork Upload State (Preloaded with official BUILD Demo Design)
   const [frontArtwork, setFrontArtwork] = useState<CustomArtworkState>({
-    url: null,
-    fileName: "",
+    url: "/images/studio/demo-front-logo.png",
+    fileName: "build_summit_front.png",
     x: 0,
     y: 0,
     scale: 0.85,
@@ -215,11 +215,11 @@ export default function CustomPrintStudioPage() {
   });
 
   const [backArtwork, setBackArtwork] = useState<CustomArtworkState>({
-    url: null,
-    fileName: "",
+    url: "/images/studio/demo-back-graphic.png",
+    fileName: "build_tomorrow_back.png",
     x: 0,
     y: 0,
-    scale: 0.85,
+    scale: 0.95,
     rotation: 0,
   });
 
