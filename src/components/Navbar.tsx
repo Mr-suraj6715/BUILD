@@ -73,16 +73,17 @@ export default function Navbar() {
 
   const isLinkActive = (href: string) => {
     if (href === "/") return pathname === "/";
-    return pathname.startsWith(href.split("?")[0].split("#")[0]);
+    if (href.startsWith("/#")) return false;
+    return pathname.startsWith(href.split("?")[0]);
   };
 
   // Determine styling based on whether on homepage and whether scrolled
   const isLightText = isHome; // Always white on homepage (either transparent over video or dark scrolled navbar)
   const headerClasses = isHome
-    ? `fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 ${
+    ? `fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 border-none ${
         isScrolled
-          ? "bg-[#101010]/95 backdrop-blur-md border-b border-[#262626] shadow-xl py-0 text-white"
-          : "bg-transparent border-b border-white/10 text-white"
+          ? "bg-[#101010]/95 backdrop-blur-md shadow-xl py-0 text-white"
+          : "bg-transparent text-white"
       }`
     : `sticky top-0 z-40 w-full transition-all duration-200 ${
         isScrolled
