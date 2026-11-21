@@ -142,42 +142,42 @@ export default function GarmentModel({
           };
         case "front-full": // Full front
           return {
-            top: "25%",
-            left: "25%",
-            width: "50%",
-            height: "58%",
+            top: "23%",
+            left: "24%",
+            width: "52%",
+            height: "62%",
           };
         case "front-chest": // Standard chest center
         default:
           return {
             top: "27%",
-            left: "30%",
-            width: "40%",
-            height: "42%",
+            left: "28%",
+            width: "44%",
+            height: "44%",
           };
       }
     } else {
       switch (placement) {
         case "back-upper": // Upper neck hit
           return {
-            top: "22%",
+            top: "20%",
             left: "35%",
             width: "30%",
-            height: "16%",
+            height: "18%",
           };
         case "back-full": // Massive full back
           return {
-            top: "24%",
+            top: "23%",
             left: "22%",
             width: "56%",
-            height: "60%",
+            height: "64%",
           };
         case "back-center": // Standard back center
         default:
           return {
-            top: "28%",
-            left: "28%",
-            width: "44%",
+            top: "27%",
+            left: "27%",
+            width: "46%",
             height: "46%",
           };
       }
@@ -190,363 +190,81 @@ export default function GarmentModel({
     colorHex.toLowerCase() === "#d9c9b6" ||
     colorHex.toLowerCase() === "#e8e5de";
 
+  const isHoodieOrSweatshirt = garmentId === "hoodie" || garmentId === "sweatshirt";
+  const garmentImgSrc = isHoodieOrSweatshirt
+    ? view === "front"
+      ? "/images/mockups/real-hoodie-front.png"
+      : "/images/mockups/real-hoodie-back.png"
+    : view === "front"
+    ? "/images/mockups/real-tee-front.png"
+    : "/images/mockups/real-tee-back.png";
+
   return (
     <div
       ref={containerRef}
       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden"
     >
       {/* ======================================================== */}
-      {/* 1. REALISTIC VECTOR GARMENT SILHOUETTE                   */}
+      {/* 1. PHOTOREALISTIC REAL APPAREL GARMENT (TRUE FABRIC)     */}
       {/* ======================================================== */}
-      <svg
-        viewBox="0 0 500 560"
-        className="w-full h-full max-h-[520px] max-w-[500px] drop-shadow-2xl transition-colors duration-300 pointer-events-none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          {/* Natural Fabric Texture & Shading Gradients */}
-          <linearGradient id="bodyShade" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#000" stopOpacity="0.28" />
-            <stop offset="15%" stopColor="#000" stopOpacity="0.08" />
-            <stop offset="50%" stopColor="#fff" stopOpacity={isLightColor ? "0.08" : "0.15"} />
-            <stop offset="85%" stopColor="#000" stopOpacity="0.08" />
-            <stop offset="100%" stopColor="#000" stopOpacity="0.32" />
-          </linearGradient>
+      <div className="relative w-full h-full max-h-[520px] max-w-[500px] flex items-center justify-center pointer-events-none select-none">
+        {/* Real Apparel Base Photo */}
+        <img
+          src={garmentImgSrc}
+          alt="Real Garment Blank"
+          className="w-full h-full object-contain filter drop-shadow-2xl transition-all duration-300"
+        />
 
-          <linearGradient id="verticalDepth" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#fff" stopOpacity="0.12" />
-            <stop offset="70%" stopColor="#000" stopOpacity="0" />
-            <stop offset="100%" stopColor="#000" stopOpacity="0.25" />
-          </linearGradient>
+        {/* Dynamic Color Multiply Tint Overlay (Masked exactly to the real garment silhouette) */}
+        <div
+          className="absolute inset-0 mix-blend-multiply transition-colors duration-300 pointer-events-none"
+          style={{
+            backgroundColor: colorHex,
+            maskImage: `url(${garmentImgSrc})`,
+            WebkitMaskImage: `url(${garmentImgSrc})`,
+            maskSize: "contain",
+            WebkitMaskSize: "contain",
+            maskPosition: "center",
+            WebkitMaskPosition: "center",
+            maskRepeat: "no-repeat",
+            WebkitMaskRepeat: "no-repeat",
+            opacity: isLightColor ? 0.78 : 0.92,
+          }}
+        />
 
-          <radialGradient id="chestHighlight" cx="50%" cy="35%" r="45%">
-            <stop offset="0%" stopColor="#fff" stopOpacity={isLightColor ? "0.15" : "0.22"} />
-            <stop offset="100%" stopColor="#000" stopOpacity="0.15" />
-          </radialGradient>
+        {/* Real Cotton Weave Texture Overlay */}
+        <div
+          className="absolute inset-0 mix-blend-overlay opacity-25 pointer-events-none"
+          style={{
+            backgroundImage: "url(/images/stitch/fabric-texture.jpg)",
+            backgroundSize: "cover",
+            maskImage: `url(${garmentImgSrc})`,
+            WebkitMaskImage: `url(${garmentImgSrc})`,
+            maskSize: "contain",
+            WebkitMaskSize: "contain",
+            maskPosition: "center",
+            WebkitMaskPosition: "center",
+            maskRepeat: "no-repeat",
+            WebkitMaskRepeat: "no-repeat",
+          }}
+        />
 
-          {/* Crease Shadow Pattern */}
-          <filter id="fabricNoise" x="0" y="0" width="100%" height="100%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise" />
-            <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0" />
-            <feComposite in2="SourceGraphic" in="gl" operator="in" />
-          </filter>
-        </defs>
-
-        {/* ---------------------------------------------------- */}
-        {/* GARMENT TYPE: HOODIE                                 */}
-        {/* ---------------------------------------------------- */}
-        {garmentId === "hoodie" ? (
-          view === "front" ? (
-            <g id="hoodie-front">
-              {/* Outer Silhouette */}
-              <path
-                d="M 175 60 C 210 75 290 75 325 60 L 450 170 L 420 230 L 370 190 L 365 480 L 135 480 L 130 190 L 80 230 L 50 170 Z"
-                fill={colorHex}
-              />
-              {/* Shading Overlays */}
-              <path
-                d="M 175 60 C 210 75 290 75 325 60 L 450 170 L 420 230 L 370 190 L 365 480 L 135 480 L 130 190 L 80 230 L 50 170 Z"
-                fill="url(#bodyShade)"
-              />
-              <path
-                d="M 135 150 L 365 150 L 365 480 L 135 480 Z"
-                fill="url(#verticalDepth)"
-              />
-
-              {/* Hood Structure */}
-              <path
-                d="M 180 55 C 160 20 220 15 250 15 C 280 15 340 20 320 55 C 300 85 200 85 180 55 Z"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1.5"
-                strokeOpacity="0.25"
-              />
-              <path
-                d="M 215 55 C 235 68 265 68 285 55 C 275 80 225 80 215 55 Z"
-                fill="#000"
-                fillOpacity="0.3"
-              />
-
-              {/* Kangaroo Pouch */}
-              <path
-                d="M 180 340 L 320 340 L 345 430 L 155 430 Z"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1.5"
-                strokeOpacity="0.3"
-              />
-              <path
-                d="M 180 340 L 320 340 L 345 430 L 155 430 Z"
-                fill="url(#chestHighlight)"
-              />
-              {/* Kangaroo Pocket Openings */}
-              <path d="M 180 340 C 170 370 160 400 155 430" stroke="#000" strokeWidth="2" strokeOpacity="0.3" fill="none" />
-              <path d="M 320 340 C 330 370 340 400 345 430" stroke="#000" strokeWidth="2" strokeOpacity="0.3" fill="none" />
-
-              {/* Drawstrings */}
-              <path d="M 225 70 Q 220 120 215 170" stroke={isLightColor ? "#333" : "#FBF9F4"} strokeWidth="3" strokeLinecap="round" fill="none" />
-              <rect x="213" y="170" width="4" height="12" rx="1" fill="#C5A059" />
-              <path d="M 275 70 Q 280 120 285 170" stroke={isLightColor ? "#333" : "#FBF9F4"} strokeWidth="3" strokeLinecap="round" fill="none" />
-              <rect x="283" y="170" width="4" height="12" rx="1" fill="#C5A059" />
-
-              {/* Ribbed Hem & Cuffs */}
-              <rect x="135" y="460" width="230" height="20" fill="#000" fillOpacity="0.12" stroke="#000" strokeWidth="1" strokeOpacity="0.2" />
-              <path d="M 50 170 L 80 230 L 92 215 L 65 155 Z" fill="#000" fillOpacity="0.08" />
-              <path d="M 450 170 L 420 230 L 408 215 L 435 155 Z" fill="#000" fillOpacity="0.08" />
-            </g>
-          ) : (
-            <g id="hoodie-back">
-              {/* Outer Silhouette */}
-              <path
-                d="M 175 60 C 210 50 290 50 325 60 L 450 170 L 420 230 L 370 190 L 365 480 L 135 480 L 130 190 L 80 230 L 50 170 Z"
-                fill={colorHex}
-              />
-              <path
-                d="M 175 60 C 210 50 290 50 325 60 L 450 170 L 420 230 L 370 190 L 365 480 L 135 480 L 130 190 L 80 230 L 50 170 Z"
-                fill="url(#bodyShade)"
-              />
-              <path
-                d="M 135 150 L 365 150 L 365 480 L 135 480 Z"
-                fill="url(#verticalDepth)"
-              />
-              {/* Back Hood Fold Resting Down */}
-              <path
-                d="M 180 50 C 190 20 310 20 320 50 C 330 90 310 130 250 135 C 190 130 170 90 180 50 Z"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1.5"
-                strokeOpacity="0.3"
-              />
-              <path
-                d="M 195 65 C 220 85 280 85 305 65 C 295 115 205 115 195 65 Z"
-                fill="#000"
-                fillOpacity="0.25"
-              />
-              {/* Ribbed Hem */}
-              <rect x="135" y="460" width="230" height="20" fill="#000" fillOpacity="0.12" stroke="#000" strokeWidth="1" strokeOpacity="0.2" />
-            </g>
-          )
-        ) : garmentId === "full-sleeve" || garmentId === "sweatshirt" ? (
-          /* ---------------------------------------------------- */
-          /* GARMENT TYPE: FULL SLEEVE TEE / SWEATSHIRT           */
-          /* ---------------------------------------------------- */
-          view === "front" ? (
-            <g id="longsleeve-front">
-              {/* Outer Body with Long Sleeves */}
-              <path
-                d="M 190 65 C 220 80 280 80 310 65 L 455 240 L 430 270 L 365 180 L 365 480 L 135 480 L 135 180 L 70 270 L 45 240 Z"
-                fill={colorHex}
-              />
-              <path
-                d="M 190 65 C 220 80 280 80 310 65 L 455 240 L 430 270 L 365 180 L 365 480 L 135 480 L 135 180 L 70 270 L 45 240 Z"
-                fill="url(#bodyShade)"
-              />
-              <path
-                d="M 135 120 L 365 120 L 365 480 L 135 480 Z"
-                fill="url(#verticalDepth)"
-              />
-              <circle cx="250" cy="220" r="160" fill="url(#chestHighlight)" opacity="0.4" />
-
-              {/* Crewneck Collar */}
-              <path
-                d="M 190 65 C 215 95 285 95 310 65 C 295 105 205 105 190 65 Z"
-                fill="#000"
-                fillOpacity="0.18"
-              />
-              <path
-                d="M 190 65 C 220 82 280 82 310 65"
-                stroke="#000"
-                strokeWidth="2"
-                strokeOpacity="0.3"
-                fill="none"
-              />
-
-              {/* Sweatshirt Triangular V-Stitch inset */}
-              {garmentId === "sweatshirt" && (
-                <path
-                  d="M 235 90 L 250 115 L 265 90"
-                  stroke="#000"
-                  strokeWidth="2"
-                  strokeOpacity="0.3"
-                  fill="none"
-                />
-              )}
-
-              {/* Sleeve Cuffs & Hem */}
-              <rect x="135" y="465" width="230" height="15" fill="#000" fillOpacity="0.12" />
-              <path d="M 45 240 L 70 270 L 62 278 L 37 248 Z" fill="#000" fillOpacity="0.15" />
-              <path d="M 455 240 L 430 270 L 438 278 L 463 248 Z" fill="#000" fillOpacity="0.15" />
-            </g>
-          ) : (
-            <g id="longsleeve-back">
-              {/* Back View */}
-              <path
-                d="M 190 65 C 220 55 280 55 310 65 L 455 240 L 430 270 L 365 180 L 365 480 L 135 480 L 135 180 L 70 270 L 45 240 Z"
-                fill={colorHex}
-              />
-              <path
-                d="M 190 65 C 220 55 280 55 310 65 L 455 240 L 430 270 L 365 180 L 365 480 L 135 480 L 135 180 L 70 270 L 45 240 Z"
-                fill="url(#bodyShade)"
-              />
-              <path
-                d="M 135 120 L 365 120 L 365 480 L 135 480 Z"
-                fill="url(#verticalDepth)"
-              />
-              {/* Back Collar Crescent */}
-              <path
-                d="M 190 65 C 225 58 275 58 310 65 C 285 75 215 75 190 65 Z"
-                fill="#000"
-                fillOpacity="0.25"
-              />
-              <rect x="135" y="465" width="230" height="15" fill="#000" fillOpacity="0.12" />
-            </g>
-          )
-        ) : garmentId === "polo" ? (
-          /* ---------------------------------------------------- */
-          /* GARMENT TYPE: POLO T-SHIRT                           */
-          /* ---------------------------------------------------- */
-          view === "front" ? (
-            <g id="polo-front">
-              <path
-                d="M 180 70 L 320 70 L 430 150 L 390 195 L 355 170 L 355 480 L 145 480 L 145 170 L 110 195 L 70 150 Z"
-                fill={colorHex}
-              />
-              <path
-                d="M 180 70 L 320 70 L 430 150 L 390 195 L 355 170 L 355 480 L 145 480 L 145 170 L 110 195 L 70 150 Z"
-                fill="url(#bodyShade)"
-              />
-              {/* Polo Collar Wings */}
-              <path
-                d="M 180 70 L 220 115 L 250 85 L 210 60 Z"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1.5"
-                strokeOpacity="0.3"
-              />
-              <path
-                d="M 320 70 L 280 115 L 250 85 L 290 60 Z"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1.5"
-                strokeOpacity="0.3"
-              />
-              {/* Placket */}
-              <rect
-                x="242"
-                y="85"
-                width="16"
-                height="65"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1"
-                strokeOpacity="0.3"
-              />
-              <circle cx="250" cy="100" r="3" fill="#FFF" stroke="#666" strokeWidth="0.8" />
-              <circle cx="250" cy="125" r="3" fill="#FFF" stroke="#666" strokeWidth="0.8" />
-            </g>
-          ) : (
-            <g id="polo-back">
-              <path
-                d="M 180 65 C 220 55 280 55 320 65 L 430 150 L 390 195 L 355 170 L 355 480 L 145 480 L 145 170 L 110 195 L 70 150 Z"
-                fill={colorHex}
-              />
-              <path
-                d="M 180 65 C 220 55 280 55 320 65 L 430 150 L 390 195 L 355 170 L 355 480 L 145 480 L 145 170 L 110 195 L 70 150 Z"
-                fill="url(#bodyShade)"
-              />
-              {/* Back Turned-down Collar Rib */}
-              <path
-                d="M 180 65 C 220 75 280 75 320 65 C 310 50 190 50 180 65 Z"
-                fill={colorHex}
-                stroke="#000"
-                strokeWidth="1.5"
-                strokeOpacity="0.3"
-              />
-            </g>
-          )
-        ) : (
-          /* ---------------------------------------------------- */
-          /* GARMENT TYPE: T-SHIRT (OVERSIZED, HALF SLEEVE, REGULAR) */
-          /* ---------------------------------------------------- */
-          view === "front" ? (
-            <g id="tee-front">
-              {/* Oversized boxy silhouette vs Regular */}
-              <path
-                d={
-                  garmentId === "oversized"
-                    ? "M 185 70 C 220 90 280 90 315 70 L 450 165 L 405 225 L 370 185 L 370 485 L 130 485 L 130 185 L 95 225 L 50 165 Z"
-                    : "M 185 70 C 220 85 280 85 315 70 L 435 155 L 395 205 L 360 175 L 360 480 L 140 480 L 140 175 L 105 205 L 65 155 Z"
-                }
-                fill={colorHex}
-              />
-              <path
-                d={
-                  garmentId === "oversized"
-                    ? "M 185 70 C 220 90 280 90 315 70 L 450 165 L 405 225 L 370 185 L 370 485 L 130 485 L 130 185 L 95 225 L 50 165 Z"
-                    : "M 185 70 C 220 85 280 85 315 70 L 435 155 L 395 205 L 360 175 L 360 480 L 140 480 L 140 175 L 105 205 L 65 155 Z"
-                }
-                fill="url(#bodyShade)"
-              />
-              <path
-                d="M 130 120 L 370 120 L 370 485 L 130 485 Z"
-                fill="url(#verticalDepth)"
-              />
-              <circle cx="250" cy="220" r="170" fill="url(#chestHighlight)" opacity="0.35" />
-
-              {/* Ribbed Collar Band */}
-              <path
-                d="M 185 70 C 215 95 285 95 315 70 C 295 108 205 108 185 70 Z"
-                fill="#000"
-                fillOpacity="0.18"
-              />
-              <path
-                d="M 185 70 C 220 85 280 85 315 70"
-                stroke="#000"
-                strokeWidth="2"
-                strokeOpacity="0.3"
-                fill="none"
-              />
-
-              {/* Streetwear Drop Shoulder Seams */}
-              <line x1="185" y1="70" x2="135" y2="180" stroke="#000" strokeWidth="1" strokeOpacity="0.15" />
-              <line x1="315" y1="70" x2="365" y2="180" stroke="#000" strokeWidth="1" strokeOpacity="0.15" />
-
-              {/* Subtle Fold Lines */}
-              <path d="M 140 220 Q 155 240 145 280" stroke="#000" strokeWidth="1" strokeOpacity="0.12" fill="none" />
-              <path d="M 360 220 Q 345 240 355 280" stroke="#000" strokeWidth="1" strokeOpacity="0.12" fill="none" />
-            </g>
-          ) : (
-            <g id="tee-back">
-              <path
-                d={
-                  garmentId === "oversized"
-                    ? "M 185 68 C 220 55 280 55 315 68 L 450 165 L 405 225 L 370 185 L 370 485 L 130 485 L 130 185 L 95 225 L 50 165 Z"
-                    : "M 185 68 C 220 55 280 55 315 68 L 435 155 L 395 205 L 360 175 L 360 480 L 140 480 L 140 175 L 105 205 L 65 155 Z"
-                }
-                fill={colorHex}
-              />
-              <path
-                d={
-                  garmentId === "oversized"
-                    ? "M 185 68 C 220 55 280 55 315 68 L 450 165 L 405 225 L 370 185 L 370 485 L 130 485 L 130 185 L 95 225 L 50 165 Z"
-                    : "M 185 68 C 220 55 280 55 315 68 L 435 155 L 395 205 L 360 175 L 360 480 L 140 480 L 140 175 L 105 205 L 65 155 Z"
-                }
-                fill="url(#bodyShade)"
-              />
-              <path
-                d="M 130 120 L 370 120 L 370 485 L 130 485 Z"
-                fill="url(#verticalDepth)"
-              />
-              {/* Back Collar Band */}
-              <path
-                d="M 185 68 C 220 60 280 60 315 68 C 290 76 210 76 185 68 Z"
-                fill="#000"
-                fillOpacity="0.25"
-              />
-            </g>
-          )
-        )}
-      </svg>
+        {/* Ambient Shading Highlights */}
+        <div
+          className="absolute inset-0 mix-blend-soft-light opacity-40 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.5) 100%)",
+            maskImage: `url(${garmentImgSrc})`,
+            WebkitMaskImage: `url(${garmentImgSrc})`,
+            maskSize: "contain",
+            WebkitMaskSize: "contain",
+            maskPosition: "center",
+            WebkitMaskPosition: "center",
+            maskRepeat: "no-repeat",
+            WebkitMaskRepeat: "no-repeat",
+          }}
+        />
+      </div>
 
       {/* ======================================================== */}
       {/* 2. PRINTABLE ZONE OVERLAY & INTERACTIVE ARTWORK STAGE    */}
