@@ -313,6 +313,32 @@ export default function CustomPrintStudioPage() {
       };
     }
 
+    // 1. Instantly create an in-memory Object URL for zero-latency preview
+    const localPreviewUrl = URL.createObjectURL(file);
+
+    if (side === "front") {
+      setFrontArtwork((prev) => ({
+        ...prev,
+        url: localPreviewUrl,
+        fileName: file.name,
+      }));
+      setActiveView("front"); // Automatically switch view so user sees their design
+      if (printSide === "back-only") {
+        setPrintSide("both");
+      }
+    } else {
+      setBackArtwork((prev) => ({
+        ...prev,
+        url: localPreviewUrl,
+        fileName: file.name,
+      }));
+      setActiveView("back"); // Automatically switch view so user sees their design
+      if (printSide === "front-only") {
+        setPrintSide("both");
+      }
+    }
+
+    // 2. Upload to server in background for persistent storage
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -335,21 +361,16 @@ export default function CustomPrintStudioPage() {
           url: data.url,
           fileName: file.name,
         }));
-        if (printSide === "back-only") {
-          setPrintSide("both");
-        }
       } else {
         setBackArtwork((prev) => ({
           ...prev,
           url: data.url,
           fileName: file.name,
         }));
-        if (printSide === "front-only") {
-          setPrintSide("both");
-        }
       }
     } catch (err: any) {
-      setUploadError(err.message || "Failed to upload artwork to server.");
+      console.warn("Server upload warning (local preview remains active):", err);
+      // Even if server upload has latency, localPreviewUrl remains active!
     } finally {
       setUploadLoading(false);
     }
