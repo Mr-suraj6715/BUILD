@@ -138,14 +138,14 @@ export default function GarmentModel({
       switch (placement) {
         case "front-left": // Left breast/pocket
           return {
-            top: isHoodie ? "28%" : isPolo ? "32%" : "26%",
+            top: isHoodie ? "26%" : isPolo ? "30%" : "25%",
             left: "56%",
             width: "20%",
             height: "18%",
           };
         case "front-full": // Full front
           return {
-            top: isHoodie ? "25%" : isPolo ? "28%" : "22%",
+            top: isHoodie ? "24%" : isPolo ? "28%" : "22%",
             left: "26%",
             width: "48%",
             height: isHoodie ? "26%" : isPolo ? "48%" : "54%",
@@ -153,10 +153,10 @@ export default function GarmentModel({
         case "front-chest": // Standard chest center
         default:
           return {
-            top: isHoodie ? "26%" : isPolo ? "30%" : "25%",
+            top: isHoodie ? "24%" : isPolo ? "29%" : "24%",
             left: "28%",
             width: "44%",
-            height: isHoodie ? "25%" : "42%",
+            height: isHoodie ? "26%" : "44%",
           };
       }
     } else {
@@ -173,15 +173,15 @@ export default function GarmentModel({
             top: isHoodie ? "32%" : "22%",
             left: "23%",
             width: "54%",
-            height: isHoodie ? "46%" : "56%",
+            height: isHoodie ? "48%" : "56%",
           };
         case "back-center": // Standard back center
         default:
           return {
-            top: isHoodie ? "34%" : "26%",
-            left: "27%",
-            width: "46%",
-            height: isHoodie ? "40%" : "44%",
+            top: isHoodie ? "32%" : "22%",
+            left: "26%",
+            width: "48%",
+            height: isHoodie ? "48%" : "50%",
           };
       }
     }
@@ -212,15 +212,16 @@ export default function GarmentModel({
       ref={containerRef}
       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden"
     >
-      {/* ======================================================== */}
-      {/* 1. PHOTOREALISTIC REAL APPAREL GARMENT (TRUE STUDIO PHOTO) */}
-      {/* ======================================================== */}
-      <div className="relative w-full h-full max-h-[540px] max-w-[500px] flex items-center justify-center pointer-events-none select-none">
+      {/* 
+        Unified 1:1 square canvas shared by both the garment photo and the print zone.
+        This guarantees 100% identical placement and scaling in the editor, modal, and mobile!
+      */}
+      <div className="relative aspect-square w-full h-full max-h-[540px] max-w-[540px] flex items-center justify-center">
         {/* Real Apparel Base Photo (Photographed in professional fashion studio) */}
         <img
           src={garmentImgSrc}
           alt={`${garmentId} ${view}`}
-          className="w-full h-full object-contain filter drop-shadow-xl transition-all duration-300"
+          className="absolute inset-0 w-full h-full object-contain filter drop-shadow-xl transition-all duration-300 pointer-events-none select-none"
         />
 
         {/* Dynamic Color Multiply Tint Overlay (Masked exactly to the real garment silhouette) */}
@@ -241,95 +242,95 @@ export default function GarmentModel({
             }}
           />
         )}
-      </div>
 
-      {/* ======================================================== */}
-      {/* 2. PRINTABLE ZONE OVERLAY & INTERACTIVE ARTWORK STAGE    */}
-      {/* ======================================================== */}
-      <div
-        className={`absolute pointer-events-auto transition-all duration-200 ${
-          showGuidelines
-            ? "border-2 border-dashed border-[#D8FF36]/70 bg-[#D8FF36]/5"
-            : "border border-transparent"
-        }`}
-        style={getPlacementBoxStyle()}
-      >
-        {/* Printable Area Zone Label (Only visible when guidelines active) */}
-        {showGuidelines && (
-          <div className="absolute -top-5 left-0 right-0 flex items-center justify-between text-[9px] font-mono uppercase tracking-widest text-[#D8FF36] px-1 pointer-events-none">
-            <span>{view.toUpperCase()} PRINT ZONE</span>
-            <span>300 DPI // CMYK</span>
-          </div>
-        )}
+        {/* ======================================================== */}
+        {/* PRINTABLE ZONE OVERLAY & INTERACTIVE ARTWORK STAGE       */}
+        {/* ======================================================== */}
+        <div
+          className={`absolute pointer-events-auto transition-all duration-200 ${
+            showGuidelines
+              ? "border-2 border-dashed border-[#D8FF36]/70 bg-[#D8FF36]/5"
+              : "border border-transparent"
+          }`}
+          style={getPlacementBoxStyle()}
+        >
+          {/* Printable Area Zone Label (Only visible when guidelines active) */}
+          {showGuidelines && (
+            <div className="absolute -top-5 left-0 right-0 flex items-center justify-between text-[9px] font-mono uppercase tracking-widest text-[#D8FF36] px-1 pointer-events-none">
+              <span>{view.toUpperCase()} PRINT ZONE</span>
+              <span>300 DPI // CMYK</span>
+            </div>
+          )}
 
-        {/* Alignment Crosshairs (Only visible when guidelines active) */}
-        {showGuidelines && (
-          <div className="absolute inset-0 pointer-events-none opacity-20">
-            <div className="absolute top-1/2 left-0 right-0 h-px bg-white" />
-            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white" />
-          </div>
-        )}
+          {/* Alignment Crosshairs (Only visible when guidelines active) */}
+          {showGuidelines && (
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+              <div className="absolute top-1/2 left-0 right-0 h-px bg-white" />
+              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white" />
+            </div>
+          )}
 
-        {/* ---------------------------------------------------- */}
-        {/* ARTWORK LAYER                                        */}
-        {/* ---------------------------------------------------- */}
-        {currentArtwork.url && (
-          <div
-            onMouseDown={(e) => handleMouseDown("artwork", e)}
-            className="absolute cursor-move select-none transition-shadow z-20 flex items-center justify-center"
-            style={{
-              top: `calc(50% + ${currentArtwork.y}%)`,
-              left: `calc(50% + ${currentArtwork.x}%)`,
-              transform: `translate(-50%, -50%) rotate(${currentArtwork.rotation}deg) scale(${currentArtwork.scale})`,
-              maxWidth: "92%",
-              maxHeight: "92%",
-              ...getFinishStyle(),
-            }}
-          >
-            <img
-              src={
-                isLightColor && currentArtwork.url.includes("demo-front-logo.png")
-                  ? "/images/studio/demo-front-logo-dark.png"
-                  : isLightColor && currentArtwork.url.includes("demo-back-graphic.png")
-                  ? "/images/studio/demo-back-graphic-dark.png"
-                  : currentArtwork.url
-              }
-              alt="Custom Artwork"
-              className="max-w-[240px] max-h-[260px] object-contain pointer-events-none filter drop-shadow-md"
-              draggable={false}
-            />
-            {interactive && activeDragItem === "artwork" && (
-              <div className="absolute -inset-2 border-2 border-[#D8FF36] pointer-events-none animate-pulse" />
-            )}
-          </div>
-        )}
+          {/* ---------------------------------------------------- */}
+          {/* ARTWORK LAYER (Sized proportionally to the zone)     */}
+          {/* ---------------------------------------------------- */}
+          {currentArtwork.url && (
+            <div
+              onMouseDown={(e) => handleMouseDown("artwork", e)}
+              className="absolute cursor-move select-none transition-shadow z-20 flex items-center justify-center"
+              style={{
+                top: `calc(50% + ${currentArtwork.y}%)`,
+                left: `calc(50% + ${currentArtwork.x}%)`,
+                width: "84%",
+                height: "84%",
+                transform: `translate(-50%, -50%) rotate(${currentArtwork.rotation}deg) scale(${currentArtwork.scale})`,
+                ...getFinishStyle(),
+              }}
+            >
+              <img
+                src={
+                  isLightColor && currentArtwork.url.includes("demo-front-logo.png")
+                    ? "/images/studio/demo-front-logo-dark.png"
+                    : isLightColor && currentArtwork.url.includes("demo-back-graphic.png")
+                    ? "/images/studio/demo-back-graphic-dark.png"
+                    : currentArtwork.url
+                }
+                alt="Custom Artwork"
+                className="w-full h-full object-contain pointer-events-none filter drop-shadow-md"
+                draggable={false}
+              />
+              {interactive && activeDragItem === "artwork" && (
+                <div className="absolute -inset-2 border-2 border-[#D8FF36] pointer-events-none animate-pulse" />
+              )}
+            </div>
+          )}
 
-        {/* ---------------------------------------------------- */}
-        {/* CUSTOM TEXT LAYER                                    */}
-        {/* ---------------------------------------------------- */}
-        {currentText.text.trim() && (
-          <div
-            onMouseDown={(e) => handleMouseDown("text", e)}
-            className="absolute cursor-move select-none whitespace-pre text-center"
-            style={{
-              top: `calc(50% + ${currentText.y}%)`,
-              left: `calc(50% + ${currentText.x}%)`,
-              transform: `translate(-50%, -50%) rotate(${currentText.rotation}deg)`,
-              fontFamily: getFontFamily(currentText.font),
-              color: currentText.color,
-              fontSize: `${currentText.fontSize}px`,
-              fontWeight: currentText.font === "display" ? 900 : 700,
-              letterSpacing: currentText.font === "mono" ? "0.15em" : "0.05em",
-              lineHeight: 1.1,
-              ...getFinishStyle(),
-            }}
-          >
-            {currentText.text}
-            {interactive && activeDragItem === "text" && (
-              <div className="absolute -inset-1 border-2 border-[#D8FF36] pointer-events-none animate-pulse" />
-            )}
-          </div>
-        )}
+          {/* ---------------------------------------------------- */}
+          {/* CUSTOM TEXT LAYER                                    */}
+          {/* ---------------------------------------------------- */}
+          {currentText.text.trim() && (
+            <div
+              onMouseDown={(e) => handleMouseDown("text", e)}
+              className="absolute cursor-move select-none whitespace-pre text-center"
+              style={{
+                top: `calc(50% + ${currentText.y}%)`,
+                left: `calc(50% + ${currentText.x}%)`,
+                transform: `translate(-50%, -50%) rotate(${currentText.rotation}deg)`,
+                fontFamily: getFontFamily(currentText.font),
+                color: currentText.color,
+                fontSize: `${currentText.fontSize}px`,
+                fontWeight: currentText.font === "display" ? 900 : 700,
+                letterSpacing: currentText.font === "mono" ? "0.15em" : "0.05em",
+                lineHeight: 1.1,
+                ...getFinishStyle(),
+              }}
+            >
+              {currentText.text}
+              {interactive && activeDragItem === "text" && (
+                <div className="absolute -inset-1 border-2 border-[#D8FF36] pointer-events-none animate-pulse" />
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

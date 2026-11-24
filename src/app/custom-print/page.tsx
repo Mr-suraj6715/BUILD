@@ -1459,9 +1459,9 @@ export default function CustomPrintStudioPage() {
 
             {/* Dual Front & Back View */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-[#101010] border border-[#252525] p-4 flex flex-col items-center">
-                <span className="font-mono text-xs text-[#D8FF36] mb-2 font-bold uppercase">FRONT VIEW</span>
-                <div className="w-full aspect-square max-h-[300px]">
+              <div className="bg-[#101010] border border-[#252525] p-5 flex flex-col items-center">
+                <span className="font-mono text-xs text-[#D8FF36] mb-3 font-bold uppercase tracking-wider">FRONT VIEW</span>
+                <div className="w-full max-w-[360px] aspect-square flex items-center justify-center">
                   <GarmentModel
                     garmentId={selectedGarment.id}
                     view="front"
@@ -1478,9 +1478,9 @@ export default function CustomPrintStudioPage() {
                 </div>
               </div>
 
-              <div className="bg-[#101010] border border-[#252525] p-4 flex flex-col items-center">
-                <span className="font-mono text-xs text-[#D8FF36] mb-2 font-bold uppercase">BACK VIEW</span>
-                <div className="w-full aspect-square max-h-[300px]">
+              <div className="bg-[#101010] border border-[#252525] p-5 flex flex-col items-center">
+                <span className="font-mono text-xs text-[#D8FF36] mb-3 font-bold uppercase tracking-wider">BACK VIEW</span>
+                <div className="w-full max-w-[360px] aspect-square flex items-center justify-center">
                   <GarmentModel
                     garmentId={selectedGarment.id}
                     view="back"
