@@ -12,9 +12,6 @@ import {
   Sliders,
   ArrowLeft,
   RotateCw,
-  ZoomIn,
-  ZoomOut,
-  Maximize2,
   Trash2,
   Type,
   Eye,
@@ -276,8 +273,7 @@ export default function CustomPrintStudioPage() {
 
   // UI Control States
   const [activeRightTab, setActiveRightTab] = useState<"artwork" | "text" | "specs">("artwork");
-  const [showGuidelines, setShowGuidelines] = useState<boolean>(true);
-  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [showGuidelines, setShowGuidelines] = useState<boolean>(false);
   const [uploadLoading, setUploadLoading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [resWarning, setResWarning] = useState<string | null>(null);
@@ -811,11 +807,11 @@ export default function CustomPrintStudioPage() {
               </div>
 
               {/* View Selector Controls */}
-              <div className="flex items-center justify-between gap-2 mb-4">
+              <div className="flex items-center justify-center mb-4">
                 <div className="inline-flex p-1 bg-[#202020] border border-[#333333]">
                   <button
                     onClick={() => setActiveView("front")}
-                    className={`px-4 py-1.5 font-mono text-xs font-bold uppercase transition-all ${
+                    className={`px-6 py-1.5 font-mono text-xs font-bold uppercase transition-all ${
                       activeView === "front"
                         ? "bg-[#D8FF36] text-black shadow"
                         : "text-[#888888] hover:text-white"
@@ -825,7 +821,7 @@ export default function CustomPrintStudioPage() {
                   </button>
                   <button
                     onClick={() => setActiveView("back")}
-                    className={`px-4 py-1.5 font-mono text-xs font-bold uppercase transition-all ${
+                    className={`px-6 py-1.5 font-mono text-xs font-bold uppercase transition-all ${
                       activeView === "back"
                         ? "bg-[#D8FF36] text-black shadow"
                         : "text-[#888888] hover:text-white"
@@ -834,49 +830,11 @@ export default function CustomPrintStudioPage() {
                     BACK VIEW
                   </button>
                 </div>
-
-                {/* View Tools */}
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => setShowGuidelines((g) => !g)}
-                    title="Toggle Printable Boundaries"
-                    className={`p-1.5 border font-mono text-xs flex items-center gap-1 ${
-                      showGuidelines
-                        ? "bg-[#D8FF36]/20 border-[#D8FF36] text-[#D8FF36]"
-                        : "bg-[#202020] border-[#333] text-[#777]"
-                    }`}
-                  >
-                    <Sliders className="w-3.5 h-3.5" />
-                    <span className="text-[10px] hidden sm:inline">GRID</span>
-                  </button>
-                  <button
-                    onClick={() => setZoomLevel((z) => Math.max(0.8, z - 0.1))}
-                    title="Zoom Out"
-                    className="p-1.5 bg-[#202020] border border-[#333] text-white hover:bg-[#333]"
-                  >
-                    <ZoomOut className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setZoomLevel((z) => Math.min(1.4, z + 0.1))}
-                    title="Zoom In"
-                    className="p-1.5 bg-[#202020] border border-[#333] text-white hover:bg-[#333]"
-                  >
-                    <ZoomIn className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setZoomLevel(1)}
-                    title="Reset Zoom"
-                    className="p-1.5 bg-[#202020] border border-[#333] text-white hover:bg-[#333]"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
               </div>
 
               {/* Garment Stage Container */}
               <div
-                className="relative aspect-square w-full bg-[#181818] border border-[#262626] overflow-hidden flex items-center justify-center p-4 transition-transform duration-200"
-                style={{ transform: `scale(${zoomLevel})` }}
+                className="relative aspect-square w-full bg-[#181818] border border-[#262626] overflow-hidden flex items-center justify-center p-4"
               >
                 <GarmentModel
                   garmentId={selectedGarment.id}
@@ -898,7 +856,7 @@ export default function CustomPrintStudioPage() {
               {/* Interactive Stage Hint */}
               <div className="mt-3 text-center">
                 <span className="font-mono text-[10px] text-[#777777] uppercase tracking-wider">
-                  Drag artwork or text inside the dashed zone to reposition
+                  Drag artwork or text on garment to reposition
                 </span>
               </div>
             </div>
