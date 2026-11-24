@@ -90,7 +90,9 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-[#D8FF36]" />
-              <span>support@buildclothing.com</span>
+              <a href="mailto:buildclothing2026@gmail.com" className="hover:text-[#D8FF36] transition-colors">
+                buildclothing2026@gmail.com
+              </a>
             </div>
           </div>
         </div>
@@ -180,11 +182,6 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/return-policy" className="hover:text-[#F5F3EE] transition-colors">
-                7-Day Returns & Exchanges
-              </Link>
-            </li>
-            <li>
               <Link href="/privacy-policy" className="hover:text-[#F5F3EE] transition-colors">
                 Privacy Policy
               </Link>
@@ -210,7 +207,13 @@ export default function Footer() {
           <div className="flex items-center space-x-6">
             <span className="text-[11px] font-mono text-[#555555]">PAYMENTS SECURED BY RAZORPAY / COD</span>
             <div className="flex space-x-4 text-[#AAAAAA]">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#D8FF36]">
+              <a
+                href="https://www.instagram.com/build_clothing?utm_source=ig_web_button_share_sheet&knvt=ZDNlZDc0MzIxNw=="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#D8FF36] transition-colors"
+                title="Follow @build_clothing on Instagram"
+              >
                 <Instagram className="w-4 h-4" />
               </a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#D8FF36]">

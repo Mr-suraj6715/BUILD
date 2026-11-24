@@ -66,8 +66,8 @@ export default function ContactPage() {
               <Mail className="w-4 h-4 text-[#D8FF36] flex-shrink-0" />
               <div>
                 <strong className="block text-white">CUSTOMER DESK</strong>
-                <a href="mailto:support@buildclothing.com" className="text-[#888888] hover:text-[#D8FF36]">
-                  support@buildclothing.com
+                <a href="mailto:buildclothing2026@gmail.com" className="text-[#888888] hover:text-[#D8FF36]">
+                  buildclothing2026@gmail.com
                 </a>
               </div>
             </div>

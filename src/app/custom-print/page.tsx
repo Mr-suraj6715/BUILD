@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -221,7 +221,10 @@ export default function CustomPrintStudioPage() {
   const { addToCart } = useCart();
 
   // Garment & Configuration State
+  const [garmentList, setGarmentList] = useState<GarmentOption[]>(GARMENTS);
   const [selectedGarment, setSelectedGarment] = useState<GarmentOption>(GARMENTS[0]); // Default Regular Fit T-Shirt
+  const [printSideList, setPrintSideList] = useState(PRINT_SIDES);
+  const [finishList, setFinishList] = useState(FINISHES);
   const [selectedColor, setSelectedColor] = useState<ColorOption>(COLORWAYS[0]); // Midnight Navy
   const [activeView, setActiveView] = useState<"front" | "back">("front");
   const [printSide, setPrintSide] = useState<string>("both");
@@ -230,6 +233,39 @@ export default function CustomPrintStudioPage() {
   const [selectedFinish, setSelectedFinish] = useState(FINISHES[0]);
   const [selectedSize, setSelectedSize] = useState<string>("L");
   const [quantity, setQuantity] = useState<number>(1);
+
+  // Fetch live studio pricing & options from DB
+  useEffect(() => {
+    fetch("/api/custom-studio/config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.garments && data.garments.length > 0) {
+          setGarmentList(data.garments);
+          setSelectedGarment((prev) => data.garments.find((g: any) => g.id === prev.id) || data.garments[0]);
+        }
+        if (data.options && data.options.length > 0) {
+          const sides = data.options.filter((o: any) => o.type === "PRINT_SIDE");
+          if (sides.length > 0) {
+            setPrintSideList(sides.map((s: any) => ({
+              id: s.id,
+              name: s.name,
+              extra: s.extra,
+              desc: s.details || "",
+            })));
+          }
+          const fin = data.options.filter((o: any) => o.type === "FINISH");
+          if (fin.length > 0) {
+            setFinishList(fin.map((f: any) => ({
+              id: f.id,
+              name: f.name,
+              extra: f.extra,
+              desc: f.details || "",
+            })));
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Artwork Upload State (Preloaded with official BUILD Demo Design)
   const [frontArtwork, setFrontArtwork] = useState<CustomArtworkState>({
@@ -285,8 +321,9 @@ export default function CustomPrintStudioPage() {
   const backFileInputRef = useRef<HTMLInputElement>(null);
 
   // Dynamic Price Calculations
-  const selectedPrintSideObj = PRINT_SIDES.find((p) => p.id === printSide) || PRINT_SIDES[0];
-  const unitPrice = selectedGarment.basePrice + selectedPrintSideObj.extra + selectedFinish.extra;
+  const selectedPrintSideObj = printSideList.find((p) => p.id === printSide) || printSideList[0];
+  const selectedFinishObj = finishList.find((f) => f.id === selectedFinish.id) || selectedFinish;
+  const unitPrice = selectedGarment.basePrice + selectedPrintSideObj.extra + selectedFinishObj.extra;
 
   // Color Category State
   const [colorCategory, setColorCategory] = useState<string>("All");
@@ -610,11 +647,11 @@ export default function CustomPrintStudioPage() {
                   <span className="w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center font-bold">1</span>
                   Select Garment
                 </h3>
-                <span className="font-mono text-[11px] text-[#777]">{GARMENTS.length} Models</span>
+                <span className="font-mono text-[11px] text-[#777]">{garmentList.length} Models</span>
               </div>
 
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                {GARMENTS.map((g) => {
+                {garmentList.map((g) => {
                   const isSelected = selectedGarment.id === g.id;
                   return (
                     <button
@@ -1238,7 +1275,7 @@ export default function CustomPrintStudioPage() {
                   <div className="space-y-2">
                     <label className="font-mono text-xs font-bold uppercase text-[#151515]">Print Sides</label>
                     <div className="space-y-1.5">
-                      {PRINT_SIDES.map((ps) => {
+                      {printSideList.map((ps) => {
                         const isSelected = printSide === ps.id;
                         return (
                           <button
@@ -1293,7 +1330,7 @@ export default function CustomPrintStudioPage() {
                   <div className="space-y-2">
                     <label className="font-mono text-xs font-bold uppercase text-[#151515]">Ink Finish & Texture</label>
                     <div className="space-y-1.5">
-                      {FINISHES.map((fn) => {
+                      {finishList.map((fn) => {
                         const isSelected = selectedFinish.id === fn.id;
                         return (
                           <button

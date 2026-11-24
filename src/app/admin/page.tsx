@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Sparkles,
   LayoutDashboard,
   Package,
   Layers,
@@ -62,6 +63,8 @@ type AdminModule =
   | "coupons"
   | "reviews"
   | "cms"
+  | "studio"
+  | "showcase"
   | "marketing"
   | "analytics"
   | "notifications"
@@ -102,11 +105,18 @@ export default function AdminDashboardPage() {
   const [dropTargetDate, setDropTargetDate] = useState("");
   const [cmsSuccess, setCmsSuccess] = useState(false);
 
+  // Custom Studio & Homepage Showcase dynamic states
+  const [studioGarments, setStudioGarments] = useState<any[]>([]);
+  const [studioOptions, setStudioOptions] = useState<any[]>([]);
+  const [showcaseItems, setShowcaseItems] = useState<any[]>([]);
+  const [studioSuccess, setStudioSuccess] = useState<string | null>(null);
+  const [showcaseSuccess, setShowcaseSuccess] = useState<string | null>(null);
+
   // Settings state
   const [settings, setSettings] = useState({
     storeName: "BUILD CLOTHING CO.",
     currency: "INR (₹)",
-    contactEmail: "support@buildclothing.com",
+    contactEmail: "buildclothing2026@gmail.com",
     contactPhone: "+91 98765 43210",
     freeShippingThreshold: 1499,
     stockWarningThreshold: 5,
@@ -202,6 +212,8 @@ export default function AdminDashboardPage() {
         mktRes,
         logRes,
         setRes,
+        studioRes,
+        showcaseRes,
       ] = await Promise.all([
         fetch("/api/admin/overview"),
         fetch("/api/admin/products"),
@@ -217,6 +229,8 @@ export default function AdminDashboardPage() {
         fetch("/api/admin/marketing"),
         fetch("/api/admin/logs"),
         fetch("/api/admin/settings"),
+        fetch("/api/custom-studio/config"),
+        fetch("/api/showcase"),
       ]);
 
       const [
@@ -234,6 +248,8 @@ export default function AdminDashboardPage() {
         mkt,
         logs,
         st,
+        std,
+        shw,
       ] = await Promise.all([
         ovRes.json(),
         prodRes.json(),
@@ -249,7 +265,13 @@ export default function AdminDashboardPage() {
         mktRes.json(),
         logRes.json(),
         setRes.json(),
+        studioRes.json(),
+        showcaseRes.json(),
       ]);
+
+      if (std?.garments) setStudioGarments(std.garments);
+      if (std?.options) setStudioOptions(std.options);
+      if (shw?.showcase) setShowcaseItems(shw.showcase);
 
       if (ov.kpis) setOverviewData(ov);
       if (prod.products) setProducts(prod.products);
@@ -557,7 +579,7 @@ export default function AdminDashboardPage() {
               title: dropTitle,
               subtitle: dropSubtitle,
               targetDate: new Date(dropTargetDate).toISOString(),
-              imageUrl: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=2400&q=95",
+              imageUrl: "/images/drop-male-model.jpg",
             },
           }),
         });
@@ -567,6 +589,57 @@ export default function AdminDashboardPage() {
       fetchAllAdminData();
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleUpdateStudioGarment = async (garment: any) => {
+    try {
+      const res = await fetch("/api/custom-studio/config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update-garment", garment }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStudioSuccess(`Updated ${garment.name} (₹${garment.basePrice}) successfully!`);
+        setTimeout(() => setStudioSuccess(null), 3500);
+      }
+    } catch {
+      alert("Failed to update garment");
+    }
+  };
+
+  const handleUpdateStudioOption = async (option: any) => {
+    try {
+      const res = await fetch("/api/custom-studio/config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update-option", option }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStudioSuccess(`Updated option ${option.name} successfully!`);
+        setTimeout(() => setStudioSuccess(null), 3500);
+      }
+    } catch {
+      alert("Failed to update option");
+    }
+  };
+
+  const handleUpdateShowcaseItem = async (item: any) => {
+    try {
+      const res = await fetch("/api/showcase", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ item }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowcaseSuccess(`Updated ${item.name} card (₹${item.price}) successfully!`);
+        setTimeout(() => setShowcaseSuccess(null), 3500);
+      }
+    } catch {
+      alert("Failed to update showcase item");
     }
   };
 
@@ -722,6 +795,8 @@ export default function AdminDashboardPage() {
     { id: "coupons", label: "Coupons", icon: Tag },
     { id: "reviews", label: "Reviews", icon: MessageSquare },
     { id: "cms", label: "CMS / Builder", icon: Radio },
+    { id: "studio", label: "Custom Studio", icon: Sparkles },
+    { id: "showcase", label: "Home Showcase", icon: Eye },
     { id: "marketing", label: "Marketing", icon: Flame },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "notifications", label: "Notifications", icon: Bell },
@@ -1683,6 +1758,334 @@ export default function AdminDashboardPage() {
                 >
                   Publish to Storefront
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* CUSTOM PRINT STUDIO MANAGEMENT */}
+          {activeModule === "studio" && (
+            <div className="space-y-8">
+              <div className="flex justify-between items-baseline pb-4 border-b border-[#D4D0C8]">
+                <div>
+                  <h2 className="font-display text-3xl uppercase font-black text-[#151515]">
+                    CUSTOM PRINT STUDIO MANAGER
+                  </h2>
+                  <p className="font-mono text-xs text-[#666666] mt-1">
+                    Manage base garment prices, GSM specs, fabric types, and print finish surcharges live on /custom-print.
+                  </p>
+                </div>
+              </div>
+
+              {studioSuccess && (
+                <div className="p-3 bg-green-100 text-green-800 font-mono text-xs font-bold border border-green-300">
+                  {studioSuccess}
+                </div>
+              )}
+
+              {/* Garment Base Prices */}
+              <div className="space-y-4">
+                <h3 className="font-display text-xl uppercase font-bold text-[#151515] flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[#2E7D32]" />
+                  Garment Base Pricing & Specifications ({studioGarments.length} Models)
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                  {studioGarments.map((g, idx) => (
+                    <div key={g.id} className="bg-[#E8E5DE] border border-[#D4D0C8] p-5 space-y-3">
+                      <div className="flex items-center justify-between border-b border-[#D4D0C8] pb-2">
+                        <strong className="text-sm text-[#151515] uppercase font-black">
+                          {g.name}
+                        </strong>
+                        <span className="text-[10px] bg-[#151515] text-[#D8FF36] px-2 py-0.5 font-bold uppercase">
+                          ID: {g.id}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Base Price (₹)</label>
+                          <input
+                            type="number"
+                            value={g.basePrice}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setStudioGarments((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, basePrice: val } : item))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 font-bold text-[#151515]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Fabric GSM</label>
+                          <input
+                            type="number"
+                            value={g.gsm}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setStudioGarments((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, gsm: val } : item))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Silhouette Fit</label>
+                          <input
+                            type="text"
+                            value={g.fit}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setStudioGarments((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, fit: val } : item))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Fabric Material</label>
+                          <input
+                            type="text"
+                            value={g.fabric}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setStudioGarments((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, fabric: val } : item))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[#666666] uppercase text-[10px] mb-1">Description</label>
+                        <textarea
+                          rows={2}
+                          value={g.description}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setStudioGarments((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, description: val } : item))
+                            );
+                          }}
+                          className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515]"
+                        />
+                      </div>
+
+                      <button
+                        onClick={() => handleUpdateStudioGarment(g)}
+                        className="w-full py-2 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors"
+                      >
+                        Save {g.name}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Print Surcharges & Finishes */}
+              <div className="space-y-4 pt-4 border-t border-[#D4D0C8]">
+                <h3 className="font-display text-xl uppercase font-bold text-[#151515]">
+                  Print Surcharges & Ink Finishes
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+                  {studioOptions.map((opt, idx) => (
+                    <div key={opt.id} className="bg-[#E8E5DE] border border-[#D4D0C8] p-4 space-y-3">
+                      <div className="flex items-center justify-between border-b border-[#D4D0C8] pb-1.5">
+                        <strong className="text-xs text-[#151515] uppercase font-bold">{opt.name}</strong>
+                        <span className="text-[9px] bg-[#333333] text-white px-1.5 py-0.5 uppercase">
+                          {opt.type}
+                        </span>
+                      </div>
+
+                      <div>
+                        <label className="block text-[#666666] uppercase text-[10px] mb-1">Additional Cost (₹)</label>
+                        <input
+                          type="number"
+                          value={opt.extra}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            setStudioOptions((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, extra: val } : item))
+                            );
+                          }}
+                          className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 font-bold text-[#151515]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[#666666] uppercase text-[10px] mb-1">Badge / Detail</label>
+                        <input
+                          type="text"
+                          value={opt.details || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setStudioOptions((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, details: val } : item))
+                            );
+                          }}
+                          className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515]"
+                        />
+                      </div>
+
+                      <button
+                        onClick={() => handleUpdateStudioOption(opt)}
+                        className="w-full py-1.5 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors"
+                      >
+                        Save Option
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* HOMEPAGE SHOWCASE MANAGEMENT */}
+          {activeModule === "showcase" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-baseline pb-4 border-b border-[#D4D0C8]">
+                <div>
+                  <h2 className="font-display text-3xl uppercase font-black text-[#151515]">
+                    THE BUILD SERIES SHOWCASE MANAGER
+                  </h2>
+                  <p className="font-mono text-xs text-[#666666] mt-1">
+                    Manage the 3 flagship colorway cards, prices, campaign boards, and interactive front/back model photos on the homepage.
+                  </p>
+                </div>
+              </div>
+
+              {showcaseSuccess && (
+                <div className="p-3 bg-green-100 text-green-800 font-mono text-xs font-bold border border-green-300">
+                  {showcaseSuccess}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-mono text-xs">
+                {showcaseItems.map((item, idx) => (
+                  <div key={item.id} className="bg-[#E8E5DE] border border-[#D4D0C8] p-5 space-y-4 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-[#D4D0C8] pb-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-4 h-4 rounded-full border border-black/40 inline-block"
+                            style={{ backgroundColor: item.hex }}
+                          />
+                          <strong className="text-sm text-[#151515] uppercase font-black">{item.name}</strong>
+                        </div>
+                        <span className="text-[10px] bg-black text-[#D8FF36] px-1.5 py-0.5 font-bold uppercase">
+                          {item.id}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Selling Price (₹)</label>
+                          <input
+                            type="number"
+                            value={item.price}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setShowcaseItems((prev) =>
+                                prev.map((sh, i) => (i === idx ? { ...sh, price: val } : sh))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 font-bold text-[#151515]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Original Price (₹)</label>
+                          <input
+                            type="number"
+                            value={item.originalPrice}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setShowcaseItems((prev) =>
+                                prev.map((sh, i) => (i === idx ? { ...sh, originalPrice: val } : sh))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#777777]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[#666666] uppercase text-[10px] mb-1">Edition Description</label>
+                        <textarea
+                          rows={2}
+                          value={item.description}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setShowcaseItems((prev) =>
+                              prev.map((sh, i) => (i === idx ? { ...sh, description: val } : sh))
+                            );
+                          }}
+                          className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[#666666] uppercase text-[10px] mb-1">Campaign Board Image</label>
+                        <input
+                          type="text"
+                          value={item.campaignImg}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setShowcaseItems((prev) =>
+                              prev.map((sh, i) => (i === idx ? { ...sh, campaignImg: val } : sh))
+                            );
+                          }}
+                          className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515] text-[11px]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Front Model Image</label>
+                          <input
+                            type="text"
+                            value={item.frontImg}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setShowcaseItems((prev) =>
+                                prev.map((sh, i) => (i === idx ? { ...sh, frontImg: val } : sh))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515] text-[10px]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Back Model Image</label>
+                          <input
+                            type="text"
+                            value={item.backImg}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setShowcaseItems((prev) =>
+                                prev.map((sh, i) => (i === idx ? { ...sh, backImg: val } : sh))
+                              );
+                            }}
+                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515] text-[10px]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleUpdateShowcaseItem(item)}
+                      className="w-full py-2.5 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors mt-2"
+                    >
+                      Save {item.name} Card
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}

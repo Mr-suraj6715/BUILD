@@ -8,7 +8,6 @@ export default function Marquee() {
     { text: "WEAR YOUR IDENTITY.", highlight: false },
     { text: "BUILT DIFFERENT.", highlight: true },
     { text: "HEAVYWEIGHT 280 GSM", highlight: false },
-    { text: "TOKYO ARCHIVE", highlight: true },
     { text: "ZERO MASS PRODUCTION", highlight: false },
   ];
 

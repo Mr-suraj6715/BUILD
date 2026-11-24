@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Sparkles, ShieldCheck, Layers, Shirt, Wind, Infinity as InfinityIcon } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
@@ -10,6 +10,8 @@ interface Colorway {
   name: string;
   hex: string;
   slug: string;
+  price?: number;
+  originalPrice?: number;
   campaignImg: string;
   frontImg: string;
   backImg: string;
@@ -50,8 +52,21 @@ const colorways: Colorway[] = [
 ];
 
 export default function BuildSeriesShowcase() {
+  const [items, setItems] = useState<Colorway[]>(colorways);
   const [selectedColor, setSelectedColor] = useState<Colorway>(colorways[0]);
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/showcase")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.showcase && data.showcase.length > 0) {
+          setItems(data.showcase);
+          setSelectedColor((prev) => data.showcase.find((c: Colorway) => c.id === prev.id) || data.showcase[0]);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="w-full bg-[#101010] text-[#F5F3EE] py-20 px-4 sm:px-6 lg:px-8 border-b border-[#262626] relative overflow-hidden">
@@ -82,7 +97,7 @@ export default function BuildSeriesShowcase() {
             <span className="text-xs font-mono uppercase text-[#777777] mr-1 hidden sm:inline">
               SELECT COLOR:
             </span>
-            {colorways.map((c) => (
+            {items.map((c) => (
               <button
                 key={c.id}
                 type="button"
@@ -197,13 +212,13 @@ export default function BuildSeriesShowcase() {
                 </h3>
                 <div className="flex items-baseline justify-center sm:justify-start gap-2.5 mt-2">
                   <span className="font-display text-2xl text-[#D8FF36] font-bold">
-                    ₹1,699
+                    ₹{selectedColor.price || 1699}
                   </span>
                   <span className="text-sm font-mono text-[#777777] line-through">
-                    ₹2,699
+                    ₹{selectedColor.originalPrice || 2699}
                   </span>
                   <span className="text-[10px] font-mono text-[#D8FF36] bg-[#222222] px-1.5 py-0.5 font-bold uppercase">
-                    37% OFF
+                    {Math.round((1 - (selectedColor.price || 1699) / (selectedColor.originalPrice || 2699)) * 100)}% OFF
                   </span>
                 </div>
               </div>
@@ -215,7 +230,7 @@ export default function BuildSeriesShowcase() {
                 href={`/product/${selectedColor.slug}`}
                 className="w-full py-4 bg-[#D8FF36] text-[#101010] hover:bg-white font-mono text-xs font-black uppercase tracking-widest transition-all duration-150 flex items-center justify-center gap-2 shadow-lg"
               >
-                <span>SHOP {selectedColor.name.toUpperCase()} (₹1,699)</span>
+                <span>SHOP {selectedColor.name.toUpperCase()} (₹{selectedColor.price || 1699})</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

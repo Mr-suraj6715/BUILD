@@ -394,16 +394,16 @@ export default async function HomePage() {
               />
             </div>
             <div className="absolute -bottom-4 -right-4 bg-[#151515] text-[#F5F3EE] p-5 shadow-lg border border-[#333333]">
-              <div className="font-display text-2xl text-[#D8FF36]">EST. 2021</div>
+              <div className="font-display text-2xl text-[#D8FF36]">EST. 2026</div>
               <div className="font-mono text-[10px] text-[#AAAAAA] uppercase">
-                TOKYO // SOHO // MITTE
+                MUMBAI
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-7 space-y-6 lg:pl-6">
             <span className="font-mono text-xs font-bold text-[#536500] uppercase tracking-widest">
-              // STUDIO MANIFESTO
+              // ABOUT STUDIO 
             </span>
 
             <h2 className="font-display text-5xl sm:text-7xl text-[#151515] uppercase leading-tight font-black">
