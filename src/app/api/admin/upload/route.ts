@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import fs from "fs";
 import path from "path";
 
@@ -55,6 +56,14 @@ export async function POST(request: Request) {
 
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+
+      // 1. Try uploading to Cloudinary cloud storage
+      const cloudUpload = await uploadToCloudinary(buffer, `build_clothing/products/${type}`);
+      if (cloudUpload.success) {
+        return NextResponse.json({ success: true, url: cloudUpload.url, fileName });
+      }
+
+      // 2. Fallback to local storage
       await fs.promises.writeFile(filePath, buffer);
 
       const fileUrl = `/uploads/products/${fileName}`;
@@ -82,6 +91,13 @@ export async function POST(request: Request) {
       const data = matches[2];
       const ext = mime.split("/")[1] || "jpg";
 
+      // 1. Try uploading to Cloudinary
+      const cloudUpload = await uploadToCloudinary(base64, `build_clothing/products/${type}`);
+      if (cloudUpload.success) {
+        return NextResponse.json({ success: true, url: cloudUpload.url });
+      }
+
+      // 2. Fallback to local storage
       const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import fs from "fs";
 import path from "path";
 
@@ -71,6 +72,18 @@ export async function POST(request: Request) {
       } else {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
+
+        // Try Cloudinary cloud storage
+        const cloudUpload = await uploadToCloudinary(buffer, `build_clothing/custom/${side}`);
+        if (cloudUpload.success) {
+          return NextResponse.json({
+            success: true,
+            url: cloudUpload.url,
+            fileName: file.name,
+            size: file.size,
+          });
+        }
+
         await fs.promises.writeFile(filePath, buffer);
       }
 
@@ -118,6 +131,17 @@ export async function POST(request: Request) {
       const safeBase = originalName.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
       const fileName = `${side}_${Date.now()}_${safeBase}.${ext}`;
       const filePath = path.join(uploadDir, fileName);
+
+      // Try Cloudinary cloud storage
+      const cloudUpload = await uploadToCloudinary(base64, `build_clothing/custom/${side}`);
+      if (cloudUpload.success) {
+        return NextResponse.json({
+          success: true,
+          url: cloudUpload.url,
+          fileName: originalName,
+          size: buffer.length,
+        });
+      }
 
       if (ext === "svg") {
         const safeSvg = sanitizeSvg(buffer.toString("utf8"));
