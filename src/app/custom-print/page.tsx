@@ -43,6 +43,42 @@ interface GarmentOption {
 
 const GARMENTS: GarmentOption[] = [
   {
+    id: "regular-fit",
+    name: "Regular Fit T-Shirt",
+    fit: "Classic Straight Cut",
+    gsm: 190,
+    fabric: "Pre-Shrunk Bio-Washed Cotton",
+    basePrice: 999,
+    description: "Clean essential cut for everyday comfort and sharp prints.",
+  },
+  {
+    id: "oversized",
+    name: "Oversized T-Shirt",
+    fit: "Tokyo Boxy Drop-Shoulder",
+    gsm: 280,
+    fabric: "High-Density Dense Weave Cotton",
+    basePrice: 1699,
+    description: "Signature drop-shoulder drape with a heavy structured silhouette.",
+  },
+  {
+    id: "sweatshirt",
+    name: "Crewneck Sweatshirt",
+    fit: "Athletic Raglan V-Notch",
+    gsm: 350,
+    fabric: "Brushed Fleece Heavy Cotton",
+    basePrice: 2199,
+    description: "Athletic triangular V-stitch inset with heavy ribbed waistband.",
+  },
+  {
+    id: "polo",
+    name: "Polo T-Shirt",
+    fit: "Structured Athletic",
+    gsm: 260,
+    fabric: "Honeycomb Pique Cotton",
+    basePrice: 1499,
+    description: "Classic collar with 2-button placket and reinforced side vents.",
+  },
+  {
     id: "half-sleeve",
     name: "Half Sleeve T-Shirt",
     fit: "Relaxed Everyday",
@@ -61,33 +97,6 @@ const GARMENTS: GarmentOption[] = [
     description: "Extended sleeves with dense ribbed cuffs for crisp layering.",
   },
   {
-    id: "oversized",
-    name: "Oversized T-Shirt",
-    fit: "Tokyo Boxy Fit",
-    gsm: 280,
-    fabric: "High-Density Dense Weave Cotton",
-    basePrice: 1699,
-    description: "Signature drop-shoulder drape with a heavy structured silhouette.",
-  },
-  {
-    id: "regular-fit",
-    name: "Regular Fit T-Shirt",
-    fit: "Classic Straight Cut",
-    gsm: 190,
-    fabric: "Pre-Shrunk Bio-Washed Cotton",
-    basePrice: 999,
-    description: "Clean essential cut for everyday comfort and sharp prints.",
-  },
-  {
-    id: "polo",
-    name: "Polo T-Shirt",
-    fit: "Structured Athletic",
-    gsm: 260,
-    fabric: "Honeycomb Pique Cotton",
-    basePrice: 1499,
-    description: "Classic collar with 2-button placket and reinforced side vents.",
-  },
-  {
     id: "hoodie",
     name: "Heavyweight Hoodie",
     fit: "Oversized Streetwear",
@@ -95,15 +104,6 @@ const GARMENTS: GarmentOption[] = [
     fabric: "French Terry Fleeceback Cotton",
     basePrice: 2499,
     description: "Double-layered thermal hood, kangaroo pouch & metal aglet cords.",
-  },
-  {
-    id: "sweatshirt",
-    name: "Crewneck Sweatshirt",
-    fit: "Relaxed Raglan",
-    gsm: 350,
-    fabric: "Brushed Fleece Heavy Cotton",
-    basePrice: 2199,
-    description: "Athletic triangular V-stitch inset with heavy ribbed waistband.",
   },
 ];
 
@@ -224,7 +224,7 @@ export default function CustomPrintStudioPage() {
   const { addToCart } = useCart();
 
   // Garment & Configuration State
-  const [selectedGarment, setSelectedGarment] = useState<GarmentOption>(GARMENTS[2]); // Default Oversized
+  const [selectedGarment, setSelectedGarment] = useState<GarmentOption>(GARMENTS[0]); // Default Regular Fit T-Shirt
   const [selectedColor, setSelectedColor] = useState<ColorOption>(COLORWAYS[0]); // Midnight Navy
   const [activeView, setActiveView] = useState<"front" | "back">("front");
   const [printSide, setPrintSide] = useState<string>("both");

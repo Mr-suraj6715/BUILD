@@ -50,28 +50,54 @@ def main():
     print("Initializing rembg u2netp session...")
     session = rembg.new_session("u2netp")
     
-    # 1. Short Sleeve / Regular Fit / Half Sleeve / Oversized / Polo
-    tee_src = os.path.join(base_dir, "media_1795496383034_59e9066a.jpg")
-    if not os.path.exists(tee_src):
-        tee_src = os.path.join(base_dir, "media_1795284214912_e03f8b52.jpg")
+    # 1. Half Sleeve T-Shirt
+    half_sleeve_src = os.path.join(base_dir, "media_1795496383034_59e9066a.jpg")
+    if not os.path.exists(half_sleeve_src):
+        half_sleeve_src = os.path.join(base_dir, "media_1795284214912_e03f8b52.jpg")
     process_image(
-        tee_src,
-        front_out_names=[
-            "mockup-half-sleeve-front.png",
-            "mockup-regular-fit-front.png",
-            "mockup-oversized-front.png",
-            "mockup-polo-front.png"
-        ],
-        back_out_names=[
-            "mockup-half-sleeve-back.png",
-            "mockup-regular-fit-back.png",
-            "mockup-oversized-back.png",
-            "mockup-polo-back.png"
-        ],
+        half_sleeve_src,
+        front_out_names=["mockup-half-sleeve-front.png"],
+        back_out_names=["mockup-half-sleeve-back.png"],
+        session=session
+    )
+
+    # 2. Regular Fit T-Shirt
+    regular_fit_src = os.path.join(base_dir, "media_1795498711341_023ca673.jpg")
+    process_image(
+        regular_fit_src,
+        front_out_names=["mockup-regular-fit-front.png"],
+        back_out_names=["mockup-regular-fit-back.png"],
+        session=session
+    )
+
+    # 3. Oversized T-Shirt
+    oversized_src = os.path.join(base_dir, "media_1795498711354_77f1647a.jpg")
+    process_image(
+        oversized_src,
+        front_out_names=["mockup-oversized-front.png"],
+        back_out_names=["mockup-oversized-back.png"],
+        session=session
+    )
+
+    # 4. Crewneck Sweatshirt
+    sweatshirt_src = os.path.join(base_dir, "media_1795498711360_ada7b038.jpg")
+    process_image(
+        sweatshirt_src,
+        front_out_names=["mockup-sweatshirt-front.png"],
+        back_out_names=["mockup-sweatshirt-back.png"],
+        session=session
+    )
+
+    # 5. Polo T-Shirt
+    polo_src = os.path.join(base_dir, "media_1795498711279_3ec3852a.jpg")
+    process_image(
+        polo_src,
+        front_out_names=["mockup-polo-front.png"],
+        back_out_names=["mockup-polo-back.png"],
         session=session
     )
     
-    # 2. Full Sleeve T-Shirt
+    # 6. Full Sleeve T-Shirt
     full_sleeve_src = os.path.join(base_dir, "media_1795496383002_d305bbb1.jpg")
     if not os.path.exists(full_sleeve_src):
         full_sleeve_src = os.path.join(base_dir, "media_1795284214896_672e14bd.jpg")
@@ -82,18 +108,18 @@ def main():
         session=session
     )
     
-    # 3. Hoodie & Sweatshirt
+    # 7. Heavyweight Hoodie
     hoodie_src = os.path.join(base_dir, "media_1795496382987_db3373a9.jpg")
     if not os.path.exists(hoodie_src):
         hoodie_src = os.path.join(base_dir, "media_1795284214909_a927628c.jpg")
     process_image(
         hoodie_src,
-        front_out_names=["mockup-hoodie-front.png", "mockup-sweatshirt-front.png"],
-        back_out_names=["mockup-hoodie-back.png", "mockup-sweatshirt-back.png"],
+        front_out_names=["mockup-hoodie-front.png"],
+        back_out_names=["mockup-hoodie-back.png"],
         session=session
     )
     
-    print("\n--- All 14 photorealistic studio mockups successfully generated from real reference photos! ---")
+    print("\n--- All 7 garments (14 mockups) generated with their own individual real studio photos! ---")
 
 if __name__ == "__main__":
     main()

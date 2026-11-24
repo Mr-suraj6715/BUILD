@@ -131,7 +131,7 @@ export default function GarmentModel({
 
   // Printable Zone Dimensions and Positioning by Placement
   const getPlacementBoxStyle = () => {
-    const isHoodie = garmentId === "hoodie" || garmentId === "sweatshirt";
+    const isHoodie = garmentId === "hoodie";
     const isPolo = garmentId === "polo";
 
     if (view === "front") {
