@@ -113,58 +113,47 @@ const GARMENTS: GarmentOption[] = [
 interface ColorOption {
   name: string;
   hex: string;
-  category: "Classic" | "Streetwear" | "Earthy" | "Bold";
+  category: "Classic" | "Premium" | "Streetwear" | "Additional";
   badge?: string;
 }
 
 const COLORWAYS: ColorOption[] = [
   // Classic Colours
+  { name: "Black", hex: "#111111", category: "Classic", badge: "CORE" },
   { name: "Pure White", hex: "#FFFFFF", category: "Classic", badge: "CORE" },
-  { name: "Jet Black", hex: "#111111", category: "Classic", badge: "CORE" },
-  { name: "Charcoal", hex: "#363636", category: "Classic" },
-  { name: "Heather Grey", hex: "#9E9E9E", category: "Classic" },
-  { name: "Light Grey", hex: "#D3D3D3", category: "Classic" },
   { name: "Off White", hex: "#FAF9F6", category: "Classic" },
-  { name: "Ivory", hex: "#FFFFF0", category: "Classic" },
-  { name: "Cream", hex: "#FFFDD0", category: "Classic" },
+  { name: "Charcoal", hex: "#363636", category: "Classic" },
+  { name: "Grey", hex: "#808080", category: "Classic" },
+  { name: "Heather Grey", hex: "#9E9E9E", category: "Classic" },
 
-  // Premium Streetwear Colours
-  { name: "Midnight Navy", hex: "#152238", category: "Streetwear", badge: "POPULAR" },
-  { name: "Deep Navy", hex: "#0A192F", category: "Streetwear" },
-  { name: "Royal Blue", hex: "#4169E1", category: "Streetwear" },
-  { name: "Sky Blue", hex: "#87CEEB", category: "Streetwear" },
-  { name: "Burgundy", hex: "#800020", category: "Streetwear" },
-  { name: "Deep Maroon", hex: "#4A0E17", category: "Streetwear", badge: "SIGNATURE" },
-  { name: "Wine", hex: "#722F37", category: "Streetwear" },
-  { name: "Chocolate Brown", hex: "#3D1C02", category: "Streetwear" },
-  { name: "Mocha", hex: "#493628", category: "Streetwear" },
-  { name: "Coffee Brown", hex: "#362B28", category: "Streetwear" },
-  { name: "Premium Beige", hex: "#D9C9B6", category: "Streetwear", badge: "NEW" },
-  { name: "Sand", hex: "#C2B280", category: "Streetwear" },
-  { name: "Taupe", hex: "#483C32", category: "Streetwear" },
+  // Premium Colours
+  { name: "Midnight Navy", hex: "#152238", category: "Premium", badge: "POPULAR" },
+  { name: "Deep Navy Blue", hex: "#0A192F", category: "Premium" },
+  { name: "Maroon", hex: "#4A0E17", category: "Premium", badge: "SIGNATURE" },
+  { name: "Burgundy", hex: "#800020", category: "Premium" },
+  { name: "Beige", hex: "#D9C9B6", category: "Premium", badge: "NEW" },
+  { name: "Cream", hex: "#FFFDD0", category: "Premium" },
+  { name: "Chocolate Brown", hex: "#3D1C02", category: "Premium" },
+  { name: "Coffee", hex: "#362B28", category: "Premium" },
 
-  // Earthy Colours
-  { name: "Olive Green", hex: "#4B5320", category: "Earthy", badge: "TRENDING" },
-  { name: "Forest Green", hex: "#228B22", category: "Earthy" },
-  { name: "Sage Green", hex: "#9DC183", category: "Earthy" },
-  { name: "Moss Green", hex: "#8A9A5B", category: "Earthy" },
-  { name: "Khaki", hex: "#C3B091", category: "Earthy" },
-  { name: "Stone", hex: "#928E85", category: "Earthy" },
-  { name: "Rust", hex: "#B7410E", category: "Earthy" },
-  { name: "Terracotta", hex: "#E2725B", category: "Earthy" },
+  // Streetwear Colours
+  { name: "Olive Green", hex: "#4B5320", category: "Streetwear", badge: "TRENDING" },
+  { name: "Forest Green", hex: "#228B22", category: "Streetwear" },
+  { name: "Sage Green", hex: "#9DC183", category: "Streetwear" },
+  { name: "Bottle Green", hex: "#004225", category: "Streetwear" },
+  { name: "Rust", hex: "#B7410E", category: "Streetwear" },
+  { name: "Mustard", hex: "#FFDB58", category: "Streetwear" },
+  { name: "Wine Red", hex: "#722F37", category: "Streetwear" },
+  { name: "Stone Grey", hex: "#928E85", category: "Streetwear" },
 
-  // Bold Colours
-  { name: "Crimson Red", hex: "#990000", category: "Bold" },
-  { name: "Cherry Red", hex: "#D2042D", category: "Bold" },
-  { name: "Mustard Yellow", hex: "#FFDB58", category: "Bold" },
-  { name: "Lemon Yellow", hex: "#FFF44F", category: "Bold" },
-  { name: "Orange", hex: "#FFA500", category: "Bold" },
-  { name: "Lavender", hex: "#E6E6FA", category: "Bold" },
-  { name: "Purple", hex: "#800080", category: "Bold" },
-  { name: "Teal", hex: "#008080", category: "Bold" },
-  { name: "Emerald Green", hex: "#50C878", category: "Bold" },
-  { name: "Baby Pink", hex: "#F4C2C2", category: "Bold" },
-  { name: "Dusty Pink", hex: "#DCAE96", category: "Bold" },
+  // Additional Colours
+  { name: "Sky Blue", hex: "#87CEEB", category: "Additional" },
+  { name: "Royal Blue", hex: "#4169E1", category: "Additional" },
+  { name: "Lavender", hex: "#E6E6FA", category: "Additional" },
+  { name: "Pastel Pink", hex: "#F4C2C2", category: "Additional" },
+  { name: "Yellow", hex: "#FFF44F", category: "Additional" },
+  { name: "Orange", hex: "#FFA500", category: "Additional" },
+  { name: "Red", hex: "#D2042D", category: "Additional" },
 ];
 
 // =========================================================================
@@ -578,19 +567,19 @@ export default function CustomPrintStudioPage() {
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handleStartWithBuildDesign}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-[#D8FF36] hover:bg-[#cbf720] text-black font-mono text-[11px] font-bold uppercase transition-all shadow-sm rounded-none"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#D8FF36] hover:bg-[#cbf720] text-black font-mono text-[11px] font-bold uppercase transition-all shadow-sm rounded-none"
                 title="Load approved BUILD summit front logo & architectural globe back graphic"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Start With BUILD Design</span>
+                <span>TRY BUILD DESIGN</span>
               </button>
               <button
                 onClick={handleStartFromBlank}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-[#202020] hover:bg-[#2A2A2A] text-white font-mono text-[11px] font-bold uppercase border border-[#444] transition-all rounded-none"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#2A2A2A] text-white font-mono text-[11px] font-bold uppercase border border-[#444] transition-all rounded-none"
                 title="Clear all artwork and text to reveal a completely plain unbranded garment"
               >
                 <Trash2 className="w-3.5 h-3.5 text-[#888]" />
-                <span>Start From Blank</span>
+                <span>START FROM BLANK</span>
               </button>
             </div>
 
@@ -670,7 +659,7 @@ export default function CustomPrintStudioPage() {
 
               {/* Organized Category Tabs */}
               <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none font-mono text-[10px]">
-                {["All", "Classic", "Streetwear", "Earthy", "Bold"].map((cat) => (
+                {["All", "Classic", "Premium", "Streetwear", "Additional"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setColorCategory(cat)}
@@ -972,14 +961,14 @@ export default function CustomPrintStudioPage() {
                         className="py-2 px-2 bg-[#D8FF36] hover:bg-[#cbf720] text-black font-mono text-[11px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
-                        BUILD Design
+                        TRY BUILD DESIGN
                       </button>
                       <button
                         onClick={handleStartFromBlank}
                         className="py-2 px-2 bg-[#222222] hover:bg-[#333333] text-white font-mono text-[11px] font-bold uppercase border border-[#444] transition-all flex items-center justify-center gap-1.5"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-[#888]" />
-                        Start Blank
+                        START BLANK
                       </button>
                     </div>
                   </div>

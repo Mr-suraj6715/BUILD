@@ -131,67 +131,69 @@ export default function GarmentModel({
 
   // Printable Zone Dimensions and Positioning by Placement
   const getPlacementBoxStyle = () => {
-    const isHoodie = garmentId === "hoodie";
-    const isSweatshirt = garmentId === "sweatshirt";
+    const isHoodie = garmentId === "hoodie" || garmentId === "sweatshirt";
     const isPolo = garmentId === "polo";
 
     if (view === "front") {
       switch (placement) {
         case "front-left": // Left breast/pocket
           return {
-            top: isHoodie || isSweatshirt ? "30%" : isPolo ? "32%" : "27%",
+            top: isHoodie ? "28%" : isPolo ? "32%" : "26%",
             left: "56%",
-            width: "22%",
-            height: "20%",
+            width: "20%",
+            height: "18%",
           };
         case "front-full": // Full front
           return {
-            top: isHoodie ? "26%" : isPolo ? "30%" : "22%",
+            top: isHoodie ? "25%" : isPolo ? "28%" : "22%",
             left: "26%",
             width: "48%",
-            height: isHoodie ? "36%" : isPolo ? "48%" : "56%",
+            height: isHoodie ? "26%" : isPolo ? "48%" : "54%",
           };
         case "front-chest": // Standard chest center
         default:
           return {
-            top: isHoodie ? "27%" : isPolo ? "31%" : "26%",
+            top: isHoodie ? "26%" : isPolo ? "30%" : "25%",
             left: "28%",
             width: "44%",
-            height: isHoodie ? "36%" : "44%",
+            height: isHoodie ? "25%" : "42%",
           };
       }
     } else {
       switch (placement) {
         case "back-upper": // Upper neck hit
           return {
-            top: isHoodie ? "24%" : "18%",
+            top: isHoodie ? "32%" : "18%",
             left: "35%",
             width: "30%",
-            height: "16%",
+            height: "14%",
           };
         case "back-full": // Massive full back
           return {
-            top: isHoodie ? "25%" : "22%",
+            top: isHoodie ? "32%" : "22%",
             left: "23%",
             width: "54%",
-            height: isHoodie ? "50%" : "58%",
+            height: isHoodie ? "46%" : "56%",
           };
         case "back-center": // Standard back center
         default:
           return {
-            top: isHoodie ? "28%" : "26%",
+            top: isHoodie ? "34%" : "26%",
             left: "27%",
             width: "46%",
-            height: "46%",
+            height: isHoodie ? "40%" : "44%",
           };
       }
     }
   };
 
-  const isLightColor =
+  const isPureWhite =
     colorHex.toLowerCase() === "#ffffff" ||
     colorHex.toLowerCase() === "#fbfbfb" ||
-    colorHex.toLowerCase() === "#faf9f6" ||
+    colorHex.toLowerCase() === "#faf9f6";
+
+  const isLightColor =
+    isPureWhite ||
     colorHex.toLowerCase() === "#fffff0" ||
     colorHex.toLowerCase() === "#fffdd0" ||
     colorHex.toLowerCase() === "#d9c9b6" ||
@@ -211,65 +213,34 @@ export default function GarmentModel({
       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden"
     >
       {/* ======================================================== */}
-      {/* 1. PHOTOREALISTIC REAL APPAREL GARMENT (TRUE FABRIC)     */}
+      {/* 1. PHOTOREALISTIC REAL APPAREL GARMENT (TRUE STUDIO PHOTO) */}
       {/* ======================================================== */}
-      <div className="relative w-full h-full max-h-[520px] max-w-[500px] flex items-center justify-center pointer-events-none select-none">
-        {/* Real Apparel Base Photo */}
+      <div className="relative w-full h-full max-h-[540px] max-w-[500px] flex items-center justify-center pointer-events-none select-none">
+        {/* Real Apparel Base Photo (Photographed in professional fashion studio) */}
         <img
           src={garmentImgSrc}
-          alt="Real Garment Blank"
-          className="w-full h-full object-contain filter drop-shadow-2xl transition-all duration-300"
+          alt={`${garmentId} ${view}`}
+          className="w-full h-full object-contain filter drop-shadow-xl transition-all duration-300"
         />
 
         {/* Dynamic Color Multiply Tint Overlay (Masked exactly to the real garment silhouette) */}
-        <div
-          className="absolute inset-0 mix-blend-multiply transition-colors duration-300 pointer-events-none"
-          style={{
-            backgroundColor: colorHex,
-            maskImage: `url(${garmentImgSrc})`,
-            WebkitMaskImage: `url(${garmentImgSrc})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-            opacity: isLightColor ? 0.78 : 0.92,
-          }}
-        />
-
-        {/* Real Cotton Weave Texture Overlay */}
-        <div
-          className="absolute inset-0 mix-blend-overlay opacity-25 pointer-events-none"
-          style={{
-            backgroundImage: "url(/images/stitch/fabric-texture.jpg)",
-            backgroundSize: "cover",
-            maskImage: `url(${garmentImgSrc})`,
-            WebkitMaskImage: `url(${garmentImgSrc})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-          }}
-        />
-
-        {/* Ambient Shading Highlights */}
-        <div
-          className="absolute inset-0 mix-blend-soft-light opacity-40 pointer-events-none"
-          style={{
-            background: "radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.5) 100%)",
-            maskImage: `url(${garmentImgSrc})`,
-            WebkitMaskImage: `url(${garmentImgSrc})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-          }}
-        />
+        {!isPureWhite && (
+          <div
+            className="absolute inset-0 mix-blend-multiply transition-colors duration-300 pointer-events-none"
+            style={{
+              backgroundColor: colorHex,
+              maskImage: `url(${garmentImgSrc})`,
+              WebkitMaskImage: `url(${garmentImgSrc})`,
+              maskSize: "contain",
+              WebkitMaskSize: "contain",
+              maskPosition: "center",
+              WebkitMaskPosition: "center",
+              maskRepeat: "no-repeat",
+              WebkitMaskRepeat: "no-repeat",
+              opacity: isLightColor ? 0.82 : 0.94,
+            }}
+          />
+        )}
       </div>
 
       {/* ======================================================== */}
