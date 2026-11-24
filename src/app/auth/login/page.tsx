@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, UserCheck, ShieldAlert } from "lucide-react";
+import { Lock, Mail, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
@@ -27,25 +27,6 @@ export default function LoginPage() {
       router.push("/account");
     } else {
       setError(res.error || "Login failed");
-    }
-  };
-
-  const handleQuickLogin = async (userType: "customer" | "admin") => {
-    setError(null);
-    setLoading(true);
-
-    const creds =
-      userType === "admin"
-        ? { email: "admin@buildclothing.com", pass: "Admin@123456", dest: "/admin" }
-        : { email: "customer@buildclothing.com", pass: "Customer@123456", dest: "/account" };
-
-    const res = await login(creds.email, creds.pass);
-    setLoading(false);
-
-    if (res.success) {
-      router.push(creds.dest);
-    } else {
-      setError(res.error || "Quick login failed");
     }
   };
 
@@ -115,30 +96,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Demo Fast Login Pills */}
-        <div className="mt-8 pt-6 border-t border-[#D4D0C8]">
-          <span className="text-[10px] font-mono uppercase text-[#777777] block text-center mb-3">
-            ONE-CLICK DEMO CREDENTIALS
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => handleQuickLogin("customer")}
-              className="py-2 px-3 bg-[#F5F3EE] border border-[#D4D0C8] text-[11px] font-bold uppercase tracking-wider text-[#151515] hover:bg-[#101010] hover:text-[#D8FF36] transition-colors flex items-center justify-center gap-1.5"
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              <span>Customer Demo</span>
-            </button>
-            <button
-              onClick={() => handleQuickLogin("admin")}
-              className="py-2 px-3 bg-[#101010] text-[#D8FF36] text-[11px] font-bold uppercase tracking-wider hover:bg-black transition-colors flex items-center justify-center gap-1.5"
-            >
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>Admin Demo</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 text-center text-xs text-[#555555]">
+        <div className="mt-8 text-center text-xs text-[#555555]">
           Don&apos;t have an account?{" "}
           <Link href="/auth/register" className="font-bold text-[#151515] underline">
             Create an Account
