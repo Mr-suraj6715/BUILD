@@ -23,8 +23,8 @@ const colorways: Colorway[] = [
     hex: "#1B2430",
     slug: "build-series-better-tomorrow-tee-navy",
     campaignImg: "/images/campaign/build-series-navy.jpg",
-    frontImg: "/images/products/build-series-navy-front.jpg",
-    backImg: "/images/products/build-series-navy-back.jpg",
+    frontImg: "/images/products/build-model-navy-front.jpg",
+    backImg: "/images/products/build-model-navy-back.jpg",
     description: "Deep nocturnal navy with ivory screenprinted globe architecture and high-density front chest brandmark.",
   },
   {

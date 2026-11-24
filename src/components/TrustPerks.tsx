@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Truck, RotateCcw, Award } from "lucide-react";
+import { ShieldCheck, Truck, Award } from "lucide-react";
 
 export default function TrustPerks() {
   const perks = [
@@ -16,11 +16,6 @@ export default function TrustPerks() {
       desc: "Complimentary shipping across India on orders above ₹1,499.",
     },
     {
-      icon: RotateCcw,
-      title: "7-DAY EASY EXCHANGES",
-      desc: "Doorstep reverse pickup with instant size swap or full refund.",
-    },
-    {
       icon: ShieldCheck,
       title: "1200 DPI KORNIT PRINTS",
       desc: "Industrial pigment inks that never peel, crack, or fade.",
@@ -30,7 +25,7 @@ export default function TrustPerks() {
   return (
     <section className="w-full bg-[#151515] text-[#F5F3EE] py-10 border-y border-[#262626]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {perks.map((p, idx) => {
             const Icon = p.icon;
             return (
