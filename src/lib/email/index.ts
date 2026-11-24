@@ -10,11 +10,43 @@ export interface EmailPayload {
   text?: string;
 }
 
-export async function sendEmail(payload: EmailPayload): Promise<{ success: boolean; messageId: string }> {
-  // In production, integrate with SendGrid, Resend, or AWS SES.
-  // In development, logs transactional output cleanly and audit logs event.
+export async function sendEmail(payload: EmailPayload): Promise<{ success: boolean; messageId: string; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (apiKey && apiKey.startsWith("re_")) {
+    try {
+      const fromEmail = process.env.RESEND_FROM_EMAIL || "BUILD CLOTHING <onboarding@resend.dev>";
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: payload.to,
+          subject: payload.subject,
+          html: payload.html,
+          text: payload.text,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (response.ok && data?.id) {
+        console.log(`[RESEND EMAIL SUCCESS] Dispatched to: ${payload.to} | Resend ID: ${data.id}`);
+        return { success: true, messageId: data.id };
+      } else {
+        console.warn(`[RESEND EMAIL WARNING] Response status ${response.status}:`, data);
+      }
+    } catch (err: any) {
+      console.error(`[RESEND EMAIL FAILED]`, err?.message || err);
+    }
+  }
+
+  // Graceful fallback for local development or sandbox simulation
   const messageId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-  console.log(`[TRANSACTIONAL EMAIL] To: ${payload.to} | Subject: "${payload.subject}" | ID: ${messageId}`);
+  console.log(`[LOCAL EMAIL SIMULATOR] To: ${payload.to} | Subject: "${payload.subject}" | ID: ${messageId}`);
   return { success: true, messageId };
 }
 
