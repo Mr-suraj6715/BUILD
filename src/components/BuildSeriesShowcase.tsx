@@ -119,10 +119,10 @@ export default function BuildSeriesShowcase() {
         </div>
 
         {/* Showcase Grid: Full Campaign Board + Interactive Two-Image Preview Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left: Full Editorial Campaign Board (7 cols) */}
-          <div className="lg:col-span-7 bg-[#161616] border border-[#2E2E2E] overflow-hidden group/board relative flex flex-col justify-between">
-            <div className="relative aspect-[16/10] sm:aspect-[16/11] w-full overflow-hidden bg-black">
+          <div className="lg:col-span-7 bg-[#161616] border border-[#2E2E2E] overflow-hidden group/board relative flex flex-col">
+            <div className="relative aspect-[3/2] w-full overflow-hidden bg-black">
               <img
                 src={selectedColor.campaignImg}
                 alt={`${selectedColor.name} Campaign Board`}
@@ -167,7 +167,7 @@ export default function BuildSeriesShowcase() {
 
               {/* Dual-Image Interactive Card */}
               <div
-                className="relative aspect-[3/4] w-full max-w-sm mx-auto overflow-hidden bg-[#1A1A1A] border border-[#333333] group/card cursor-pointer shadow-xl"
+                className="relative aspect-[4/5] w-full max-w-[320px] mx-auto overflow-hidden bg-[#1A1A1A] border border-[#333333] group/card cursor-pointer shadow-xl"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >

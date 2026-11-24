@@ -97,12 +97,12 @@ export default function Navbar() {
   return (
     <>
       <header className={headerClasses}>
-        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 sm:gap-6">
+        <div className="w-full max-w-[1536px] mx-auto px-4 sm:px-8 lg:px-12 h-20 flex items-center justify-between gap-4">
           {/* ======================================================== */}
           {/* LEFT SECTION — BRAND IDENTITY                            */}
           {/* Official BUILD Mountain Wordmark Logo                    */}
           {/* ======================================================== */}
-          <div className="flex items-center shrink-0">
+          <div className="flex-1 flex items-center justify-start">
             <Link
               href="/"
               className="group flex items-center focus:outline-none py-1"
@@ -111,7 +111,7 @@ export default function Navbar() {
               <img
                 src={isLightText ? "/images/build-logo-white.png" : "/images/build-logo-dark.png"}
                 alt="BUILD"
-                className="h-9 sm:h-10 md:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+                className="h-8 sm:h-9 md:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
               />
             </Link>
           </div>
@@ -121,7 +121,7 @@ export default function Navbar() {
           {/* HOME | SHOP | COLLECTIONS | CUSTOM PRINT | LOOKBOOK | ABOUT */}
           {/* ======================================================== */}
           <nav
-            className="hidden lg:flex items-center gap-5 xl:gap-7"
+            className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 shrink-0"
             aria-label="Main Navigation"
           >
             {navLinks.map((link) => {
@@ -156,7 +156,7 @@ export default function Navbar() {
           {/* RIGHT SECTION — ACTION ICONS                             */}
           {/* Exact sequence: Search, Account, Wishlist, Cart          */}
           {/* ======================================================== */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2.5">
             {/* 1. Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
