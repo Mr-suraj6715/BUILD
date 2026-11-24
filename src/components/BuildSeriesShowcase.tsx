@@ -69,7 +69,7 @@ export default function BuildSeriesShowcase() {
   }, []);
 
   return (
-    <section className="w-full bg-[#101010] text-[#F5F3EE] py-20 px-4 sm:px-6 lg:px-8 border-b border-[#262626] relative overflow-hidden">
+    <section id="lookbook" className="w-full bg-[#101010] text-[#F5F3EE] py-20 px-4 sm:px-6 lg:px-8 border-b border-[#262626] relative overflow-hidden">
       {/* Background Subtle Accent Gradients */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#D8FF36]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />

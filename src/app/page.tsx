@@ -318,61 +318,6 @@ export default async function HomePage() {
       <TrustPerks />
 
       {/* =========================================================================
-          SECTION 09 — EDITORIAL LOOKBOOK (SHIBUYA CONCRETE)
-          ========================================================================= */}
-      <section
-        id="lookbook"
-        className="w-full bg-[#151515] text-[#F5F3EE] px-4 sm:px-6 lg:px-8 py-20 relative overflow-hidden border-b border-[#262626]"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between border-b border-[#333333] pb-4">
-            <div>
-              <span className="font-mono text-xs text-[#D8FF36] uppercase tracking-widest font-bold">
-                // EDITORIAL CAMPAIGN: THE BUILD SERIES
-              </span>
-              <h2 className="font-display text-4xl sm:text-6xl text-white uppercase leading-none mt-1">
-                BUILDING A BETTER TOMORROW
-              </h2>
-            </div>
-            <div className="font-mono text-xs text-[#888888] uppercase mt-2 md:mt-0 font-bold">
-              240 GSM HEAVY COMBED COTTON // CORE ARCHIVE
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            <div className="md:col-span-8 relative aspect-[16/9] bg-[#1D1C16] overflow-hidden shadow-2xl border border-[#333333]">
-              <img
-                src="/images/campaign/build-series-flatlay.jpg"
-                alt="BUILD Core T-Shirt Collection Flat Lay - Front Chest Logo & Back Graphic"
-                className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
-              />
-              <div className="absolute bottom-4 left-4 font-display text-lg text-white bg-black/85 px-4 py-1.5 border-l-2 border-[#D8FF36]">
-                FLAT LAY STUDIO // MIDNIGHT NAVY DUAL PRINT
-              </div>
-            </div>
-
-            <div className="md:col-span-4 flex flex-col gap-6">
-              <div className="aspect-square bg-[#0c121c] overflow-hidden shadow-xl border border-[#333333] flex items-center justify-center p-4">
-                <img
-                  src="/images/campaign/build-artwork.jpg"
-                  alt="Building A Better Tomorrow Official Graphic Artwork"
-                  className="max-h-full max-w-full object-contain transition-all duration-700 hover:scale-105"
-                />
-              </div>
-              <div className="bg-[#1D1C16] p-6 border border-[#2E2D27]">
-                <span className="font-mono text-xs text-[#D8FF36] uppercase tracking-widest font-bold">
-                  ARCHITECTURAL IDENTITY
-                </span>
-                <p className="font-sans text-xs sm:text-sm text-[#AAAAAA] mt-2 leading-relaxed">
-                  The flagship globe &amp; metropolis illustration fuses brutalist architectural line-work with retro-futuristic cartography. Screenprinted on 240 GSM dense combed cotton for eternal durability.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
           SECTION 10 — DROP COUNTDOWN
           ========================================================================= */}
       <DropCountdown />
