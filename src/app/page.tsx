@@ -12,34 +12,43 @@ import NewsletterForm from "@/components/NewsletterForm";
 import HeroVideoBackground from "@/components/HeroVideoBackground";
 import BuildSeriesShowcase from "@/components/BuildSeriesShowcase";
 
-export const revalidate = 60; // ISR cache 60s
+export const dynamic = "force-dynamic";
 
 async function getHomeData() {
-  const [featuredProducts, collections, categories] = await Promise.all([
-    prisma.product.findMany({
-      where: { isFeatured: true },
-      take: 8,
-      include: {
-        images: { orderBy: { displayOrder: "asc" } },
-        variants: true,
-        category: true,
-        collection: true,
-      },
-    }),
-    prisma.collection.findMany({
-      where: { isFeatured: true },
-      take: 4,
-    }),
-    prisma.category.findMany({
-      take: 6,
-    }),
-  ]);
+  try {
+    const [featuredProducts, collections, categories] = await Promise.all([
+      prisma.product.findMany({
+        where: { isFeatured: true },
+        take: 8,
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+          category: true,
+          collection: true,
+        },
+      }),
+      prisma.collection.findMany({
+        where: { isFeatured: true },
+        take: 4,
+      }),
+      prisma.category.findMany({
+        take: 6,
+      }),
+    ]);
 
-  return {
-    featuredProducts,
-    collections,
-    categories,
-  };
+    return {
+      featuredProducts: featuredProducts || [],
+      collections: collections || [],
+      categories: categories || [],
+    };
+  } catch (err: any) {
+    console.warn("[HOMEPAGE DB WARNING] Could not query database during build/render:", err?.message || err);
+    return {
+      featuredProducts: [],
+      collections: [],
+      categories: [],
+    };
+  }
 }
 
 export default async function HomePage() {
