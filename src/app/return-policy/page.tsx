@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { RotateCcw, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, AlertCircle, ShieldAlert, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
-  title: "Return & Refund Policy | BUILD CLOTHING",
-  description: "7-day hassle-free returns and size exchanges for BUILD CLOTHING garments.",
+  title: "No Return & Exchange Policy | BUILD CLOTHING",
+  description: "BUILD CLOTHING strict No Return, No Exchange, and Final Sale policy.",
 };
 
 export default function ReturnPolicyPage() {
@@ -19,55 +19,78 @@ export default function ReturnPolicyPage() {
       </Link>
 
       <span className="text-xs font-mono font-bold tracking-mega text-[#777777] uppercase block">
-        CUSTOMER PROTECTION
+        STORE POLICY // TERMS OF PURCHASE
       </span>
       <h1 className="font-display text-4xl sm:text-6xl uppercase font-black tracking-tight text-[#151515] mt-1 mb-8">
-        RETURNS & EXCHANGES
+        NO RETURN & NO EXCHANGE POLICY
       </h1>
 
       <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-6 sm:p-8 space-y-8 text-xs font-mono leading-relaxed text-[#333333]">
-        <div className="space-y-3">
-          <h2 className="font-display text-2xl uppercase font-bold text-[#151515]">
-            1. 7-DAY HASSLE-FREE RETURN WINDOW
-          </h2>
-          <p>
-            We stand behind our 240+ GSM craftsmanship. If your garment does not fit the way you want, or if you received an incorrect item, you can initiate a return or exchange within <strong>7 days of delivery</strong> directly from your <Link href="/account" className="underline font-bold text-[#151515]">Customer Account Dashboard</Link>.
+        <div className="bg-[#151515] text-[#F5F3EE] p-5 border-l-4 border-[#D8FF36] space-y-2">
+          <div className="flex items-center gap-2 text-[#D8FF36] font-bold uppercase tracking-wider text-sm">
+            <ShieldAlert className="w-4 h-4" />
+            <span>ALL SALES ARE FINAL</span>
+          </div>
+          <p className="text-xs text-[#CCCCCC]">
+            BUILD CLOTHING does not offer returns, exchanges, or refunds on any garments, hoodies, t-shirts, or bespoke custom printed merchandise. Please review your order and size measurements carefully before completing your purchase.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-display text-2xl uppercase font-bold text-[#151515]">
-            2. ELIGIBILITY CRITERIA
+            1. STRICT NO RETURN & NO EXCHANGE FACILITY
           </h2>
+          <p>
+            Due to the exclusive limited-run drops, premium heavyweight 240+ GSM Japanese combed cotton milling, and made-to-order bespoke nature of our Custom Print Studio apparel, we operate on a strict <strong>Final Sale</strong> basis.
+          </p>
+          <p>
+            We do not accept returns or process size exchanges for any reason, including change of mind, personal preference, or ordering an incorrect size.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-display text-2xl uppercase font-bold text-[#151515]">
+            2. ACCURATE SIZE SELECTION
+          </h2>
+          <p>
+            To ensure the desired boxy or relaxed streetwear drape, comprehensive dimensional size charts (Chest, Length, Shoulder Width, Sleeve Length) are provided on every product page. Customers are encouraged to consult our size charts or reach out to our team at{" "}
+            <a href="mailto:buildclothing2026@gmail.com" className="underline font-bold text-[#151515]">
+              buildclothing2026@gmail.com
+            </a>{" "}
+            prior to purchasing.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-display text-2xl uppercase font-bold text-[#151515]">
+            3. TRANSIT DAMAGE OR INCORRECT SHIPMENT
+          </h2>
+          <p>
+            In the rare event that your package arrives physically damaged in transit or you receive a completely incorrect item from our warehouse:
+          </p>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li>The garment must be unworn, unwashed, and with all original brand tags attached.</li>
-            <li>Original packaging and polybag must be returned in good condition.</li>
-            <li>Limited numbered drop items with certificates of authenticity must include the certificate.</li>
-            <li>Items damaged due to customer misuse or improper washing (e.g. ironing directly on rubberized high-density prints) are not eligible.</li>
+            <li>
+              You must report the issue within <strong>48 hours of delivery</strong> by emailing{" "}
+              <strong>buildclothing2026@gmail.com</strong>.
+            </li>
+            <li>
+              Include your order number (e.g. <code>BLD-2505-8821</code>), high-resolution photos of the parcel label, and a complete unboxing video showing the sealed courier package being opened.
+            </li>
+            <li>
+              Upon verification by our fulfillment team, a replacement piece of the exact same product and size will be dispatched at no additional cost.
+            </li>
           </ul>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-display text-2xl uppercase font-bold text-[#151515]">
-            3. REVERSE PICKUP & REFUND PROCESS
+            4. ORDER CANCELLATIONS
           </h2>
           <p>
-            Once a return request is submitted, our courier partner will arrange a doorstep pickup within 48–72 hours.
+            Orders can only be cancelled while in <strong>PENDING</strong> status before payment capture and processing. Once an order enters our automated cut, print, or dispatch pipeline, it cannot be modified or cancelled.
           </p>
-          <p>
-            Upon receipt and standard quality inspection at our Mumbai warehouse:
-          </p>
-          <ul className="list-disc pl-5 space-y-1.5">
-            <li>
-              <strong>Prepaid Orders (Razorpay UPI / Cards):</strong> Refund is credited directly to the original payment source within 3–5 business days.
-            </li>
-            <li>
-              <strong>Cash on Delivery (COD):</strong> Refund is issued via direct bank transfer (NEFT/IMPS) or instant store credits per your preference.
-            </li>
-          </ul>
         </div>
       </div>
     </div>
   );
 }
-

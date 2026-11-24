@@ -525,7 +525,7 @@ export default function ProductDetailPage() {
               </div>
               <div className="bg-[#E8E5DE] p-2.5">
                 <span className="text-[#777777] block text-[10px]">RETURNS & EXCHANGE</span>
-                <span className="font-bold text-[#151515]">7-Day Hassle Free</span>
+                <span className="font-bold text-[#151515]">Non-Returnable (Final Sale)</span>
               </div>
             </div>
             <p className="text-xs text-[#555555] leading-relaxed pt-2">

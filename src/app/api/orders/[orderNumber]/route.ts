@@ -105,25 +105,10 @@ export async function POST(
     }
 
     if (action === "RETURN") {
-      if (order.status !== "DELIVERED") {
-        return NextResponse.json(
-          { error: "Returns can only be requested for delivered orders." },
-          { status: 400 }
-        );
-      }
-
-      const updated = await prisma.order.update({
-        where: { id: order.id },
-        data: {
-          status: "RETURN_REQUESTED",
-        },
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: "Return request submitted. Our team will verify and arrange courier pickup.",
-        order: updated,
-      });
+      return NextResponse.json(
+        { error: "Returns and exchanges are not supported. All sales are final." },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

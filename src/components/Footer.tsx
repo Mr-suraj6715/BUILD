@@ -182,6 +182,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link href="/return-policy" className="hover:text-[#F5F3EE] transition-colors">
+                No Return & Exchange Policy
+              </Link>
+            </li>
+            <li>
               <Link href="/privacy-policy" className="hover:text-[#F5F3EE] transition-colors">
                 Privacy Policy
               </Link>

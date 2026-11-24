@@ -59,7 +59,6 @@ type AdminModule =
   | "customers"
   | "payments"
   | "shipping"
-  | "returns"
   | "coupons"
   | "reviews"
   | "cms"
@@ -964,7 +963,6 @@ export default function AdminDashboardPage() {
     { id: "customers", label: "Customers", icon: Users },
     { id: "payments", label: "Payments", icon: CreditCard },
     { id: "shipping", label: "Shipping", icon: Truck },
-    { id: "returns", label: "Returns & Refunds", icon: RotateCcw },
     { id: "coupons", label: "Coupons", icon: Tag },
     { id: "reviews", label: "Reviews", icon: MessageSquare },
     { id: "cms", label: "CMS / Builder", icon: Radio },
@@ -1156,11 +1154,11 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] text-[#555555]">Active releases in catalog</span>
                 </div>
                 <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-5">
-                  <span className="text-[10px] uppercase text-[#777777]">REFUND REQUESTS</span>
-                  <span className="font-display text-3xl font-black text-purple-700 block mt-1">
-                    {kpis.refundRequests || 0}
+                  <span className="text-[10px] uppercase text-[#777777]">POLICY STATUS</span>
+                  <span className="font-display text-2xl font-black text-[#151515] block mt-1">
+                    FINAL SALE
                   </span>
-                  <span className="text-[10px] text-[#555555]">7-day returns queue</span>
+                  <span className="text-[10px] text-[#555555]">No Returns / Exchanges</span>
                 </div>
               </div>
 
@@ -1420,12 +1418,12 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {/* 6. ORDERS & 9. RETURNS */}
-          {(activeModule === "orders" || activeModule === "returns") && (
+          {/* 6. ORDERS */}
+          {activeModule === "orders" && (
             <div className="space-y-6">
               <div className="flex justify-between items-baseline pb-4 border-b border-[#D4D0C8]">
                 <h2 className="font-display text-3xl uppercase font-black text-[#151515]">
-                  {activeModule === "orders" ? "ORDERS MANAGEMENT" : "RETURNS & REFUNDS QUEUE"}
+                  ORDERS MANAGEMENT
                 </h2>
                 <button
                   onClick={() => exportToCSV(orders, "orders_master")}
@@ -1436,9 +1434,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-4">
-                {orders
-                  .filter((o) => activeModule !== "returns" || o.status === "RETURN_REQUESTED")
-                  .map((o) => (
+                {orders.map((o) => (
                     <div key={o.id} className="bg-[#E8E5DE] border border-[#D4D0C8] p-5 space-y-3 font-mono text-xs">
                       <div className="flex flex-col sm:flex-row justify-between pb-3 border-b border-[#D4D0C8]">
                         <div>
@@ -2517,13 +2513,10 @@ export default function AdminDashboardPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[#555555] uppercase mb-1">Return Window (Days)</label>
-                    <input
-                      type="number"
-                      value={settings.returnWindowDays}
-                      onChange={(e) => setSettings({ ...settings, returnWindowDays: Number(e.target.value) })}
-                      className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2.5"
-                    />
+                    <label className="block text-[#555555] uppercase mb-1">Return & Exchange Policy</label>
+                    <div className="w-full bg-[#E8E5DE] border border-[#D4D0C8] p-2.5 text-xs font-bold text-[#151515]">
+                      DISABLED (STRICT FINAL SALE — NO RETURNS / EXCHANGES)
+                    </div>
                   </div>
                 </div>
                 <button type="submit" className="px-6 py-3 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider">
