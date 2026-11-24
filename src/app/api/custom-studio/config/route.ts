@@ -77,3 +77,30 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Failed to update studio option" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getSessionUser();
+    if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const garmentId = searchParams.get("garmentId");
+    const optionId = searchParams.get("optionId");
+
+    if (garmentId) {
+      await prisma.studioGarment.delete({ where: { id: garmentId } });
+      return NextResponse.json({ success: true, message: "Garment deleted" });
+    }
+
+    if (optionId) {
+      await prisma.studioOption.delete({ where: { id: optionId } });
+      return NextResponse.json({ success: true, message: "Option deleted" });
+    }
+
+    return NextResponse.json({ error: "garmentId or optionId is required" }, { status: 400 });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to delete studio item" }, { status: 500 });
+  }
+}

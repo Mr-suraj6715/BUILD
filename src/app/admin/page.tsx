@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -72,6 +72,110 @@ type AdminModule =
   | "settings"
   | "audit";
 
+function ImageUploadField({
+  label,
+  value,
+  onChange,
+  aspect = "square",
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  aspect?: "square" | "wide";
+}) {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "showcase");
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        onChange(data.url);
+      } else {
+        alert(data.error || "Failed to upload image");
+      }
+    } catch {
+      alert("Error uploading image");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <label className="block text-[#666666] uppercase text-[10px] font-bold">{label}</label>
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="text-[10px] text-red-600 hover:underline uppercase font-bold"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      <div className="flex items-start gap-3 bg-[#F5F3EE] border border-[#D4D0C8] p-2">
+        {value ? (
+          <div
+            className={`relative shrink-0 overflow-hidden bg-black border border-[#D4D0C8] ${
+              aspect === "wide" ? "w-20 h-14" : "w-14 h-14"
+            }`}
+          >
+            <img src={value} alt={label} className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div
+            className={`shrink-0 bg-[#E8E5DE] border border-dashed border-[#BBB] flex items-center justify-center text-[#999] ${
+              aspect === "wide" ? "w-20 h-14" : "w-14 h-14"
+            }`}
+          >
+            <ImageIcon className="w-5 h-5 opacity-40" />
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0 space-y-1">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/png,image/jpeg,image/webp,image/jpg"
+            className="hidden"
+          />
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}
+            className="px-3 py-1.5 bg-[#101010] text-[#D8FF36] font-mono text-[10px] font-bold uppercase tracking-wider hover:bg-black transition-colors flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <UploadCloud className="w-3.5 h-3.5" />
+            <span>{uploading ? "Uploading..." : value ? "Change Photo" : "Upload Photo"}</span>
+          </button>
+          {value && (
+            <p className="text-[9px] text-[#777] truncate font-mono" title={value}>
+              {value}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -103,6 +207,7 @@ export default function AdminDashboardPage() {
   const [dropTitle, setDropTitle] = useState("");
   const [dropSubtitle, setDropSubtitle] = useState("");
   const [dropTargetDate, setDropTargetDate] = useState("");
+  const [dropImageUrl, setDropImageUrl] = useState<string>("/images/drop-male-model.jpg");
   const [cmsSuccess, setCmsSuccess] = useState(false);
 
   // Custom Studio & Homepage Showcase dynamic states
@@ -295,6 +400,7 @@ export default function AdminDashboardPage() {
           setDropTitle(cms.dropCountdown.title);
           setDropSubtitle(cms.dropCountdown.subtitle || "");
           setDropTargetDate(cms.dropCountdown.targetDate?.slice(0, 10) || "");
+          if (cms.dropCountdown.imageUrl) setDropImageUrl(cms.dropCountdown.imageUrl);
         }
       }
 
@@ -579,7 +685,7 @@ export default function AdminDashboardPage() {
               title: dropTitle,
               subtitle: dropSubtitle,
               targetDate: new Date(dropTargetDate).toISOString(),
-              imageUrl: "/images/drop-male-model.jpg",
+              imageUrl: dropImageUrl || "/images/drop-male-model.jpg",
             },
           }),
         });
@@ -640,6 +746,73 @@ export default function AdminDashboardPage() {
       }
     } catch {
       alert("Failed to update showcase item");
+    }
+  };
+
+  const handleDeleteShowcase = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to remove the "${name}" showcase card from the homepage?`)) return;
+    try {
+      const res = await fetch(`/api/showcase?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setShowcaseItems((prev) => prev.filter((s) => s.id !== id));
+        setShowcaseSuccess(`Removed ${name} from homepage showcase.`);
+        setTimeout(() => setShowcaseSuccess(null), 3500);
+      } else {
+        alert(data.error || "Failed to remove showcase card");
+      }
+    } catch {
+      alert("Error deleting showcase card");
+    }
+  };
+
+  const handleDeleteGarment = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to remove "${name}" from Custom Print Studio?`)) return;
+    try {
+      const res = await fetch(`/api/custom-studio/config?garmentId=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setStudioGarments((prev) => prev.filter((g) => g.id !== id));
+        setStudioSuccess(`Removed ${name} from studio.`);
+        setTimeout(() => setStudioSuccess(null), 3500);
+      } else {
+        alert(data.error || "Failed to remove garment");
+      }
+    } catch {
+      alert("Error deleting garment");
+    }
+  };
+
+  const handleDeleteAdmin = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete admin "${name}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/admins?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setAdmins((prev) => prev.filter((a) => a.id !== id));
+      } else {
+        alert(data.error || "Failed to delete admin");
+      }
+    } catch {
+      alert("Error deleting admin");
+    }
+  };
+
+  const handleDeleteCampaign = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this marketing campaign broadcast?")) return;
+    try {
+      const res = await fetch(`/api/admin/marketing?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setMarketingData((prev: any) => ({
+          ...prev,
+          campaigns: prev.campaigns.filter((c: any) => c.id !== id),
+        }));
+      } else {
+        alert(data.error || "Failed to delete campaign");
+      }
+    } catch {
+      alert("Error deleting campaign");
     }
   };
 
@@ -1752,6 +1925,11 @@ export default function AdminDashboardPage() {
                     className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2.5"
                   />
                 </div>
+                <ImageUploadField
+                  label="Next Drop Hero Image"
+                  value={dropImageUrl}
+                  onChange={(url) => setDropImageUrl(url)}
+                />
                 <button
                   onClick={handleSaveCMS}
                   className="px-6 py-3 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider"
@@ -1878,12 +2056,22 @@ export default function AdminDashboardPage() {
                         />
                       </div>
 
-                      <button
-                        onClick={() => handleUpdateStudioGarment(g)}
-                        className="w-full py-2 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors"
-                      >
-                        Save {g.name}
-                      </button>
+                      <div className="flex items-center gap-2 pt-2 border-t border-[#D4D0C8]">
+                        <button
+                          onClick={() => handleUpdateStudioGarment(g)}
+                          className="flex-1 py-2 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors"
+                        >
+                          Save {g.name}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteGarment(g.id, g.name)}
+                          className="p-2 bg-red-100 text-red-700 hover:bg-red-200 border border-red-300 transition-colors"
+                          title={`Delete ${g.name}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -2031,59 +2219,55 @@ export default function AdminDashboardPage() {
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-[#666666] uppercase text-[10px] mb-1">Campaign Board Image</label>
-                        <input
-                          type="text"
-                          value={item.campaignImg}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setShowcaseItems((prev) =>
-                              prev.map((sh, i) => (i === idx ? { ...sh, campaignImg: val } : sh))
-                            );
-                          }}
-                          className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515] text-[11px]"
-                        />
-                      </div>
+                      <ImageUploadField
+                        label="Campaign Board Image"
+                        value={item.campaignImg}
+                        aspect="wide"
+                        onChange={(url) => {
+                          setShowcaseItems((prev) =>
+                            prev.map((sh, i) => (i === idx ? { ...sh, campaignImg: url } : sh))
+                          );
+                        }}
+                      />
 
                       <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Front Model Image</label>
-                          <input
-                            type="text"
-                            value={item.frontImg}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setShowcaseItems((prev) =>
-                                prev.map((sh, i) => (i === idx ? { ...sh, frontImg: val } : sh))
-                              );
-                            }}
-                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515] text-[10px]"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[#666666] uppercase text-[10px] mb-1">Back Model Image</label>
-                          <input
-                            type="text"
-                            value={item.backImg}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setShowcaseItems((prev) =>
-                                prev.map((sh, i) => (i === idx ? { ...sh, backImg: val } : sh))
-                              );
-                            }}
-                            className="w-full bg-[#F5F3EE] border border-[#D4D0C8] p-2 text-[#151515] text-[10px]"
-                          />
-                        </div>
+                        <ImageUploadField
+                          label="Front Model Photo"
+                          value={item.frontImg}
+                          onChange={(url) => {
+                            setShowcaseItems((prev) =>
+                              prev.map((sh, i) => (i === idx ? { ...sh, frontImg: url } : sh))
+                            );
+                          }}
+                        />
+                        <ImageUploadField
+                          label="Back Model Photo"
+                          value={item.backImg}
+                          onChange={(url) => {
+                            setShowcaseItems((prev) =>
+                              prev.map((sh, i) => (i === idx ? { ...sh, backImg: url } : sh))
+                            );
+                          }}
+                        />
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleUpdateShowcaseItem(item)}
-                      className="w-full py-2.5 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors mt-2"
-                    >
-                      Save {item.name} Card
-                    </button>
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#D4D0C8]">
+                      <button
+                        onClick={() => handleUpdateShowcaseItem(item)}
+                        className="flex-1 py-2.5 bg-[#101010] text-[#D8FF36] font-bold uppercase tracking-wider hover:bg-black transition-colors"
+                      >
+                        Save {item.name} Card
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteShowcase(item.id, item.name)}
+                        className="p-2.5 bg-red-100 text-red-700 hover:bg-red-200 border border-red-300 transition-colors"
+                        title={`Delete ${item.name} Card`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -2118,9 +2302,19 @@ export default function AdminDashboardPage() {
                       <strong className="block text-sm text-[#151515]">{camp.name}</strong>
                       <span className="text-[#777777]">{camp.type} • {camp.recipientCount} Recipients</span>
                     </div>
-                    <span className="px-2 py-0.5 bg-green-100 text-green-800 font-bold uppercase">
-                      {camp.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-green-100 text-green-800 font-bold uppercase">
+                        {camp.status}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCampaign(camp.id)}
+                        className="p-1.5 text-red-600 hover:bg-red-100 rounded transition-colors"
+                        title="Delete Campaign"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -2237,9 +2431,21 @@ export default function AdminDashboardPage() {
                       <strong className="block text-sm text-[#151515] font-bold">{adm.name}</strong>
                       <span className="text-[#777777]">{adm.email}</span>
                     </div>
-                    <span className="px-2.5 py-0.5 bg-[#101010] text-[#D8FF36] font-bold text-[10px]">
-                      {adm.role}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 bg-[#101010] text-[#D8FF36] font-bold text-[10px]">
+                        {adm.role}
+                      </span>
+                      {user?.email !== adm.email && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAdmin(adm.id, adm.name)}
+                          className="p-1.5 text-red-600 hover:bg-red-100 rounded transition-colors"
+                          title={`Delete Admin ${adm.name}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

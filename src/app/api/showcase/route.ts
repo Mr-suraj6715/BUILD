@@ -59,3 +59,26 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Failed to update showcase item" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getSessionUser();
+    if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Showcase item ID is required" }, { status: 400 });
+    }
+
+    await prisma.homepageShowcase.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true, message: "Showcase item deleted successfully" });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to delete showcase item" }, { status: 500 });
+  }
+}

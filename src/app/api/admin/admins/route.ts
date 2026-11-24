@@ -71,3 +71,30 @@ export async function POST(request: Request) {
   }
 }
 
+export async function DELETE(request: Request) {
+  try {
+    const session = await getSessionUser();
+    if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Admin ID is required" }, { status: 400 });
+    }
+
+    if (session.userId === id) {
+      return NextResponse.json({ error: "You cannot delete your own admin account." }, { status: 400 });
+    }
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true, message: "Admin user removed successfully." });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Failed to delete admin" }, { status: 500 });
+  }
+}
+

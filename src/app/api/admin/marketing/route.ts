@@ -62,3 +62,23 @@ export async function POST(request: Request) {
   }
 }
 
+export async function DELETE(request: Request) {
+  try {
+    const session = await getSessionUser();
+    if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Campaign ID required" }, { status: 400 });
+    }
+
+    campaignList = campaignList.filter((c) => c.id !== id);
+    return NextResponse.json({ success: true, message: "Campaign removed successfully" });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to delete campaign" }, { status: 500 });
+  }
+}
+
