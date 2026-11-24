@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 
 // Simple sanitizer for SVG to prevent XSS
 function sanitizeSvg(svgContent: string): string {
-  // Strip out script tags and event handlers
   return svgContent
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, "")
@@ -18,10 +17,6 @@ function sanitizeSvg(svgContent: string): string {
 export async function POST(request: Request) {
   try {
     const contentType = request.headers.get("content-type") || "";
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "custom");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
 
     // 1. Multipart Form Data handling
     if (contentType.includes("multipart/form-data")) {
@@ -63,37 +58,81 @@ export async function POST(request: Request) {
         .toLowerCase()
         .replace(/\.[^/.]+$/, "");
       const fileName = `${side}_${Date.now()}_${sanitizedBase}.${ext}`;
-      const filePath = path.join(uploadDir, fileName);
 
-      if (ext === "svg") {
-        const text = await file.text();
-        const safeSvg = sanitizeSvg(text);
-        await fs.promises.writeFile(filePath, safeSvg, "utf8");
-      } else {
+      // 1. Try Cloudinary cloud storage
+      if (ext !== "svg") {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        // Try Cloudinary cloud storage
-        const cloudUpload = await uploadToCloudinary(buffer, `build_clothing/custom/${side}`);
-        if (cloudUpload.success) {
+        try {
+          const cloudUpload = await uploadToCloudinary(buffer, `build_clothing/custom/${side}`);
+          if (cloudUpload.success && cloudUpload.url) {
+            return NextResponse.json({
+              success: true,
+              url: cloudUpload.url,
+              fileName: file.name,
+              size: file.size,
+            });
+          }
+        } catch (cloudErr) {
+          console.warn("[STUDIO UPLOAD] Cloudinary attempt failed:", cloudErr);
+        }
+
+        // 2. Try writing to local disk
+        try {
+          const uploadDir = path.join(process.cwd(), "public", "uploads", "custom");
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+          const filePath = path.join(uploadDir, fileName);
+          await fs.promises.writeFile(filePath, buffer);
+          const fileUrl = `/uploads/custom/${fileName}`;
           return NextResponse.json({
             success: true,
-            url: cloudUpload.url,
+            url: fileUrl,
+            fileName: file.name,
+            size: file.size,
+          });
+        } catch (fsErr) {
+          // 3. Fallback for read-only serverless environment (Vercel)
+          const base64Url = `data:${file.type || "image/png"};base64,${buffer.toString("base64")}`;
+          return NextResponse.json({
+            success: true,
+            url: base64Url,
             fileName: file.name,
             size: file.size,
           });
         }
+      } else {
+        // SVG handling
+        const text = await file.text();
+        const safeSvg = sanitizeSvg(text);
 
-        await fs.promises.writeFile(filePath, buffer);
+        try {
+          const uploadDir = path.join(process.cwd(), "public", "uploads", "custom");
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+          const filePath = path.join(uploadDir, fileName);
+          await fs.promises.writeFile(filePath, safeSvg, "utf8");
+          const fileUrl = `/uploads/custom/${fileName}`;
+          return NextResponse.json({
+            success: true,
+            url: fileUrl,
+            fileName: file.name,
+            size: file.size,
+          });
+        } catch (fsErr) {
+          const base64Svg = Buffer.from(safeSvg, "utf8").toString("base64");
+          const base64Url = `data:image/svg+xml;base64,${base64Svg}`;
+          return NextResponse.json({
+            success: true,
+            url: base64Url,
+            fileName: file.name,
+            size: file.size,
+          });
+        }
       }
-
-      const fileUrl = `/uploads/custom/${fileName}`;
-      return NextResponse.json({
-        success: true,
-        url: fileUrl,
-        fileName: file.name,
-        size: file.size,
-      });
     }
 
     // 2. Base64 payload handling
@@ -130,33 +169,53 @@ export async function POST(request: Request) {
 
       const safeBase = originalName.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
       const fileName = `${side}_${Date.now()}_${safeBase}.${ext}`;
-      const filePath = path.join(uploadDir, fileName);
 
-      // Try Cloudinary cloud storage
-      const cloudUpload = await uploadToCloudinary(base64, `build_clothing/custom/${side}`);
-      if (cloudUpload.success) {
+      // 1. Try Cloudinary cloud storage
+      try {
+        const cloudUpload = await uploadToCloudinary(base64, `build_clothing/custom/${side}`);
+        if (cloudUpload.success && cloudUpload.url) {
+          return NextResponse.json({
+            success: true,
+            url: cloudUpload.url,
+            fileName: originalName,
+            size: buffer.length,
+          });
+        }
+      } catch (cloudErr) {
+        console.warn("[STUDIO UPLOAD] Cloudinary base64 attempt failed:", cloudErr);
+      }
+
+      // 2. Try writing to local disk
+      try {
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "custom");
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const filePath = path.join(uploadDir, fileName);
+
+        if (ext === "svg") {
+          const safeSvg = sanitizeSvg(buffer.toString("utf8"));
+          await fs.promises.writeFile(filePath, safeSvg, "utf8");
+        } else {
+          await fs.promises.writeFile(filePath, buffer);
+        }
+
+        const fileUrl = `/uploads/custom/${fileName}`;
         return NextResponse.json({
           success: true,
-          url: cloudUpload.url,
-          fileName: originalName,
+          url: fileUrl,
+          fileName,
+          size: buffer.length,
+        });
+      } catch (fsErr) {
+        // 3. Fallback for serverless
+        return NextResponse.json({
+          success: true,
+          url: base64,
+          fileName,
           size: buffer.length,
         });
       }
-
-      if (ext === "svg") {
-        const safeSvg = sanitizeSvg(buffer.toString("utf8"));
-        await fs.promises.writeFile(filePath, safeSvg, "utf8");
-      } else {
-        await fs.promises.writeFile(filePath, buffer);
-      }
-
-      const fileUrl = `/uploads/custom/${fileName}`;
-      return NextResponse.json({
-        success: true,
-        url: fileUrl,
-        fileName,
-        size: buffer.length,
-      });
     }
 
     return NextResponse.json({ error: "Unsupported Content-Type" }, { status: 400 });
