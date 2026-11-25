@@ -314,19 +314,32 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Price & Discount */}
-        <div className="mt-auto pt-1 flex items-baseline gap-2">
-          <span className="text-sm font-black text-[#151515]">
-            {formatPrice(product.basePrice)}
-          </span>
-          {product.originalPrice > product.basePrice && (
-            <>
-              <span className="text-xs text-[#777777] line-through font-medium">
-                {formatPrice(product.originalPrice)}
-              </span>
-              <span className="text-[11px] font-bold text-[#101010] bg-[#D8FF36] px-1">
-                {discountPercent}% OFF
-              </span>
-            </>
+        <div className="mt-auto pt-1 flex items-baseline justify-between gap-1">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-xs sm:text-sm font-black text-[#151515]">
+              {formatPrice(product.basePrice)}
+            </span>
+            {product.originalPrice > product.basePrice && (
+              <>
+                <span className="text-[10px] sm:text-xs text-[#777777] line-through font-medium">
+                  {formatPrice(product.originalPrice)}
+                </span>
+                <span className="text-[9px] sm:text-[11px] font-bold text-[#101010] bg-[#D8FF36] px-1">
+                  {discountPercent}% OFF
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Quick-Add Button (Touch-friendly 36px hit target, hidden on desktop >=640px where hover overlay works) */}
+          {!isSoldOut && (
+            <button
+              onClick={handleQuickAdd}
+              className="sm:hidden p-1.5 bg-[#101010] text-[#D8FF36] active:bg-[#D8FF36] active:text-[#101010] transition-colors rounded-none flex items-center justify-center min-w-[32px] min-h-[32px] shrink-0"
+              aria-label={`Quick add ${product.title} to bag`}
+            >
+              {added ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+            </button>
           )}
         </div>
       </div>

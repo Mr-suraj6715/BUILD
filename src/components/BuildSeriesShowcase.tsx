@@ -69,14 +69,14 @@ export default function BuildSeriesShowcase() {
   }, []);
 
   return (
-    <section id="lookbook" className="w-full bg-[#101010] text-[#F5F3EE] py-20 px-4 sm:px-6 lg:px-8 border-b border-[#262626] relative overflow-hidden">
+    <section id="lookbook" className="w-full bg-[#101010] text-[#F5F3EE] py-12 sm:py-20 px-3 sm:px-6 lg:px-8 border-b border-[#262626] relative overflow-hidden">
       {/* Background Subtle Accent Gradients */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#D8FF36]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto space-y-12">
+      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#262626] pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#262626] pb-6 sm:pb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-[#D8FF36]" />
@@ -84,10 +84,10 @@ export default function BuildSeriesShowcase() {
                 CORE T-SHIRT COLLECTION // 2026
               </span>
             </div>
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl uppercase text-white font-black tracking-tight leading-none">
+            <h2 className="font-display text-3xl xs:text-4xl sm:text-6xl lg:text-7xl uppercase text-white font-black tracking-tight leading-none">
               THE BUILD SERIES
             </h2>
-            <p className="font-sans text-sm sm:text-base text-[#AAAAAA] mt-2 max-w-xl">
+            <p className="font-sans text-xs sm:text-base text-[#AAAAAA] mt-2 max-w-xl">
               Engineered with 240 GSM heavy cotton and our signature &quot;Building A Better Tomorrow&quot; globe architecture artwork.
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function BuildSeriesShowcase() {
                 key={c.id}
                 type="button"
                 onClick={() => setSelectedColor(c)}
-                className={`px-4 py-2 flex items-center gap-2.5 border text-xs font-mono uppercase font-bold transition-all duration-200 ${
+                className={`px-3 sm:px-4 py-2 flex items-center gap-2 sm:gap-2.5 border text-[11px] sm:text-xs font-mono uppercase font-bold transition-all duration-200 ${
                   selectedColor.id === c.id
                     ? "bg-[#D8FF36] text-[#101010] border-[#D8FF36] shadow-md scale-105"
                     : "bg-[#181818] text-[#CCCCCC] border-[#333333] hover:border-[#666666]"
@@ -154,22 +154,24 @@ export default function BuildSeriesShowcase() {
           </div>
 
           {/* Right: Interactive Two-Image Card with Hover Effect (5 cols) */}
-          <div className="lg:col-span-5 bg-[#161616] border border-[#2E2E2E] p-6 flex flex-col justify-between">
+          <div className="lg:col-span-5 bg-[#161616] border border-[#2E2E2E] p-4 sm:p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-[#262626] mb-4">
                 <span className="font-mono text-xs font-bold text-[#AAAAAA] uppercase tracking-wider">
                   INTERACTIVE PRODUCT VIEW
                 </span>
                 <span className="font-mono text-[10px] text-[#D8FF36] uppercase bg-[#222222] px-2 py-0.5">
-                  HOVER TO REVEAL BACK ART
+                  <span className="hidden sm:inline">HOVER TO REVEAL BACK ART</span>
+                  <span className="sm:hidden">TAP TO REVEAL BACK ART</span>
                 </span>
               </div>
 
-              {/* Dual-Image Interactive Card */}
+              {/* Dual-Image Interactive Card with Mobile Tap Support */}
               <div
-                className="relative aspect-[4/5] w-full max-w-[320px] mx-auto overflow-hidden bg-[#1A1A1A] border border-[#333333] group/card cursor-pointer shadow-xl"
+                className="relative aspect-[4/5] w-full max-w-[320px] mx-auto overflow-hidden bg-[#1A1A1A] border border-[#333333] group/card cursor-pointer shadow-xl select-none"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                onClick={() => setIsHovered((prev) => !prev)}
               >
                 {/* Front Image */}
                 <img
@@ -178,7 +180,7 @@ export default function BuildSeriesShowcase() {
                   className="w-full h-full object-cover transition-all duration-300 group-hover/card:scale-105"
                 />
 
-                {/* Back Image (Hover Swap) */}
+                {/* Back Image (Hover / Tap Swap) */}
                 <img
                   src={selectedColor.backImg}
                   alt={`${selectedColor.name} Back View`}
@@ -198,8 +200,34 @@ export default function BuildSeriesShowcase() {
                 </div>
 
                 <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-xs text-[#D8FF36] text-[9px] font-mono px-2 py-0.5 z-10">
-                  {isHovered ? "BACK VIEW (GLOBE ARCHITECTURE)" : "FRONT VIEW (CHEST BRANDMARK)"}
+                  {isHovered ? "BACK VIEW (GLOBE ART)" : "FRONT VIEW (CHEST)"}
                 </div>
+              </div>
+
+              {/* Mobile View Toggle Buttons */}
+              <div className="flex sm:hidden items-center justify-center gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsHovered(false)}
+                  className={`px-3 py-1 font-mono text-[10px] uppercase font-bold border transition-colors ${
+                    !isHovered
+                      ? "bg-[#D8FF36] text-black border-[#D8FF36]"
+                      : "bg-[#202020] text-[#888] border-[#333]"
+                  }`}
+                >
+                  Front View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsHovered(true)}
+                  className={`px-3 py-1 font-mono text-[10px] uppercase font-bold border transition-colors ${
+                    isHovered
+                      ? "bg-[#D8FF36] text-black border-[#D8FF36]"
+                      : "bg-[#202020] text-[#888] border-[#333]"
+                  }`}
+                >
+                  Back View
+                </button>
               </div>
 
               {/* Title & Price */}

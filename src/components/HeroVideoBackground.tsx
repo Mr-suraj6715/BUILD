@@ -113,46 +113,46 @@ export default function HeroVideoBackground() {
         }}
       />
 
-      {/* Spacer to push hero content below transparent fixed navbar (80px) */}
-      <div className="h-20 w-full shrink-0 relative z-[2]" aria-hidden="true" />
+      {/* Spacer to push hero content below transparent fixed navbar (64px mobile, 80px desktop) */}
+      <div className="h-16 lg:h-20 w-full shrink-0 relative z-[2]" aria-hidden="true" />
 
       {/* =========================================================================
           3. HERO CONTENT OVER MOVING VIDEO (Z-INDEX: 2)
           ========================================================================= */}
-      <div className="hero-content relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 my-auto">
-        <div className="max-w-2xl flex flex-col justify-center space-y-6">
+      <div className="hero-content relative z-[2] w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-10 my-auto">
+        <div className="max-w-2xl flex flex-col justify-center space-y-4 sm:space-y-6">
           {/* Monumental Main Heading */}
           <div className="flex flex-col">
-            <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[104px] tracking-tight text-white uppercase select-none leading-[0.88] drop-shadow-2xl">
+            <h1 className="font-display text-4xl xs:text-5xl sm:text-7xl md:text-8xl lg:text-[104px] tracking-tight text-white uppercase select-none leading-[0.9] sm:leading-[0.88] drop-shadow-2xl">
               BUILT FOR <br />
               <span className="text-[#D8FF36]">THE DIFFERENT</span>
             </h1>
           </div>
 
           {/* Supporting Text */}
-          <p className="font-sans text-base sm:text-xl text-[#F5F3EE] max-w-lg leading-relaxed drop-shadow font-normal">
+          <p className="font-sans text-sm sm:text-lg md:text-xl text-[#F5F3EE] max-w-lg leading-relaxed drop-shadow font-normal">
             Premium streetwear. Bold identity. <br className="hidden sm:inline" />
             Wear what defines you.
           </p>
 
           {/* Streetwear Specifications */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-mono text-[#D4D0C8]">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 text-[11px] sm:text-xs font-mono text-[#D4D0C8]">
             <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 border border-white/15 text-[#D8FF36] font-bold">
               240 GSM HEAVY COMBED COTTON
             </span>
             <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 border border-white/10 hidden sm:inline-block">
               OVERSIZED BOXY FIT
             </span>
-            <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 border border-white/10 hidden sm:inline-block">
+            <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 border border-white/10 hidden md:inline-block">
               BRUTALIST ARCHITECTURE PRINT
             </span>
           </div>
 
           {/* Call-to-Action Buttons */}
-          <div className="flex flex-wrap items-center gap-4 pt-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 sm:pt-3">
             <Link
               href="/shop"
-              className="group inline-flex items-center justify-center bg-[#D8FF36] text-[#151515] font-mono text-xs sm:text-sm font-bold px-8 py-4 uppercase tracking-widest transition-all duration-200 hover:bg-white hover:text-[#151515] shadow-2xl gap-2 hover:scale-[1.02]"
+              className="group inline-flex items-center justify-center bg-[#D8FF36] text-[#151515] font-mono text-xs sm:text-sm font-bold px-6 sm:px-8 py-3.5 sm:py-4 uppercase tracking-widest transition-all duration-200 hover:bg-white hover:text-[#151515] shadow-2xl gap-2 hover:scale-[1.02]"
             >
               <span>SHOP COLLECTION</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -160,7 +160,7 @@ export default function HeroVideoBackground() {
 
             <Link
               href="/custom-print"
-              className="group inline-flex items-center justify-center bg-black/60 backdrop-blur-md text-[#F5F3EE] font-mono text-xs sm:text-sm font-bold px-8 py-4 uppercase tracking-widest border border-white/30 hover:border-white hover:bg-white/20 transition-all gap-2"
+              className="group inline-flex items-center justify-center bg-black/60 backdrop-blur-md text-[#F5F3EE] font-mono text-xs sm:text-sm font-bold px-6 sm:px-8 py-3.5 sm:py-4 uppercase tracking-widest border border-white/30 hover:border-white hover:bg-white/20 transition-all gap-2"
             >
               <span className="w-2 h-2 rounded-full bg-[#D8FF36] animate-pulse" />
               <span>CUSTOM PRINT</span>

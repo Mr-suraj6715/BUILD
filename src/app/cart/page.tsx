@@ -61,13 +61,13 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full min-h-screen">
-      <div className="border-b border-[#D4D0C8] pb-6 mb-8 flex items-baseline justify-between">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full min-h-screen">
+      <div className="border-b border-[#D4D0C8] pb-4 sm:pb-6 mb-6 sm:mb-8 flex flex-col xs:flex-row items-start xs:items-baseline justify-between gap-2">
         <div>
           <span className="text-xs font-mono font-bold tracking-mega text-[#777777] uppercase">
             SHOPPING CART
           </span>
-          <h1 className="font-display text-4xl sm:text-6xl uppercase font-black tracking-tight text-[#151515]">
+          <h1 className="font-display text-2xl xs:text-3xl sm:text-6xl uppercase font-black tracking-tight text-[#151515]">
             YOUR BAG ({cart.reduce((s, i) => s + i.quantity, 0)} ITEMS)
           </h1>
         </div>

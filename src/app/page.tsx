@@ -101,7 +101,7 @@ export default async function HomePage() {
                 <span className="w-2 h-2 bg-[#151515]" />
                 T-SHIRT ARCHIVES // 2025
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl uppercase font-black text-[#151515] mt-1">
+              <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl uppercase font-black text-[#151515] mt-1">
                 CURATED CAPSULES
               </h2>
             </div>
@@ -115,7 +115,7 @@ export default async function HomePage() {
           </div>
 
           {/* Bento 4-Card Asymmetrical Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
             {/* Collection 01: The Oversized Edit (Span 7) */}
             <Link
               href="/shop?collection=oversized-edit"
@@ -128,17 +128,17 @@ export default async function HomePage() {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-mono text-[10px] bg-white text-[#151515] px-2 py-1 font-bold">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 font-mono text-[9px] sm:text-[10px] bg-white text-[#151515] px-2 py-0.5 sm:py-1 font-bold">
                   [01] // CORE SILHOUETTE
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="font-mono text-[10px] text-[#D8FF36] uppercase tracking-widest">
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
+                  <span className="font-mono text-[9px] sm:text-[10px] text-[#D8FF36] uppercase tracking-widest">
                     DROPPED SHOULDERS // RELAXED COLLAR
                   </span>
-                  <h3 className="font-display text-3xl sm:text-4xl uppercase text-white mt-0.5">
+                  <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl uppercase text-white mt-0.5">
                     THE OVERSIZED EDIT
                   </h3>
-                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-1">
+                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-0.5 sm:mt-1">
                     Engineered boxy drape with thick 1.25&quot; neck-ribbing that stays crisp after 100+ washes.
                   </p>
                 </div>
@@ -150,24 +150,24 @@ export default async function HomePage() {
               href="/shop?collection=graphic-universe"
               className="md:col-span-5 group relative bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#E8E5DE]"
             >
-              <div className="aspect-[16/10] md:aspect-auto md:h-full w-full overflow-hidden bg-[#E8E5DE] relative min-h-[260px]">
+              <div className="aspect-[16/10] md:aspect-auto md:h-full w-full overflow-hidden bg-[#E8E5DE] relative min-h-[220px] sm:min-h-[260px]">
                 <img
                   src="/images/stitch/collection-graphic.jpg"
                   alt="Graphic Universe Streetwear Collection"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-mono text-[10px] bg-[#D8FF36] text-[#151515] px-2 py-1 font-bold">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 font-mono text-[9px] sm:text-[10px] bg-[#D8FF36] text-[#151515] px-2 py-0.5 sm:py-1 font-bold">
                   [02] // HIGH IMPACT
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="font-mono text-[10px] text-[#D8FF36] uppercase tracking-widest">
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
+                  <span className="font-mono text-[9px] sm:text-[10px] text-[#D8FF36] uppercase tracking-widest">
                     SILKSCREEN &amp; GLITCH PRINTS
                   </span>
-                  <h3 className="font-display text-3xl sm:text-4xl uppercase text-white mt-0.5">
+                  <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl uppercase text-white mt-0.5">
                     GRAPHIC UNIVERSE
                   </h3>
-                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-1">
+                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-0.5 sm:mt-1">
                     Cyber-nihilism, Tokyo mecha schematics, and distorted Japanese typography hits.
                   </p>
                 </div>
@@ -179,24 +179,24 @@ export default async function HomePage() {
               href="/shop?collection=original-artwork"
               className="md:col-span-5 group relative bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#E8E5DE]"
             >
-              <div className="aspect-[16/10] md:aspect-auto md:h-full w-full overflow-hidden bg-[#E8E5DE] relative min-h-[260px]">
+              <div className="aspect-[16/10] md:aspect-auto md:h-full w-full overflow-hidden bg-[#E8E5DE] relative min-h-[220px] sm:min-h-[260px]">
                 <img
                   src="/images/stitch/collection-original.jpg"
                   alt="Original Artwork Streetwear Collection"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-mono text-[10px] bg-white text-[#151515] px-2 py-1 font-bold">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 font-mono text-[9px] sm:text-[10px] bg-white text-[#151515] px-2 py-0.5 sm:py-1 font-bold">
                   [03] // COLLABORATIVE
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="font-mono text-[10px] text-[#D8FF36] uppercase tracking-widest">
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
+                  <span className="font-mono text-[9px] sm:text-[10px] text-[#D8FF36] uppercase tracking-widest">
                     TACTILE PUFF INK SERIES
                   </span>
-                  <h3 className="font-display text-3xl sm:text-4xl uppercase text-white mt-0.5">
+                  <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl uppercase text-white mt-0.5">
                     ORIGINAL ARTWORK
                   </h3>
-                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-1">
+                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-0.5 sm:mt-1">
                     Numbered capsules designed in conjunction with global underground digital artists.
                   </p>
                 </div>
@@ -215,17 +215,17 @@ export default async function HomePage() {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-mono text-[10px] bg-[#BA1A1A] text-white px-2 py-1 font-bold">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 font-mono text-[9px] sm:text-[10px] bg-[#BA1A1A] text-white px-2 py-0.5 sm:py-1 font-bold">
                   [04] // ARCHIVE ONLY
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="font-mono text-[10px] text-[#D8FF36] uppercase tracking-widest">
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
+                  <span className="font-mono text-[9px] sm:text-[10px] text-[#D8FF36] uppercase tracking-widest">
                     ONE-OFF RUNS // NEVER RESTOCKED
                   </span>
-                  <h3 className="font-display text-3xl sm:text-4xl uppercase text-white mt-0.5">
+                  <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl uppercase text-white mt-0.5">
                     LIMITED DROPS
                   </h3>
-                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-1">
+                  <p className="font-sans text-xs sm:text-sm text-[#CCCCCC] line-clamp-1 mt-0.5 sm:mt-1">
                     Every unit stamped with a unique cryptographic verification serial.
                   </p>
                 </div>
@@ -273,23 +273,23 @@ export default async function HomePage() {
           </div>
 
           {/* Right: Technical Specification & Customizer Invitation */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2 font-mono text-xs text-[#D8FF36] uppercase tracking-widest">
+          <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs text-[#D8FF36] uppercase tracking-widest">
               <span className="w-2 h-2 bg-[#D8FF36]" />
               BUILD STUDIO PROTOCOL // STUDIO ENGINE
             </div>
 
-            <h2 className="font-display text-5xl sm:text-7xl tracking-tight uppercase leading-none text-white">
+            <h2 className="font-display text-4xl xs:text-5xl sm:text-7xl tracking-tight uppercase leading-none text-white">
               YOUR ARTWORK. <br />
               <span className="text-[#D8FF36]">OUR TEE BLANKS.</span>
             </h2>
 
-            <p className="font-sans text-base text-[#AAAAAA] leading-relaxed">
+            <p className="font-sans text-sm sm:text-base text-[#AAAAAA] leading-relaxed">
               Upload your artwork or graphic, choose from ultra-heavyweight 240–280 GSM Japanese
               cotton blanks, and customize print placement. Single custom tees or batch orders with zero minimums.
             </p>
 
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-2.5 sm:gap-3 pt-2">
               <div className="bg-[#1D1C16] p-3 flex items-center gap-2.5 border border-[#2E2D27]">
                 <CheckCircle2 className="w-4 h-4 text-[#D8FF36] shrink-0" />
                 <span className="font-mono text-xs uppercase text-[#E8E5DE]">Zero Minimums</span>
@@ -308,10 +308,10 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2 sm:pt-4">
               <Link
                 href="/custom-print"
-                className="inline-flex items-center gap-3 bg-[#D8FF36] text-[#151515] font-display text-xl px-8 py-4 uppercase tracking-wider hover:bg-white transition-all shadow-lg hover:translate-x-1"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#D8FF36] text-[#151515] font-display text-xl px-6 sm:px-8 py-3.5 sm:py-4 uppercase tracking-wider hover:bg-white transition-all shadow-lg hover:translate-x-1"
               >
                 <span>LAUNCH CUSTOM TEE LAB</span>
                 <ArrowRight className="w-5 h-5" />
@@ -360,7 +360,7 @@ export default async function HomePage() {
               // ABOUT STUDIO 
             </span>
 
-            <h2 className="font-display text-5xl sm:text-7xl text-[#151515] uppercase leading-tight font-black">
+            <h2 className="font-display text-4xl xs:text-5xl sm:text-7xl text-[#151515] uppercase leading-tight font-black">
               WEAR WHAT <br />
               YOU CREATE.
             </h2>

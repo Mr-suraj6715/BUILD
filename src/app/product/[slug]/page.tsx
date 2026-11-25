@@ -35,6 +35,7 @@ export default function ProductDetailPage() {
 
   // Gallery state
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   // Variant selections
   const [selectedSize, setSelectedSize] = useState<string>("L");
@@ -42,6 +43,26 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [wishlist, setWishlist] = useState(false);
+
+  // Mobile Gallery Touch Gestures
+  const handleGalleryTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleGalleryTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null || images.length <= 1) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 35) {
+      if (diff > 0) {
+        // Swipe left -> next image
+        setSelectedImageIndex((prev) => (prev + 1) % images.length);
+      } else {
+        // Swipe right -> previous image
+        setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
+      }
+    }
+    setTouchStartX(null);
+  };
 
   // Modals & Pincode check
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
@@ -195,7 +216,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-28 md:pb-12 w-full">
       {/* Breadcrumbs */}
       <nav className="flex items-center space-x-2 text-xs font-mono text-[#777777] uppercase mb-8">
         <Link href="/" className="hover:text-[#151515]">
@@ -243,8 +264,12 @@ export default function ProductDetailPage() {
             ))}
           </div>
 
-          {/* Main Primary Image with zoom preview on hover */}
-          <div className="flex-1 relative aspect-[3/4] bg-[#E8E5DE] border border-[#D4D0C8] overflow-hidden group">
+          {/* Main Primary Image with zoom preview on hover and touch swipe on mobile */}
+          <div
+            className="flex-1 relative aspect-[3/4] bg-[#E8E5DE] border border-[#D4D0C8] overflow-hidden group select-none"
+            onTouchStart={handleGalleryTouchStart}
+            onTouchEnd={handleGalleryTouchEnd}
+          >
             <img
               src={images[selectedImageIndex]?.url || images[0].url}
               alt={product.title}
@@ -263,6 +288,20 @@ export default function ProductDetailPage() {
                 </span>
               )}
             </div>
+
+            {/* Mobile Pagination Indicator */}
+            {images.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 md:hidden flex items-center gap-1.5 bg-black/75 backdrop-blur-xs px-2.5 py-1 rounded-full pointer-events-none z-10">
+                {images.map((_: any, idx: number) => (
+                  <span
+                    key={idx}
+                    className={`h-1.5 rounded-full transition-all ${
+                      selectedImageIndex === idx ? "w-4 bg-[#D8FF36]" : "w-1.5 bg-white/40"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

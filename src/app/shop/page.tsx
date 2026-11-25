@@ -123,15 +123,15 @@ function ShopContent() {
             <span className="text-xs font-mono font-bold tracking-mega text-[#777777] uppercase">
               EXCLUSIVE T-SHIRT ARCHIVE
             </span>
-            <h1 className="font-display text-4xl sm:text-6xl uppercase font-black tracking-tight text-[#151515]">
+            <h1 className="font-display text-3xl xs:text-4xl sm:text-6xl uppercase font-black tracking-tight text-[#151515]">
               STREETWEAR T-SHIRT CATALOG
             </h1>
           </div>
 
           {/* Quick Search & Sort */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full md:w-auto">
             {/* Search Input */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-initial">
               <input
                 type="text"
                 value={searchTerm}
@@ -140,38 +140,40 @@ function ShopContent() {
                   updateFilters({ search: e.target.value });
                 }}
                 placeholder="Search styles..."
-                className="bg-[#E8E5DE] border border-[#D4D0C8] px-3.5 py-2 pl-9 text-xs font-medium text-[#151515] placeholder:text-[#777777] focus:outline-none focus:border-[#151515] w-48 sm:w-60"
+                className="bg-[#E8E5DE] border border-[#D4D0C8] px-3.5 py-2 pl-9 text-xs font-medium text-[#151515] placeholder:text-[#777777] focus:outline-none focus:border-[#151515] w-full sm:w-60"
               />
               <Search className="w-4 h-4 text-[#777777] absolute left-2.5 top-1/2 -translate-y-1/2" />
             </div>
 
-            {/* Sort Dropdown */}
-            <div className="relative">
-              <select
-                value={selectedSort}
-                onChange={(e) => {
-                  setSelectedSort(e.target.value);
-                  updateFilters({ sort: e.target.value });
-                }}
-                className="bg-[#E8E5DE] border border-[#D4D0C8] px-3 py-2 pr-8 text-xs font-bold uppercase tracking-wider text-[#151515] focus:outline-none focus:border-[#151515] cursor-pointer appearance-none"
-              >
-                <option value="newest">Newest First</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-                <option value="popular">Popularity</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-[#151515] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
+            <div className="flex items-center gap-2">
+              {/* Sort Dropdown */}
+              <div className="relative flex-1 sm:flex-initial">
+                <select
+                  value={selectedSort}
+                  onChange={(e) => {
+                    setSelectedSort(e.target.value);
+                    updateFilters({ sort: e.target.value });
+                  }}
+                  className="bg-[#E8E5DE] border border-[#D4D0C8] px-3 py-2 pr-8 text-xs font-bold uppercase tracking-wider text-[#151515] focus:outline-none focus:border-[#151515] cursor-pointer appearance-none w-full"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="popular">Popularity</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-[#151515] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
 
-            {/* Mobile Filter Toggle */}
-            <button
-              onClick={() => setMobileFilterOpen(true)}
-              className="md:hidden flex items-center gap-1.5 bg-[#101010] text-[#D8FF36] px-3.5 py-2 text-xs font-bold uppercase tracking-wider"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Filters {activeFilterCount > 0 && `(${activeFilterCount})`}</span>
-            </button>
+              {/* Mobile Filter Toggle */}
+              <button
+                onClick={() => setMobileFilterOpen(true)}
+                className="md:hidden flex items-center justify-center gap-1.5 bg-[#101010] text-[#D8FF36] px-3.5 py-2 text-xs font-bold uppercase tracking-wider shrink-0 min-h-[36px]"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Filters {activeFilterCount > 0 && `(${activeFilterCount})`}</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -399,7 +401,7 @@ function ShopContent() {
               <div className="mb-4 text-xs font-mono text-[#777777] uppercase">
                 SHOWING {products.length} OF {totalCount} RELEASES
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -413,26 +415,104 @@ function ShopContent() {
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div
-            className="fixed inset-0 bg-black/60"
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs"
             onClick={() => setMobileFilterOpen(false)}
           />
-          <div className="relative w-full max-w-xs bg-[#F5F3EE] h-full shadow-2xl flex flex-col justify-between p-6 z-10 overflow-y-auto">
+          <div className="relative w-full max-w-xs bg-[#F5F3EE] h-full shadow-2xl flex flex-col justify-between p-5 z-10 overflow-y-auto">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-[#D4D0C8]">
                 <h3 className="font-display text-2xl uppercase font-bold text-[#151515]">
                   FILTERS
                 </h3>
-                <button onClick={() => setMobileFilterOpen(false)}>
-                  <X className="w-6 h-6 text-[#151515]" />
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="p-1 rounded-full hover:bg-black/10 transition-colors"
+                  aria-label="Close filters"
+                >
+                  <X className="w-5 h-5 text-[#151515]" />
                 </button>
+              </div>
+
+              {/* Categories */}
+              <div className="py-4 border-b border-[#E8E5DE]">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-[#151515] mb-2.5">
+                  CATEGORIES
+                </h4>
+                <div className="flex flex-col space-y-1">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory("");
+                      updateFilters({ category: "" });
+                    }}
+                    className={`text-left text-xs uppercase py-1 px-1.5 transition-colors ${
+                      !selectedCategory ? "bg-[#101010] text-[#D8FF36] font-bold" : "text-[#555]"
+                    }`}
+                  >
+                    All Categories
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setSelectedCategory(cat.slug);
+                        updateFilters({ category: cat.slug });
+                      }}
+                      className={`text-left text-xs uppercase py-1 px-1.5 transition-colors flex items-center justify-between ${
+                        selectedCategory === cat.slug
+                          ? "bg-[#101010] text-[#D8FF36] font-bold"
+                          : "text-[#555] hover:text-black"
+                      }`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="text-[10px] font-mono opacity-60">({cat._count?.products || 0})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Collections */}
+              <div className="py-4 border-b border-[#E8E5DE]">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-[#151515] mb-2.5">
+                  COLLECTIONS
+                </h4>
+                <div className="flex flex-col space-y-1">
+                  <button
+                    onClick={() => {
+                      setSelectedCollection("");
+                      updateFilters({ collection: "" });
+                    }}
+                    className={`text-left text-xs uppercase py-1 px-1.5 transition-colors ${
+                      !selectedCollection ? "bg-[#101010] text-[#D8FF36] font-bold" : "text-[#555]"
+                    }`}
+                  >
+                    All Collections
+                  </button>
+                  {collections.map((col) => (
+                    <button
+                      key={col.id}
+                      onClick={() => {
+                        setSelectedCollection(col.slug);
+                        updateFilters({ collection: col.slug });
+                      }}
+                      className={`text-left text-xs uppercase py-1 px-1.5 transition-colors flex items-center justify-between ${
+                        selectedCollection === col.slug
+                          ? "bg-[#101010] text-[#D8FF36] font-bold"
+                          : "text-[#555] hover:text-black"
+                      }`}
+                    >
+                      <span>{col.name}</span>
+                      <span className="text-[10px] font-mono opacity-60">({col._count?.products || 0})</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Badges */}
               <div className="py-4 border-b border-[#E8E5DE]">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-[#151515] mb-3">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-[#151515] mb-2.5">
                   DROP TYPE
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {[
                     { label: "All Items", val: "" },
                     { label: "New Drops", val: "NEW DROP" },
@@ -445,10 +525,10 @@ function ShopContent() {
                         setSelectedBadge(b.val);
                         updateFilters({ badge: b.val });
                       }}
-                      className={`px-3 py-1.5 text-xs font-bold uppercase ${
+                      className={`px-2.5 py-1 text-xs font-bold uppercase border transition-colors ${
                         selectedBadge === b.val
-                          ? "bg-[#101010] text-[#D8FF36]"
-                          : "bg-[#E8E5DE] text-[#151515]"
+                          ? "bg-[#101010] text-[#D8FF36] border-black"
+                          : "bg-[#E8E5DE] text-[#151515] border-[#D4D0C8]"
                       }`}
                     >
                       {b.label}
@@ -459,10 +539,10 @@ function ShopContent() {
 
               {/* Sizes */}
               <div className="py-4 border-b border-[#E8E5DE]">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-[#151515] mb-3">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-[#151515] mb-2.5">
                   SIZES
                 </h4>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-1.5">
                   {["S", "M", "L", "XL", "XXL"].map((sz) => (
                     <button
                       key={sz}
@@ -471,7 +551,7 @@ function ShopContent() {
                         setSelectedSize(newSz);
                         updateFilters({ size: newSz });
                       }}
-                      className={`h-9 text-xs font-bold flex items-center justify-center border ${
+                      className={`h-9 text-xs font-bold flex items-center justify-center border transition-colors ${
                         selectedSize === sz
                           ? "bg-[#101010] text-[#D8FF36] border-[#101010]"
                           : "bg-[#E8E5DE] text-[#151515] border-[#D4D0C8]"

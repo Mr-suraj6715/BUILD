@@ -59,7 +59,7 @@ export default function GarmentModel({
   const currentArtwork = view === "front" ? frontArtwork : backArtwork;
   const currentText = view === "front" ? frontText : backText;
 
-  // Handle Dragging within printable zone
+  // Handle Dragging within printable zone (Mouse and Touch)
   const handleMouseDown = (item: "artwork" | "text", e: React.MouseEvent) => {
     if (!interactive) return;
     e.preventDefault();
@@ -69,12 +69,21 @@ export default function GarmentModel({
     setDragStart({ x: e.clientX, y: e.clientY, origX: orig.x, origY: orig.y });
   };
 
+  const handleTouchStart = (item: "artwork" | "text", e: React.TouchEvent) => {
+    if (!interactive) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    setActiveDragItem(item);
+    const orig = item === "artwork" ? { x: currentArtwork.x, y: currentArtwork.y } : { x: currentText.x, y: currentText.y };
+    setDragStart({ x: touch.clientX, y: touch.clientY, origX: orig.x, origY: orig.y });
+  };
+
   useEffect(() => {
     if (!activeDragItem || !dragStart || !interactive) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const dx = ((e.clientX - dragStart.x) / 300) * 100;
-      const dy = ((e.clientY - dragStart.y) / 300) * 100;
+    const updatePosition = (clientX: number, clientY: number) => {
+      const dx = ((clientX - dragStart.x) / 300) * 100;
+      const dy = ((clientY - dragStart.y) / 300) * 100;
 
       const newX = Math.max(-45, Math.min(45, dragStart.origX + dx));
       const newY = Math.max(-45, Math.min(45, dragStart.origY + dy));
@@ -86,16 +95,30 @@ export default function GarmentModel({
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (e: MouseEvent) => {
+      updatePosition(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches[0]) {
+        updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleEnd = () => {
       setActiveDragItem(null);
       setDragStart(null);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mouseup", handleEnd);
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleEnd);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mouseup", handleEnd);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleEnd);
     };
   }, [activeDragItem, dragStart, view, onUpdateArtwork, onUpdateText, interactive]);
 
@@ -276,7 +299,8 @@ export default function GarmentModel({
           {currentArtwork.url && (
             <div
               onMouseDown={(e) => handleMouseDown("artwork", e)}
-              className="absolute cursor-move select-none transition-shadow z-20 flex items-center justify-center"
+              onTouchStart={(e) => handleTouchStart("artwork", e)}
+              className="absolute cursor-move select-none transition-shadow z-20 flex items-center justify-center touch-none"
               style={{
                 top: `calc(50% + ${currentArtwork.y}%)`,
                 left: `calc(50% + ${currentArtwork.x}%)`,
@@ -310,7 +334,8 @@ export default function GarmentModel({
           {currentText.text.trim() && (
             <div
               onMouseDown={(e) => handleMouseDown("text", e)}
-              className="absolute cursor-move select-none whitespace-pre text-center"
+              onTouchStart={(e) => handleTouchStart("text", e)}
+              className="absolute cursor-move select-none whitespace-pre text-center touch-none"
               style={{
                 top: `calc(50% + ${currentText.y}%)`,
                 left: `calc(50% + ${currentText.x}%)`,

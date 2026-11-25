@@ -31,8 +31,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-20 w-full min-h-[80vh] flex flex-col justify-center">
-      <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-8 shadow-xl">
+    <div className="max-w-md mx-auto px-3 sm:px-4 py-8 sm:py-20 w-full min-h-[80vh] flex flex-col justify-center">
+      <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-5 sm:p-8 shadow-xl">
         <div className="text-center mb-8">
           <span className="font-display text-4xl uppercase font-black tracking-wider text-[#151515]">
             BUILD<span className="text-[#101010]">.</span>

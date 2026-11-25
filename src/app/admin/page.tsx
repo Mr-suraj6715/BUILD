@@ -1046,6 +1046,72 @@ export default function AdminDashboardPage() {
         </div>
       </aside>
 
+      {/* Mobile Drawer (<= 768px) */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div className="relative w-72 max-w-[85vw] bg-[#101010] text-[#F5F3EE] p-5 flex flex-col justify-between z-10 border-r border-[#262626] h-full shadow-2xl">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-[#262626]">
+                <Link
+                  href="/"
+                  className="flex items-center gap-1.5"
+                  onClick={() => setMobileSidebarOpen(false)}
+                >
+                  <span className="font-display text-2xl font-black uppercase text-[#F5F3EE]">
+                    BUILD<span className="text-[#D8FF36]">.</span>
+                  </span>
+                  <span className="text-[10px] font-mono uppercase bg-[#222222] text-[#D8FF36] px-1.5 py-0.5 font-bold">
+                    HQ
+                  </span>
+                </Link>
+                <button
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className="p-1.5 text-[#AAAAAA] hover:text-[#D8FF36]"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <nav className="mt-4 space-y-1 text-xs font-bold uppercase tracking-wider overflow-y-auto max-h-[70vh] pr-1">
+                {sidebarModules.map((m) => {
+                  const Icon = m.icon;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => {
+                        setActiveModule(m.id as AdminModule);
+                        setMobileSidebarOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 transition-colors ${
+                        activeModule === m.id
+                          ? "bg-[#D8FF36] text-[#101010] font-black"
+                          : "text-[#AAAAAA] hover:bg-[#181818] hover:text-[#F5F3EE]"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{m.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            <div className="pt-4 border-t border-[#262626]">
+              <Link
+                href="/"
+                className="w-full block text-center py-2.5 bg-[#181818] text-[#AAAAAA] hover:text-[#D8FF36] text-xs font-mono uppercase transition-colors"
+              >
+                ← Exit to Storefront
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Operations Canvas */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {/* Top Operational Navigation */}
