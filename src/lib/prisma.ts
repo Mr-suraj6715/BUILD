@@ -11,4 +11,5 @@ export const prisma =
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") global.prisma = prisma;
+// Always retain instance globally to reuse connection pool across serverless lambdas
+global.prisma = prisma;

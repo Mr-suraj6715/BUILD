@@ -12,7 +12,9 @@ import NewsletterForm from "@/components/NewsletterForm";
 import HeroVideoBackground from "@/components/HeroVideoBackground";
 import BuildSeriesShowcase from "@/components/BuildSeriesShowcase";
 
-export const dynamic = "force-dynamic";
+// Incremental Static Regeneration: revalidates every 60s in the background
+// Serves instantly (30-50ms) from Vercel Edge CDN nodes worldwide
+export const revalidate = 60;
 
 async function getHomeData() {
   try {

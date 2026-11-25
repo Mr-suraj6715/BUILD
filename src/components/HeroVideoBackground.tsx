@@ -82,7 +82,7 @@ export default function HeroVideoBackground() {
         autoPlay
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster="/images/campaign/build-series-navy.jpg"
         aria-hidden="true"
         tabIndex={-1}

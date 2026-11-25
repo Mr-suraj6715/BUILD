@@ -11,10 +11,17 @@ export async function GET() {
       orderBy: { displayOrder: "asc" },
     });
 
-    return NextResponse.json({
-      success: true,
-      showcase,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        showcase,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     console.error("Failed to fetch showcase:", error);
     return NextResponse.json(

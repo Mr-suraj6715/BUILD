@@ -103,12 +103,19 @@ export async function GET(request: Request) {
       return c;
     });
 
-    return NextResponse.json({
-      products,
-      totalCount,
-      categories,
-      collections,
-    });
+    return NextResponse.json(
+      {
+        products,
+        totalCount,
+        categories,
+        collections,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     console.error("Products fetch error:", error);
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
