@@ -20,6 +20,8 @@ export async function POST(request: Request) {
       couponCode,
       guestEmail,
       guestPhone,
+      utrNumber,
+      paymentScreenshot,
     } = await request.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -171,6 +173,7 @@ export async function POST(request: Request) {
 
     const orderNumber = generateOrderNumber();
     const isCOD = paymentMethod === "COD";
+    const isUPI = paymentMethod === "UPI_QR";
 
     // 4. Create Order, decrement variant stock & increment coupon usage in a single transaction
     const order = await prisma.$transaction(async (tx) => {
@@ -189,20 +192,27 @@ export async function POST(request: Request) {
         });
       }
 
+      const shippingPayload = {
+        ...shippingAddress,
+        paymentScreenshot: paymentScreenshot || shippingAddress.paymentScreenshot || null,
+        utrNumber: utrNumber || shippingAddress.utrNumber || null,
+      };
+
       return await tx.order.create({
         data: {
           orderNumber,
           userId: session?.userId || null,
           guestEmail: guestEmail || (session?.email ?? null),
           guestPhone: guestPhone || shippingAddress.phone || null,
-          status: isCOD ? "CONFIRMED" : "PENDING",
-          paymentMethod: isCOD ? "COD" : "RAZORPAY",
-          paymentStatus: isCOD ? "PENDING" : "PENDING",
+          status: isCOD ? "CONFIRMED" : (isUPI ? "PROCESSING" : "PENDING"),
+          paymentMethod: isCOD ? "COD" : (isUPI ? "UPI_QR" : "RAZORPAY"),
+          paymentStatus: isCOD ? "PENDING" : (isUPI ? "PENDING_VERIFICATION" : "PENDING"),
+          razorpayPaymentId: utrNumber || shippingAddress.utrNumber || null,
           subtotal,
           discount,
           shippingFee,
           totalAmount,
-          shippingAddress: JSON.stringify(shippingAddress),
+          shippingAddress: JSON.stringify(shippingPayload),
           items: {
             create: validatedOrderItems.map((item) => ({
               variantId: item.variantId,
@@ -225,9 +235,9 @@ export async function POST(request: Request) {
       sendOrderConfirmationEmail(recipientEmail, order.orderNumber, totalAmount, validatedOrderItems).catch(() => {});
     }
 
-    // 6. Handle Razorpay order preparation
+    // 6. Handle Razorpay order preparation only if Razorpay is explicitly used
     let razorpayOrder = null;
-    if (!isCOD) {
+    if (!isCOD && !isUPI) {
       // In production or test mode, generate a mock or live razorpay order
       const mockRazorpayId = `order_${Math.random().toString(36).substring(2, 14)}`;
       await prisma.order.update({
@@ -250,6 +260,7 @@ export async function POST(request: Request) {
       orderId: order.id,
       totalAmount,
       isCOD,
+      isUPI,
       razorpayOrder,
     });
   } catch (error) {

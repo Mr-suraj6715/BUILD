@@ -12,6 +12,10 @@ import {
   Lock,
   ChevronLeft,
   Tag,
+  Upload,
+  Trash2,
+  Check,
+  QrCode,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -52,9 +56,55 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<"RAZORPAY" | "COD">("RAZORPAY");
+  const [paymentMethod, setPaymentMethod] = useState<"UPI_QR" | "COD">("UPI_QR");
+  const [paymentScreenshot, setPaymentScreenshot] = useState<string | null>(null);
+  const [screenshotFileName, setScreenshotFileName] = useState<string | null>(null);
+  const [utrNumber, setUtrNumber] = useState<string>("");
+  const [copiedUpi, setCopiedUpi] = useState<boolean>(false);
+  const screenshotInputRef = React.useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Client-side screenshot processor with lightweight image compression
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrorMessage("Please select a valid image file (PNG, JPG, WebP).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.82);
+        setPaymentScreenshot(compressedDataUrl);
+        setScreenshotFileName(file.name);
+        setErrorMessage(null);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Pre-fill user data if logged in
   useEffect(() => {
@@ -106,10 +156,16 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Require payment screenshot or UTR number if UPI QR is selected
+    if (paymentMethod === "UPI_QR" && !paymentScreenshot && !utrNumber.trim()) {
+      setErrorMessage("Please upload your Google Pay / UPI payment screenshot or enter the UTR reference number.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Step 1: Create Order on server
+      // Step 1: Create Order on server with payment proof
       const res = await fetch("/api/checkout/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -124,11 +180,17 @@ export default function CheckoutPage() {
             image: i.image,
             isCustom: i.variantId?.startsWith("custom-") || i.slug === "custom-print",
           })),
-          shippingAddress: formData,
+          shippingAddress: {
+            ...formData,
+            paymentScreenshot: paymentScreenshot || null,
+            utrNumber: utrNumber.trim() || null,
+          },
           paymentMethod,
           couponCode: coupon?.code,
           guestEmail: formData.email,
           guestPhone: formData.phone,
+          paymentScreenshot: paymentScreenshot || null,
+          utrNumber: utrNumber.trim() || null,
         }),
       });
 
@@ -137,32 +199,9 @@ export default function CheckoutPage() {
         throw new Error(data.error || "Order creation failed.");
       }
 
-      const { orderNumber, isCOD, razorpayOrder } = data;
+      const { orderNumber } = data;
 
-      // If Cash on delivery, order is immediately confirmed
-      if (isCOD) {
-        clearCart();
-        router.push(`/order-success/${orderNumber}`);
-        return;
-      }
-
-      // Step 2: Handle Razorpay Online Payment Flow
-      // Check if Razorpay SDK exists or handle verification
-      const verifyRes = await fetch("/api/checkout/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderNumber,
-          razorpayOrderId: razorpayOrder?.id || "order_mock_" + Date.now(),
-          razorpayPaymentId: "pay_mock_" + Math.random().toString(36).substring(2, 10),
-          razorpaySignature: "mock_signature_valid",
-        }),
-      });
-
-      if (!verifyRes.ok) {
-        throw new Error("Payment verification failed. Please try again.");
-      }
-
+      // Order created successfully!
       clearCart();
       router.push(`/order-success/${orderNumber}`);
     } catch (err: any) {
@@ -326,70 +365,244 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment Method Selection */}
-          <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-6">
-            <h2 className="font-display text-2xl uppercase font-bold text-[#151515] mb-4">
-              3. PAYMENT METHOD
-            </h2>
-            <div className="space-y-3">
-              {/* Razorpay Online */}
-              <label
-                className={`flex items-start gap-3 p-4 border cursor-pointer transition-all ${
-                  paymentMethod === "RAZORPAY"
+          <div className="bg-[#E8E5DE] border border-[#D4D0C8] p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-2xl uppercase font-bold text-[#151515]">
+                3. PAYMENT METHOD
+              </h2>
+              <span className="font-mono text-[10px] text-[#555555] uppercase font-bold">
+                Instant & Direct UPI
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              {/* Google Pay / UPI QR Code (Primary) */}
+              <div
+                className={`border transition-all ${
+                  paymentMethod === "UPI_QR"
                     ? "bg-[#F5F3EE] border-[#101010] ring-1 ring-[#101010]"
                     : "bg-[#E8E5DE] border-[#D4D0C8] hover:border-[#151515]"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="RAZORPAY"
-                  checked={paymentMethod === "RAZORPAY"}
-                  onChange={() => setPaymentMethod("RAZORPAY")}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
-                      Razorpay Online Payment (UPI, Cards, NetBanking)
-                    </span>
-                    <span className="text-[10px] font-bold bg-[#D8FF36] text-[#101010] px-2 py-0.5 uppercase">
-                      FASTEST
-                    </span>
+                <label className="flex items-start gap-3 p-4 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="UPI_QR"
+                    checked={paymentMethod === "UPI_QR"}
+                    onChange={() => setPaymentMethod("UPI_QR")}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#151515] flex items-center gap-1.5">
+                        <QrCode className="w-4 h-4 text-[#151515]" />
+                        <span>Google Pay / UPI QR Code Payment</span>
+                      </span>
+                      <span className="text-[10px] font-bold bg-[#D8FF36] text-[#101010] px-2 py-0.5 uppercase tracking-wide">
+                        RECOMMENDED • 0% FEES
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#666666] mt-1">
+                      Scan our official Google Pay QR code to pay instantly with GPay, PhonePe, Paytm, or any UPI app.
+                    </p>
                   </div>
-                  <p className="text-[11px] text-[#777777] mt-1">
-                    Pay securely using Google Pay, PhonePe, Paytm, Credit / Debit cards, or Net Banking.
-                  </p>
-                </div>
-              </label>
+                </label>
+
+                {/* EXPANDABLE QR & SCREENSHOT UPLOAD SECTION */}
+                {paymentMethod === "UPI_QR" && (
+                  <div className="p-4 sm:p-6 border-t border-[#D4D0C8] bg-white space-y-5">
+                    {/* Amount Banner */}
+                    <div className="bg-[#101010] text-[#F5F3EE] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono">
+                      <div>
+                        <span className="text-[10px] uppercase text-[#AAAAAA] block">Total Amount to Pay</span>
+                        <span className="text-2xl sm:text-3xl font-display font-black text-[#D8FF36]">
+                          {formatPrice(total)}
+                        </span>
+                      </div>
+                      <div className="sm:text-right">
+                        <span className="text-[10px] text-[#AAAAAA] block uppercase">Receiver UPI ID</span>
+                        <span className="text-xs text-white font-bold">surajyadav67150@okicici</span>
+                      </div>
+                    </div>
+
+                    {/* QR Code Presentation Box */}
+                    <div className="flex flex-col md:flex-row items-center gap-6 p-4 sm:p-5 bg-[#FBF9F4] border border-[#E0DCD3]">
+                      {/* QR Image Frame */}
+                      <div className="relative shrink-0 w-52 sm:w-60 aspect-square bg-white p-3 border-2 border-[#101010] shadow-md flex flex-col items-center justify-center">
+                        <img
+                          src="/images/payment/gpay_qr.jpg"
+                          alt="Google Pay QR Code - Suraj Yadav"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+
+                      {/* Step-by-Step Payment Instructions */}
+                      <div className="flex-1 space-y-3 font-mono text-xs w-full">
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] text-[#777] uppercase font-bold tracking-wider">RECIPIENT NAME</span>
+                          <p className="font-bold text-sm text-[#151515]">Suraj Yadav</p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-[#777] uppercase font-bold tracking-wider">UPI ID</span>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <code className="bg-[#E8E5DE] px-2.5 py-1.5 text-xs font-bold text-[#101010] border border-[#D4D0C8] select-all">
+                              surajyadav67150@okicici
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText("surajyadav67150@okicici");
+                                setCopiedUpi(true);
+                                setTimeout(() => setCopiedUpi(false), 2000);
+                              }}
+                              className="px-2.5 py-1.5 bg-[#101010] text-[#D8FF36] hover:bg-black font-mono text-[10px] font-bold uppercase transition-colors"
+                            >
+                              {copiedUpi ? "COPIED!" : "COPY UPI ID"}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-[#EAE6DF] space-y-1.5 text-[11px] text-[#555]">
+                          <p className="flex items-center gap-1.5">
+                            <span className="w-4 h-4 bg-[#101010] text-[#D8FF36] rounded-full flex items-center justify-center text-[9px] font-bold">1</span>
+                            Scan with GPay, PhonePe, Paytm, or BHIM UPI
+                          </p>
+                          <p className="flex items-center gap-1.5">
+                            <span className="w-4 h-4 bg-[#101010] text-[#D8FF36] rounded-full flex items-center justify-center text-[9px] font-bold">2</span>
+                            Pay exact amount <strong>{formatPrice(total)}</strong>
+                          </p>
+                          <p className="flex items-center gap-1.5">
+                            <span className="w-4 h-4 bg-[#101010] text-[#D8FF36] rounded-full flex items-center justify-center text-[9px] font-bold">3</span>
+                            Upload screenshot of your payment receipt below
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Screenshot Upload Field */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-mono uppercase font-bold text-[#151515]">
+                          INSERT / UPLOAD PAYMENT SCREENSHOT *
+                        </label>
+                        {paymentScreenshot && (
+                          <span className="text-[10px] font-mono text-green-700 font-bold flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> Receipt Attached
+                          </span>
+                        )}
+                      </div>
+
+                      <input
+                        ref={screenshotInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleScreenshotChange}
+                        className="hidden"
+                      />
+
+                      {paymentScreenshot ? (
+                        <div className="border border-[#151515] bg-[#FBF9F4] p-3 flex items-center gap-4">
+                          <img
+                            src={paymentScreenshot}
+                            alt="Payment receipt preview"
+                            className="w-16 h-20 object-cover border border-[#D4D0C8] bg-white shrink-0"
+                          />
+                          <div className="flex-1 min-w-0 font-mono">
+                            <p className="text-xs font-bold text-[#151515] truncate">
+                              {screenshotFileName || "payment_receipt.jpg"}
+                            </p>
+                            <p className="text-[10px] text-green-700 font-bold mt-0.5">
+                              Receipt ready for order verification
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => screenshotInputRef.current?.click()}
+                              className="mt-2 text-[10px] uppercase font-bold text-[#151515] underline hover:text-black"
+                            >
+                              Change Screenshot
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPaymentScreenshot(null);
+                              setScreenshotFileName(null);
+                              if (screenshotInputRef.current) screenshotInputRef.current.value = "";
+                            }}
+                            className="p-2 text-red-600 hover:text-red-800"
+                            title="Remove screenshot"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => screenshotInputRef.current?.click()}
+                          className="border-2 border-dashed border-[#C5BFB5] hover:border-black p-6 text-center cursor-pointer transition-colors bg-[#FBF9F4]"
+                        >
+                          <Upload className="w-8 h-8 mx-auto mb-2 text-[#666666]" />
+                          <span className="font-mono text-xs font-bold uppercase text-[#151515] block">
+                            Tap / Click to insert payment screenshot
+                          </span>
+                          <span className="font-mono text-[10px] text-[#777777] block mt-1">
+                            Supports JPG, PNG, WebP (Receipt from Google Pay, PhonePe, Paytm, etc.)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Optional UTR / Reference ID Field */}
+                    <div className="space-y-1.5 pt-1">
+                      <label className="block text-xs font-mono uppercase font-bold text-[#555555]">
+                        UPI Ref / 12-Digit UTR Number (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={utrNumber}
+                        onChange={(e) => setUtrNumber(e.target.value)}
+                        placeholder="e.g. 432198765432"
+                        className="w-full bg-[#F5F3EE] border border-[#D4D0C8] px-3.5 py-2.5 text-xs font-mono text-[#151515] focus:outline-none focus:border-[#151515]"
+                      />
+                      <span className="text-[10px] font-mono text-[#777777] block">
+                        Found on your Google Pay receipt under &quot;UPI transaction ID&quot; or &quot;UTR&quot;.
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Cash On Delivery */}
-              <label
-                className={`flex items-start gap-3 p-4 border cursor-pointer transition-all ${
+              <div
+                className={`border transition-all ${
                   paymentMethod === "COD"
                     ? "bg-[#F5F3EE] border-[#101010] ring-1 ring-[#101010]"
                     : "bg-[#E8E5DE] border-[#D4D0C8] hover:border-[#151515]"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="COD"
-                  checked={paymentMethod === "COD"}
-                  onChange={() => setPaymentMethod("COD")}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
-                      Cash on Delivery (COD)
-                    </span>
-                    <Truck className="w-4 h-4 text-[#151515]" />
+                <label className="flex items-start gap-3 p-4 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="COD"
+                    checked={paymentMethod === "COD"}
+                    onChange={() => setPaymentMethod("COD")}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
+                        Cash on Delivery (COD)
+                      </span>
+                      <Truck className="w-4 h-4 text-[#151515]" />
+                    </div>
+                    <p className="text-[11px] text-[#777777] mt-1">
+                      Pay in cash when your streetwear arrives at your doorstep. Verified OTP upon delivery.
+                    </p>
                   </div>
-                  <p className="text-[11px] text-[#777777] mt-1">
-                    Pay in cash when your streetwear arrives at your doorstep. Verified OTP upon delivery.
-                  </p>
-                </div>
-              </label>
+                </label>
+              </div>
             </div>
           </div>
         </div>

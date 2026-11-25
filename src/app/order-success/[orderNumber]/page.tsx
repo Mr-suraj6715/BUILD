@@ -183,11 +183,54 @@ export default function OrderSuccessPage() {
           <div>
             <span className="font-bold uppercase text-[#777777]">BILLING METHOD:</span>
             <p className="text-[#151515] mt-1 font-bold">
-              {order.paymentMethod === "RAZORPAY" ? "Prepaid via Razorpay (UPI/Card)" : "Cash on Delivery (Pay at Doorstep)"}
+              {order.paymentMethod === "UPI_QR"
+                ? "Google Pay / UPI QR Code (Direct Payment)"
+                : order.paymentMethod === "RAZORPAY"
+                ? "Prepaid Online (UPI/Card)"
+                : "Cash on Delivery (Pay at Doorstep)"}
             </p>
+            {shippingAddr?.utrNumber && (
+              <p className="text-[#555555] mt-0.5">UPI Ref / UTR: {shippingAddr.utrNumber}</p>
+            )}
             <p className="text-[#777777] mt-1">Delivery: Express Standard (2-4 Days)</p>
           </div>
         </div>
+
+        {/* UPI Payment Screenshot Receipt Callout */}
+        {order.paymentMethod === "UPI_QR" && (
+          <div className="bg-[#EAE7DF] border border-[#D4D0C8] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs">
+            <div>
+              <span className="font-bold text-[#151515] block uppercase">
+                Payment Verification in Progress
+              </span>
+              <p className="text-[#555555] text-[11px] mt-0.5">
+                Your Google Pay payment screenshot has been received and recorded. Our team will verify and dispatch your order.
+              </p>
+              {shippingAddr?.utrNumber && (
+                <p className="text-[11px] text-[#151515] mt-1">
+                  Recorded UTR / Ref: <strong>{shippingAddr.utrNumber}</strong>
+                </p>
+              )}
+            </div>
+            {shippingAddr?.paymentScreenshot && (
+              <div className="shrink-0 flex items-center gap-3">
+                <img
+                  src={shippingAddr.paymentScreenshot}
+                  alt="Payment Receipt"
+                  className="w-16 h-20 object-cover border border-[#CCC] bg-white shadow-sm"
+                />
+                <a
+                  href={shippingAddr.paymentScreenshot}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[11px] underline font-bold text-blue-700"
+                >
+                  View Full Receipt
+                </a>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Order Items Table */}
         <div className="overflow-x-auto">

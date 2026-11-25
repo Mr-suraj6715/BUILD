@@ -184,6 +184,7 @@ export default function AdminDashboardPage() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
 
   // Data states
   const [overviewData, setOverviewData] = useState<any>(null);
@@ -425,6 +426,23 @@ export default function AdminDashboardPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId, status, trackingNumber, courierName }),
+      });
+      if (res.ok) fetchAllAdminData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdatePaymentStatus = async (orderId: string, paymentStatus: string) => {
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          paymentStatus,
+          status: paymentStatus === "PAID" ? "PROCESSING" : undefined,
+        }),
       });
       if (res.ok) fetchAllAdminData();
     } catch (err) {
@@ -1500,14 +1518,36 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-4">
-                {orders.map((o) => (
+                {orders.map((o) => {
+                  const shipping = typeof o.shippingAddress === "string" ? JSON.parse(o.shippingAddress || "{}") : o.shippingAddress || {};
+                  const isUPI = o.paymentMethod === "UPI_QR";
+                  const hasReceipt = !!shipping.paymentScreenshot;
+                  return (
                     <div key={o.id} className="bg-[#E8E5DE] border border-[#D4D0C8] p-5 space-y-3 font-mono text-xs">
                       <div className="flex flex-col sm:flex-row justify-between pb-3 border-b border-[#D4D0C8]">
                         <div>
                           <strong className="text-base text-[#151515]">{o.orderNumber}</strong>
                           <span className="text-[#777777] ml-3">{new Date(o.createdAt).toLocaleString()}</span>
+                          <span className="text-[#555555] block sm:inline sm:ml-3">
+                            {shipping.fullName} • {shipping.city || "India"}
+                          </span>
                         </div>
-                        <div className="flex gap-2 mt-2 sm:mt-0">
+                        <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
+                          {isUPI && (
+                            <span className="px-2 py-0.5 bg-[#101010] text-[#D8FF36] font-bold uppercase text-[10px]">
+                              GPAY UPI QR
+                            </span>
+                          )}
+                          {o.paymentStatus === "PENDING_VERIFICATION" && (
+                            <span className="px-2 py-0.5 bg-yellow-400 text-black font-bold text-[10px] uppercase">
+                              Needs Verification
+                            </span>
+                          )}
+                          {o.paymentStatus === "PAID" && (
+                            <span className="px-2 py-0.5 bg-green-800 text-white font-bold text-[10px] uppercase">
+                              Paid
+                            </span>
+                          )}
                           <span className="px-2 py-0.5 bg-[#101010] text-[#D8FF36] font-bold">
                             {o.status}
                           </span>
@@ -1516,6 +1556,50 @@ export default function AdminDashboardPage() {
                           </span>
                         </div>
                       </div>
+
+                      {/* Payment Verification Card if screenshot or UTR attached */}
+                      {(hasReceipt || shipping.utrNumber) && (
+                        <div className="bg-[#FAF8F5] border border-[#151515] p-3 flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            {hasReceipt && (
+                              <img
+                                src={shipping.paymentScreenshot}
+                                alt="Payment receipt"
+                                onClick={() => setViewingReceipt(shipping.paymentScreenshot)}
+                                className="w-12 h-16 object-cover border border-[#999] bg-white cursor-pointer hover:scale-105 transition-transform shrink-0"
+                                title="Click to view payment receipt full size"
+                              />
+                            )}
+                            <div>
+                              <span className="font-bold text-[#151515] block uppercase">
+                                Google Pay Payment Receipt
+                              </span>
+                              {shipping.utrNumber && (
+                                <span className="text-[#555] text-[11px] block">
+                                  UTR / Ref: <strong>{shipping.utrNumber}</strong>
+                                </span>
+                              )}
+                              {hasReceipt && (
+                                <button
+                                  type="button"
+                                  onClick={() => setViewingReceipt(shipping.paymentScreenshot)}
+                                  className="text-blue-700 underline text-[11px] font-bold mt-0.5 inline-block"
+                                >
+                                  View Full Receipt Screenshot
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          {o.paymentStatus !== "PAID" && (
+                            <button
+                              onClick={() => handleUpdatePaymentStatus(o.id, "PAID")}
+                              className="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-bold text-xs uppercase transition-colors"
+                            >
+                              ✓ Verify & Mark Paid
+                            </button>
+                          )}
+                        </div>
+                      )}
 
                       <div className="space-y-2">
                         {o.items?.map((it: any) => {
@@ -1598,7 +1682,8 @@ export default function AdminDashboardPage() {
                         </Link>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -3614,6 +3699,47 @@ export default function AdminDashboardPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Payment Receipt Full Size Modal */}
+      {viewingReceipt && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setViewingReceipt(null)}
+        >
+          <div
+            className="bg-[#151515] border border-[#333] max-w-lg w-full p-4 space-y-3 relative text-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-[#333] pb-2">
+              <span className="font-mono text-xs font-bold text-[#D8FF36] uppercase tracking-wider">
+                Google Pay Payment Receipt
+              </span>
+              <button
+                onClick={() => setViewingReceipt(null)}
+                className="p-1 hover:text-[#D8FF36] text-[#AAA]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="max-h-[75vh] overflow-auto flex items-center justify-center bg-black p-2 border border-[#222]">
+              <img
+                src={viewingReceipt}
+                alt="Payment Receipt Full"
+                className="max-w-full max-h-[70vh] object-contain"
+              />
+            </div>
+            <div className="flex justify-between items-center pt-1 font-mono text-xs">
+              <span className="text-[#888] text-[11px]">Customer Uploaded Verification Proof</span>
+              <a
+                href={viewingReceipt}
+                download="payment_receipt.jpg"
+                className="px-3 py-1.5 bg-[#D8FF36] text-black font-bold uppercase"
+              >
+                Download Receipt
+              </a>
+            </div>
           </div>
         </div>
       )}
