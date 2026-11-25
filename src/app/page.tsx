@@ -275,7 +275,7 @@ export default async function HomePage() {
           </div>
 
           {/* Right: Technical Specification & Customizer Invitation */}
-          <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+          <div className="lg:col-span-6 space-y-5 sm:space-y-6">
             <div className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs text-[#D8FF36] uppercase tracking-widest">
               <span className="w-2 h-2 bg-[#D8FF36]" />
               BUILD STUDIO PROTOCOL // STUDIO ENGINE
